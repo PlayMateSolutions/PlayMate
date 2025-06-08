@@ -29,7 +29,7 @@ function recordAttendance(attendanceData) {
     attendanceId,
     attendanceData.memberId,
     attendanceData.date || new Date(),
-    attendanceData.sport,
+    // attendanceData.sport,
     attendanceData.checkInTime || new Date(),
     attendanceData.checkOutTime || '',
     duration || '',

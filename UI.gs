@@ -314,11 +314,7 @@ function showAddMemberForm() {
           <option value="Suspended">Suspended</option>
         </select>
       </div>
-      <div class="form-group">
-        <label for="sports">Sports (comma-separated)</label>
-        <input type="text" id="sports" name="sports">
-        <div class="sport-list">Available sports: ${sports}</div>
-      </div>
+     
       <div class="form-group">
         <label for="notes">Notes</label>
         <textarea id="notes" name="notes" rows="3"></textarea>
@@ -524,13 +520,7 @@ function showAttendanceForm() {
         <label for="date">Date *</label>
         <input type="date" id="date" name="date" value="${today}" required>
       </div>
-      <div class="form-group">
-        <label for="sport">Sport *</label>
-        <select id="sport" name="sport" required>
-          <option value="">-- Select Sport --</option>
-          ${sportOptions}
-        </select>
-      </div>
+    
       <div class="form-group">
         <label for="checkInTime">Check-In Time</label>
         <input type="time" id="checkInTime" name="checkInTime" value="${time}">
@@ -554,7 +544,7 @@ function showAttendanceForm() {
         const form = document.getElementById('attendanceForm');
         
         // Validate form
-        if (!form.memberId.value || !form.date.value || !form.sport.value) {
+        if (!form.memberId.value || !form.date.value) {
           alert('Please fill in all required fields.');
           return;
         }
@@ -562,7 +552,6 @@ function showAttendanceForm() {
         const formData = {
           memberId: form.memberId.value,
           date: form.date.value,
-          sport: form.sport.value,
           checkInTime: combineDateTime(form.date.value, form.checkInTime.value),
           notes: form.notes.value
         };
@@ -749,7 +738,7 @@ function showPaymentForm() {
     <form id="paymentForm" onsubmit="submitForm(); return false;">
       <div class="form-group">
         <label for="memberId">Member *</label>
-        <select id="memberId" name="memberId" required onchange="updateSportDropdown()">
+        <select id="memberId" name="memberId" required>
           <option value="">-- Select Member --</option>
           ${memberOptions}
         </select>
@@ -758,13 +747,7 @@ function showPaymentForm() {
         <label for="date">Payment Date *</label>
         <input type="date" id="date" name="date" value="${today}" required>
       </div>
-      <div class="form-group">
-        <label for="sport">Sport *</label>
-        <select id="sport" name="sport" required onchange="updateFee()">
-          <option value="">-- Select Sport --</option>
-          ${sportOptions}
-        </select>
-      </div>
+          
       <div class="form-group">
         <label for="amount">Amount *</label>
         <input type="number" id="amount" name="amount" step="0.01" required>
@@ -810,51 +793,12 @@ function showPaymentForm() {
           return obj;
         }, {}))}');
         window.sportFees = sportFees;
-      });
-      
-      function updateSportDropdown() {
-        const form = document.getElementById('paymentForm');
-        const memberId = form.memberId.value;
-        
-        if (!memberId) return;
-        
-        google.script.run
-          .withSuccessHandler(function(member) {
-            if (!member) return;
-            
-            const sportSelect = form.sport;
-            const currentValue = sportSelect.value;
-            
-            // Clear options except the first one
-            while (sportSelect.options.length > 1) {
-              sportSelect.remove(1);
-            }
-            
-            // Add member's sports
-            for (const sport of member.sports) {
-              const option = document.createElement('option');
-              option.value = sport;
-              option.text = sport;
-              sportSelect.add(option);
-            }
-            
-            // Restore selected value if it's in the member's sports
-            if (member.sports.includes(currentValue)) {
-              sportSelect.value = currentValue;
-            }
-            
-            updateFee();
-          })
-          .getMemberById(memberId);
-      }
+      });  
       
       function updateFee() {
         const form = document.getElementById('paymentForm');
-        const sport = form.sport.value;
-        
-        if (!sport) return;
-        
-        const fee = window.sportFees[sport];
+       
+        const fee = 500;
         if (fee) {
           form.amount.value = fee;
           
@@ -885,7 +829,7 @@ function showPaymentForm() {
         const form = document.getElementById('paymentForm');
         
         // Validate form
-        if (!form.memberId.value || !form.date.value || !form.sport.value || !form.amount.value) {
+        if (!form.memberId.value || !form.date.value || !form.amount.value) {
           alert('Please fill in all required fields.');
           return;
         }
@@ -893,7 +837,6 @@ function showPaymentForm() {
         const formData = {
           memberId: form.memberId.value,
           date: form.date.value,
-          sport: form.sport.value,
           amount: parseFloat(form.amount.value),
           paymentType: form.paymentType.value,
           status: form.status.value,
