@@ -1,7 +1,7 @@
 /**
  * API Service for the Sports Membership Management App
  * Created: May 25, 2025
- * 
+ *
  * This file contains functions that expose the app's functionality as web APIs
  * that can be called from external applications like the Ionic client.
  */
@@ -25,7 +25,7 @@ function doPost(request) {
 
 /**
  * Main request handler for both GET and POST requests
- * 
+ *
  * @param {Object} request - The request object from doGet or doPost
  * @return {TextOutput} JSON response
  */
@@ -33,143 +33,178 @@ function handleRequest(request) {
   try {
     // Parse the request parameters
     const action = request.parameter.action;
-    const payload = request.parameter.payload ? JSON.parse(request.parameter.payload) : {};
-    const authToken = request.parameter.authToken;
-    
-    // Validate auth token (implement your own auth logic)
-    if (!validateAuthToken(authToken)) {
-      return createErrorResponse('Authentication failed', 401);
+    const payload = request.parameter.payload
+      ? JSON.parse(request.parameter.payload)
+      : {};
+    let userEmail = null;
+    let authResult = { success: true };
+
+    // List of public actions that only need basic auth token
+    const publicActions = ["getMember", "recordAttendance"];
+    if (!publicActions.includes(action)) {
+      // All other actions require OAuth and sheet access
+      const token = getBearerToken(request);
+      Logger.log('token ' + token)
+      const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+      authResult = authorizeUserWithSheet(token, spreadsheet);
+      if (!authResult.success) {
+        return createErrorResponse(authResult.message, 403);
+      }
+      userEmail = authResult.userEmail;
     }
-    
+
     // Route the request to the appropriate handler based on the action
     let result;
     switch (action) {
       // Member endpoints
-      case 'getMembers':
+      case "getMembers":
         result = handleGetMembers(payload);
         break;
-      case 'getMember':
+      case "getMember":
         result = handleGetMember(payload);
         break;
-      case 'addMember':
+      case "addMember":
         result = handleAddMember(payload);
         break;
-      case 'updateMember':
+      case "updateMember":
         result = handleUpdateMember(payload);
         break;
-      case 'deleteMember':
+      case "deleteMember":
         result = handleDeleteMember(payload);
         break;
-      case 'searchMembers':
+      case "searchMembers":
         result = handleSearchMembers(payload);
         break;
-        
+
       // Attendance endpoints
-      case 'recordAttendance':
+      case "recordAttendance":
         result = handleRecordAttendance(payload);
         break;
-      case 'getAttendance':
+      case "getAttendance":
         result = handleGetAttendance(payload);
         break;
-      case 'getMemberAttendance':
+      case "getMemberAttendance":
         result = handleGetMemberAttendance(payload);
         break;
-      case 'getAttendanceSummary':
+      case "getAttendanceSummary":
         result = handleGetAttendanceSummary(payload);
         break;
-      case 'updateAttendance':
+      case "updateAttendance":
         result = handleUpdateAttendance(payload);
         break;
-      
+
       // Payment endpoints
-      case 'recordPayment':
+      case "recordPayment":
         result = handleRecordPayment(payload);
         break;
-      case 'getPayments':
+      case "getPayments":
         result = handleGetPayments(payload);
         break;
-      case 'getMemberPayments':
+      case "getMemberPayments":
         result = handleGetMemberPayments(payload);
         break;
-      case 'getPaymentSummary':
+      case "getPaymentSummary":
         result = handleGetPaymentSummary(payload);
         break;
-      case 'getPaymentStatus':
+      case "getPaymentStatus":
         result = handleGetPaymentStatus(payload);
         break;
-      
+
       // Sports endpoints
-      case 'getSports':
+      case "getSports":
         result = handleGetSports(payload);
         break;
-      case 'addSport':
+      case "addSport":
         result = handleAddSport(payload);
         break;
-      case 'updateSport':
+      case "updateSport":
         result = handleUpdateSport(payload);
         break;
-      
+
       // Settings endpoints
-      case 'getSettings':
+      case "getSettings":
         result = handleGetSettings(payload);
         break;
-      case 'updateSettings':
+      case "updateSettings":
         result = handleUpdateSettings(payload);
         break;
-      
+
       // If action is not recognized
       default:
-        return createErrorResponse('Unknown action: ' + action, 400);
+        return createErrorResponse("Unknown action: " + action, 400);
     }
-    
+
     // Return successful response
     return createSuccessResponse(result);
   } catch (error) {
     // Log the error and return an error response
-    console.error('API error:', error);
+    console.error("API error:", error);
     return createErrorResponse(error.message, 500);
+  }
+}
+
+
+function getBearerToken(e) {
+  try {
+    Logger.log(e)
+    var headers = e.parameter; // Google Apps Script does not provide a direct headers object
+    if (!headers) {
+      headers = e;
+    }
+    var authorization = headers["Authorization"] || headers["authorization"];
+
+    if (!authorization || !authorization.startsWith("Bearer ")) {
+      return null;
+    }
+
+    return authorization.replace("Bearer ", "").trim(); // Extract token after "Bearer "
+  } catch (error) {
+    Logger.log("Error extracting token: " + error);
+    return null;
   }
 }
 
 /**
  * Create a success response
- * 
+ *
  * @param {Object} data - The data to include in the response
  * @return {TextOutput} JSON response
  */
 function createSuccessResponse(data) {
   const response = {
-    status: 'success',
-    data: data
+    status: "success",
+    data: data,
   };
-  
-  return ContentService.createTextOutput(JSON.stringify(response))
-    .setMimeType(ContentService.MimeType.JSON);
+
+  return ContentService.createTextOutput(JSON.stringify(response)).setMimeType(
+    ContentService.MimeType.JSON
+  );
 }
 
 /**
  * Create an error response
- * 
+ *
  * @param {string} message - The error message
  * @param {number} code - The HTTP status code
  * @return {TextOutput} JSON response
  */
 function createErrorResponse(message, code) {
   const response = {
-    status: 'error',
+    status: "error",
     error: {
       code: code,
-      message: message
-    }
+      message: message,
+    },
   };
-  
-  return ContentService.createTextOutput(JSON.stringify(response))
-    .setMimeType(ContentService.MimeType.JSON);
+
+  return ContentService.createTextOutput(JSON.stringify(response)).setMimeType(
+    ContentService.MimeType.JSON
+  );
 }
 
 /**
  * Validate auth token (implement your own logic)
- * 
+ *
  * @param {string} token - The auth token to validate
  * @return {boolean} True if token is valid
  */
@@ -177,16 +212,69 @@ function validateAuthToken(token) {
   // For development, return true
   // TODO: Implement proper authentication logic
   if (!token) return false;
-  
+
   const settings = getSettings();
   const validToken = settings.apitoken;
-  
+
   // If no token is set in settings, use a development token
   if (!validToken) {
-    return token === 'dev-token-playmate-api';
+    return token === "dev-token-playmate-api";
   }
-  
+
   return token === validToken;
+}
+
+/**
+ * Authorize user for sensitive actions using OAuth and sheet access
+ * @param {string} token - OAuth Bearer token
+ * @param {Spreadsheet} spreadsheet - The active spreadsheet
+ * @return {Object} { success: boolean, userEmail?: string, message?: string }
+ */
+function authorizeUserWithSheet(token, spreadsheet) {
+  const tokenValidation = validateOAuthToken(token);
+  if (!tokenValidation.valid) {
+    return {
+      success: false,
+      message: "Invalid or expired OAuth token: " + tokenValidation.error,
+    };
+  }
+  const userEmail = tokenValidation.email;
+  const viewers = spreadsheet.getViewers().map((user) => user.getEmail());
+  const editors = spreadsheet.getEditors().map((user) => user.getEmail());
+  if (!viewers.includes(userEmail) && !editors.includes(userEmail)) {
+    return {
+      success: false,
+      message: "Unauthorized: You do not have access to this sheet",
+    };
+  }
+  return { success: true, userEmail };
+}
+
+function validateOAuthToken(token) {
+  var url =
+    "https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=" + token;
+
+  try {
+    var response = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
+    var json = JSON.parse(response.getContentText());
+    Logger.log(json)
+
+    if (json.error) {
+      Logger.log("Invalid Token: " + json.error_description);
+      return { valid: false, error: json.error_description };
+    }
+
+    Logger.log("Valid Token for: " + json.email);
+    return {
+      valid: true,
+      email: json.email,
+      scope: json.scope,
+      expires_in: json.expires_in,
+    };
+  } catch (error) {
+    Logger.log("Error validating token: " + error);
+    return { valid: false, error: "Error occurred during validation" };
+  }
 }
 
 // ----------------------
@@ -195,7 +283,7 @@ function validateAuthToken(token) {
 
 /**
  * Handle get members request
- * 
+ *
  * @param {Object} payload - Request payload with optional filters
  * @return {Object} List of members
  */
@@ -206,44 +294,46 @@ function handleGetMembers(payload) {
 
 /**
  * Handle get single member request
- * 
+ *
  * @param {Object} payload - Request payload with memberId
  * @return {Object} Member details
  */
 function handleGetMember(payload) {
   if (!payload.memberId) {
-    throw new Error('Member ID is required');
+    throw new Error("Member ID is required");
   }
-  
+
   const member = getMemberById(payload.memberId);
   if (!member) {
-    throw new Error('Member not found');
+    throw new Error("Member not found");
   }
-  
+
   return member;
 }
 
 /**
  * Handle add member request
- * 
+ *
  * @param {Object} payload - Member data
  * @return {Object} Result with new member ID
  */
 function handleAddMember(payload) {
   if (!payload.firstName || !payload.lastName || !payload.email) {
-    throw new Error('First name, last name, and email are required');
+    throw new Error("First name, last name, and email are required");
   }
-  
+
   // Convert date strings to Date objects if present
   if (payload.joinDate) {
     payload.joinDate = new Date(payload.joinDate);
   }
-  
+
   // Try to acquire lock to prevent concurrent writes
   if (!LOCK.tryLock(10000)) {
-    throw new Error('Failed to acquire lock. The system is busy. Please try again.');
+    throw new Error(
+      "Failed to acquire lock. The system is busy. Please try again."
+    );
   }
-  
+
   try {
     const memberId = addMember(payload);
     return { memberId: memberId };
@@ -254,29 +344,31 @@ function handleAddMember(payload) {
 
 /**
  * Handle update member request
- * 
+ *
  * @param {Object} payload - Updated member data with memberId
  * @return {Object} Result indicating success
  */
 function handleUpdateMember(payload) {
   if (!payload.memberId) {
-    throw new Error('Member ID is required');
+    throw new Error("Member ID is required");
   }
-  
+
   // Convert date strings to Date objects if present
   if (payload.joinDate) {
     payload.joinDate = new Date(payload.joinDate);
   }
-  
+
   // Try to acquire lock to prevent concurrent writes
   if (!LOCK.tryLock(10000)) {
-    throw new Error('Failed to acquire lock. The system is busy. Please try again.');
+    throw new Error(
+      "Failed to acquire lock. The system is busy. Please try again."
+    );
   }
-  
+
   try {
     const success = updateMember(payload.memberId, payload);
     if (!success) {
-      throw new Error('Member not found or update failed');
+      throw new Error("Member not found or update failed");
     }
     return { success: true };
   } finally {
@@ -286,24 +378,26 @@ function handleUpdateMember(payload) {
 
 /**
  * Handle delete member request
- * 
+ *
  * @param {Object} payload - Request with memberId
  * @return {Object} Result indicating success
  */
 function handleDeleteMember(payload) {
   if (!payload.memberId) {
-    throw new Error('Member ID is required');
+    throw new Error("Member ID is required");
   }
-  
+
   // Try to acquire lock to prevent concurrent writes
   if (!LOCK.tryLock(10000)) {
-    throw new Error('Failed to acquire lock. The system is busy. Please try again.');
+    throw new Error(
+      "Failed to acquire lock. The system is busy. Please try again."
+    );
   }
-  
+
   try {
     const success = deleteMember(payload.memberId);
     if (!success) {
-      throw new Error('Member not found or deletion failed');
+      throw new Error("Member not found or deletion failed");
     }
     return { success: true };
   } finally {
@@ -313,15 +407,15 @@ function handleDeleteMember(payload) {
 
 /**
  * Handle search members request
- * 
+ *
  * @param {Object} payload - Request with search term
  * @return {Object} List of matching members
  */
 function handleSearchMembers(payload) {
   if (!payload.searchTerm) {
-    throw new Error('Search term is required');
+    throw new Error("Search term is required");
   }
-  
+
   return searchMembers(payload.searchTerm);
 }
 
@@ -331,15 +425,15 @@ function handleSearchMembers(payload) {
 
 /**
  * Handle record attendance request
- * 
+ *
  * @param {Object} payload - Attendance data
  * @return {Object} Result with new attendance ID
  */
 function handleRecordAttendance(payload) {
-  if (!payload.memberId || !payload.sport) {
-    throw new Error('Member ID and sport are required');
+  if (!payload.memberId) {
+    throw new Error("Member ID and sport are required");
   }
-  
+
   // Convert date strings to Date objects if present
   if (payload.date) {
     payload.date = new Date(payload.date);
@@ -350,12 +444,14 @@ function handleRecordAttendance(payload) {
   if (payload.checkOutTime) {
     payload.checkOutTime = new Date(payload.checkOutTime);
   }
-  
+
   // Try to acquire lock to prevent concurrent writes
   if (!LOCK.tryLock(10000)) {
-    throw new Error('Failed to acquire lock. The system is busy. Please try again.');
+    throw new Error(
+      "Failed to acquire lock. The system is busy. Please try again."
+    );
   }
-  
+
   try {
     const attendanceId = recordAttendance(payload);
     return { attendanceId: attendanceId };
@@ -366,13 +462,13 @@ function handleRecordAttendance(payload) {
 
 /**
  * Handle get attendance records request
- * 
+ *
  * @param {Object} payload - Request with optional filters
  * @return {Object} List of attendance records
  */
 function handleGetAttendance(payload) {
   const filters = payload.filters || {};
-  
+
   // Convert date strings to Date objects if present
   if (filters.startDate) {
     filters.startDate = new Date(filters.startDate);
@@ -380,23 +476,23 @@ function handleGetAttendance(payload) {
   if (filters.endDate) {
     filters.endDate = new Date(filters.endDate);
   }
-  
+
   return getAttendanceRecords(filters);
 }
 
 /**
  * Handle get member attendance request
- * 
+ *
  * @param {Object} payload - Request with memberId and optional date range
  * @return {Object} Member's attendance records
  */
 function handleGetMemberAttendance(payload) {
   if (!payload.memberId) {
-    throw new Error('Member ID is required');
+    throw new Error("Member ID is required");
   }
-  
+
   const options = payload.options || {};
-  
+
   // Convert date strings to Date objects if present
   if (options.startDate) {
     options.startDate = new Date(options.startDate);
@@ -404,19 +500,19 @@ function handleGetMemberAttendance(payload) {
   if (options.endDate) {
     options.endDate = new Date(options.endDate);
   }
-  
+
   return getMemberAttendanceSummary(payload.memberId, options);
 }
 
 /**
  * Handle get attendance summary request
- * 
+ *
  * @param {Object} payload - Request with optional filters
  * @return {Object} Attendance summary statistics
  */
 function handleGetAttendanceSummary(payload) {
   const options = payload.options || {};
-  
+
   // Convert date strings to Date objects if present
   if (options.startDate) {
     options.startDate = new Date(options.startDate);
@@ -424,21 +520,21 @@ function handleGetAttendanceSummary(payload) {
   if (options.endDate) {
     options.endDate = new Date(options.endDate);
   }
-  
+
   return getOverallAttendanceSummary(options);
 }
 
 /**
  * Handle update attendance request
- * 
+ *
  * @param {Object} payload - Updated attendance data with attendanceId
  * @return {Object} Result indicating success
  */
 function handleUpdateAttendance(payload) {
   if (!payload.attendanceId) {
-    throw new Error('Attendance ID is required');
+    throw new Error("Attendance ID is required");
   }
-  
+
   // Convert date strings to Date objects if present
   if (payload.date) {
     payload.date = new Date(payload.date);
@@ -449,16 +545,18 @@ function handleUpdateAttendance(payload) {
   if (payload.checkOutTime) {
     payload.checkOutTime = new Date(payload.checkOutTime);
   }
-  
+
   // Try to acquire lock to prevent concurrent writes
   if (!LOCK.tryLock(10000)) {
-    throw new Error('Failed to acquire lock. The system is busy. Please try again.');
+    throw new Error(
+      "Failed to acquire lock. The system is busy. Please try again."
+    );
   }
-  
+
   try {
     const success = updateAttendance(payload.attendanceId, payload);
     if (!success) {
-      throw new Error('Attendance record not found or update failed');
+      throw new Error("Attendance record not found or update failed");
     }
     return { success: true };
   } finally {
@@ -472,15 +570,15 @@ function handleUpdateAttendance(payload) {
 
 /**
  * Handle record payment request
- * 
+ *
  * @param {Object} payload - Payment data
  * @return {Object} Result with new payment ID
  */
 function handleRecordPayment(payload) {
   if (!payload.memberId || !payload.amount || !payload.sport) {
-    throw new Error('Member ID, amount, and sport are required');
+    throw new Error("Member ID, amount, and sport are required");
   }
-  
+
   // Convert date strings to Date objects if present
   if (payload.date) {
     payload.date = new Date(payload.date);
@@ -491,12 +589,14 @@ function handleRecordPayment(payload) {
   if (payload.periodEnd) {
     payload.periodEnd = new Date(payload.periodEnd);
   }
-  
+
   // Try to acquire lock to prevent concurrent writes
   if (!LOCK.tryLock(10000)) {
-    throw new Error('Failed to acquire lock. The system is busy. Please try again.');
+    throw new Error(
+      "Failed to acquire lock. The system is busy. Please try again."
+    );
   }
-  
+
   try {
     const paymentId = recordPayment(payload);
     return { paymentId: paymentId };
@@ -507,13 +607,13 @@ function handleRecordPayment(payload) {
 
 /**
  * Handle get payments request
- * 
+ *
  * @param {Object} payload - Request with optional filters
  * @return {Object} List of payment records
  */
 function handleGetPayments(payload) {
   const filters = payload.filters || {};
-  
+
   // Convert date strings to Date objects if present
   if (filters.startDate) {
     filters.startDate = new Date(filters.startDate);
@@ -521,23 +621,23 @@ function handleGetPayments(payload) {
   if (filters.endDate) {
     filters.endDate = new Date(filters.endDate);
   }
-  
+
   return getPaymentRecords(filters);
 }
 
 /**
  * Handle get member payments request
- * 
+ *
  * @param {Object} payload - Request with memberId and optional filters
  * @return {Object} Member's payment summary
  */
 function handleGetMemberPayments(payload) {
   if (!payload.memberId) {
-    throw new Error('Member ID is required');
+    throw new Error("Member ID is required");
   }
-  
+
   const options = payload.options || {};
-  
+
   // Convert date strings to Date objects if present
   if (options.startDate) {
     options.startDate = new Date(options.startDate);
@@ -545,19 +645,19 @@ function handleGetMemberPayments(payload) {
   if (options.endDate) {
     options.endDate = new Date(options.endDate);
   }
-  
+
   return getMemberPaymentSummary(payload.memberId, options);
 }
 
 /**
  * Handle get payment summary request
- * 
+ *
  * @param {Object} payload - Request with optional filters
  * @return {Object} Payment summary statistics
  */
 function handleGetPaymentSummary(payload) {
   const options = payload.options || {};
-  
+
   // Convert date strings to Date objects if present
   if (options.startDate) {
     options.startDate = new Date(options.startDate);
@@ -565,13 +665,13 @@ function handleGetPaymentSummary(payload) {
   if (options.endDate) {
     options.endDate = new Date(options.endDate);
   }
-  
+
   return getOverallPaymentSummary(options);
 }
 
 /**
  * Handle get payment status request
- * 
+ *
  * @param {Object} payload - Request with optional sport filter
  * @return {Object} List of members with payment status
  */
@@ -586,7 +686,7 @@ function handleGetPaymentStatus(payload) {
 
 /**
  * Handle get sports request
- * 
+ *
  * @param {Object} payload - Request with optional activeOnly flag
  * @return {Object} List of sports
  */
@@ -597,24 +697,26 @@ function handleGetSports(payload) {
 
 /**
  * Handle add sport request
- * 
+ *
  * @param {Object} payload - Sport data
  * @return {Object} Result indicating success
  */
 function handleAddSport(payload) {
   if (!payload.name) {
-    throw new Error('Sport name is required');
+    throw new Error("Sport name is required");
   }
-  
+
   // Try to acquire lock to prevent concurrent writes
   if (!LOCK.tryLock(10000)) {
-    throw new Error('Failed to acquire lock. The system is busy. Please try again.');
+    throw new Error(
+      "Failed to acquire lock. The system is busy. Please try again."
+    );
   }
-  
+
   try {
     const success = addSport(payload);
     if (!success) {
-      throw new Error('Sport already exists or addition failed');
+      throw new Error("Sport already exists or addition failed");
     }
     return { success: true };
   } finally {
@@ -624,24 +726,26 @@ function handleAddSport(payload) {
 
 /**
  * Handle update sport request
- * 
+ *
  * @param {Object} payload - Updated sport data with sportName
  * @return {Object} Result indicating success
  */
 function handleUpdateSport(payload) {
   if (!payload.sportName) {
-    throw new Error('Sport name is required');
+    throw new Error("Sport name is required");
   }
-  
+
   // Try to acquire lock to prevent concurrent writes
   if (!LOCK.tryLock(10000)) {
-    throw new Error('Failed to acquire lock. The system is busy. Please try again.');
+    throw new Error(
+      "Failed to acquire lock. The system is busy. Please try again."
+    );
   }
-  
+
   try {
     const success = updateSport(payload.sportName, payload);
     if (!success) {
-      throw new Error('Sport not found or update failed');
+      throw new Error("Sport not found or update failed");
     }
     return { success: true };
   } finally {
@@ -655,7 +759,7 @@ function handleUpdateSport(payload) {
 
 /**
  * Handle get settings request
- * 
+ *
  * @param {Object} payload - Empty payload
  * @return {Object} App settings
  */
@@ -665,16 +769,18 @@ function handleGetSettings(payload) {
 
 /**
  * Handle update settings request
- * 
+ *
  * @param {Object} payload - Updated settings
  * @return {Object} Result indicating success
  */
 function handleUpdateSettings(payload) {
   // Try to acquire lock to prevent concurrent writes
   if (!LOCK.tryLock(10000)) {
-    throw new Error('Failed to acquire lock. The system is busy. Please try again.');
+    throw new Error(
+      "Failed to acquire lock. The system is busy. Please try again."
+    );
   }
-  
+
   try {
     // Update each setting
     for (const key in payload) {
