@@ -39,7 +39,6 @@ export class MemberService {
   getMembers(filters?: MemberFilters): Observable<Member[]> {
     return from(this.authService.getAuthToken()).pipe(
       switchMap(token => {
-        token = 'ya29.a0AW4XtxhLkHFvnQ2Zs4ntZmXUlPFmnu40seYWi6I3Q05o9p1QUuJeQxwxK6lY7VGhVnjVE-7epKxDoPokZcmUblTyYMcGp7N2CfUauxopW-7cG2LN2JbOAHBS3cQcvhnTdh4kOdHe7D0G2tt-Q6KAug2GT3UDd7ifH5RTZGW8PwaCgYKAfASARUSFQHGX2Mip4O-T-WbJvFpxC-OEtPoXQ0177';
         const params = new HttpParams()
           .set('action', 'getMembers')
           .set('payload', JSON.stringify({ filters }))

@@ -4,8 +4,17 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec',
-  defaultAuthToken: 'dev-token-playmate-api'
+  apiUrl: 'https://script.google.com/macros/s/AKfycbwkIwh2XoG6k3r2BsPTLcbZK9S6EmqdDGSs4kGAMD1xc6qQ7jJCURjwjJbB8NeuuX2j/exec',
+  defaultAuthToken: 'dev-token-playmate-api',
+  googleClientId: '1031239235658-04jeuifg37vruvmkiu71m45tskj94tnv.apps.googleusercontent.com',
+  googleSignInClientId: '1031239235658-04jeuifg37vruvmkiu71m45tskj94tnv.apps.googleusercontent.com', // Used for Capacitor Social Login
+  authConfig: {
+    allowedDomains: ['localhost:4200', 'localhost:8100'],
+    corsConfig: {
+      allowedOrigins: ['http://localhost:4200', 'http://localhost:8100'],
+      allowCredentials: false
+    }
+  }
 };
 
 /*

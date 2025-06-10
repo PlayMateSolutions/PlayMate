@@ -12,14 +12,13 @@ import {
   IonCardTitle,
   IonCardContent,
   IonIcon,
+  Platform,
   ToastController
 } from '@ionic/angular/standalone';
 import { AuthService } from '../../core/services/auth.service';
 import { addIcons } from 'ionicons';
 import { logoGoogle } from 'ionicons/icons';
 import { environment } from '../../../environments/environment';
-
-declare const google: any;
 
 @Component({
   selector: 'app-login',
@@ -38,7 +37,10 @@ declare const google: any;
         <ion-card-content>
           <div class="login-container">
             <div class="intro-text">Please sign in with your Google account to continue</div>
-            <div id="googleButton"></div>
+            <ion-button (click)="handleGoogleSignIn()" expand="block">
+              <ion-icon slot="start" name="logo-google"></ion-icon>
+              Sign in with Google
+            </ion-button>
             <div class="scope-info">
               This app requires access to:
               <ul>
@@ -64,10 +66,6 @@ declare const google: any;
       text-align: center;
     }
 
-    #googleButton {
-      margin: 20px 0;
-    }
-
     .scope-info {
       margin-top: 20px;
       color: var(--ion-color-medium);
@@ -82,13 +80,18 @@ declare const google: any;
 
     .intro-text {
       color: var(--ion-color-dark);
-      margin-bottom: 8px;
+      margin-bottom: 20px;
     }
 
     .error-message {
       color: var(--ion-color-danger);
       margin-top: 16px;
       font-size: 14px;
+    }
+
+    ion-button {
+      margin: 20px 0;
+      width: 250px;
     }
   `],
   standalone: true,
@@ -112,6 +115,7 @@ export class LoginPage implements OnInit {
   constructor(
     private authService: AuthService,
     private router: Router,
+    private platform: Platform,
     private zone: NgZone,
     private toastController: ToastController
   ) {
@@ -120,58 +124,33 @@ export class LoginPage implements OnInit {
 
   async ngOnInit() {
     try {
-      await this.initializeGoogleSignIn();
+            this.platform.ready().then(async () => {
+      await this.initializeAuth();
+            });
     } catch (error) {
-      console.error('Google Sign-In initialization failed:', error);
-      this.error = 'Failed to initialize Google Sign-In. Please try again later.';
+      console.error('Login initialization failed:', error);
+      this.error = 'Failed to initialize login. Please try again later.';
     }
   }
 
-  private async initializeGoogleSignIn() {
-    if (!google?.accounts?.id) {
-      this.error = 'Google Sign-In SDK not loaded. Please check your internet connection and try again.';
-      return;
-    }
-
-    google.accounts.id.initialize({
-      client_id: environment.googleClientId,
-      scope: 'https://spreadsheets.google.com/feeds https://www.googleapis.com/auth/userinfo.email',
-      callback: (response: any) => {
-        this.zone.run(() => this.handleGoogleSignIn(response));
-      },
-      auto_select: false,
-      cancel_on_tap_outside: true
-    });
-
-    this.renderGoogleButton();
-  }
-
-  private renderGoogleButton() {
-    const buttonElement = document.getElementById('googleButton');
-    if (buttonElement) {
-      google.accounts.id.renderButton(buttonElement, {
-        type: 'standard',
-        theme: 'outline',
-        size: 'large',
-        width: 280,
-        text: 'continue_with',
-        shape: 'rectangular'
-      });
+  private async initializeAuth() {
+    const initialized = await this.authService.initGoogleAuth();
+    if (!initialized) {
+      this.error = 'Failed to initialize authentication. Please check your internet connection and try again.';
     }
   }
 
-  private async handleGoogleSignIn(response: any) {
+  async handleGoogleSignIn() {
     try {
-      if (response?.credential) {
-        const success = await this.authService.handleGoogleSignIn(response);
-        if (success) {
-          await this.router.navigate(['/tabs']);
-        } else {
-          throw new Error('Authentication failed');
-        }
+      this.error = null;
+      const success = await this.zone.run(() => this.authService.login());
+      if (success) {
+        await this.router.navigate(['/tabs']);
+      } else {
+        throw new Error('Authentication failed');
       }
     } catch (error) {
-      console.error('Google Sign-In error:', error);
+      console.error('Login error:', error);
       this.error = 'Authentication failed. Please ensure you grant all required permissions.';
       await this.showErrorToast('Authentication failed. Please try again.');
     }

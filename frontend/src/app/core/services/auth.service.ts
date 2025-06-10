@@ -3,6 +3,10 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { Storage } from '@ionic/storage-angular';
 import { environment } from '../../../environments/environment';
+import {
+  GoogleLoginResponseOnline,
+  SocialLogin,
+} from '@capgo/capacitor-social-login';
 
 export interface UserSession {
   token: string;
@@ -12,19 +16,16 @@ export interface UserSession {
   expiresAt: number;
 }
 
-declare const google: any;
-
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   private _isAuthenticated = new BehaviorSubject<boolean>(false);
   private _userSession = new BehaviorSubject<UserSession | null>(null);
   private readonly STORAGE_KEY = 'user_session';
   private storageReady = false;
-  constructor(
-    private storage: Storage
-  ) {
+
+  constructor(private storage: Storage) {
     this.init();
   }
 
@@ -56,41 +57,45 @@ export class AuthService {
     return this._userSession.asObservable();
   }
 
-  async initGoogleAuth() {
-    return new Promise((resolve) => {
-      google.accounts.id.initialize({
-        client_id: environment.googleClientId,
-        callback: (response: any) => {
-          this.handleGoogleSignIn(response);
+  async initGoogleAuth(): Promise<boolean> {
+ await SocialLogin.initialize({
+        google: {
+          webClientId: environment.googleSignInClientId, // the web client id for Android and Web
         },
-        auto_select: false,
-        scopes: ['email', 'profile']
+      });    return true;
+  }
+  async login(): Promise<boolean> {
+    try {
+      const response = await SocialLogin.login({
+        provider: 'google',
+        options: {
+          scopes: ['email', 'profile'],
+        },
       });
-      resolve(true);
-    });
-  }
 
-  async handleGoogleSignIn(response: any) {
-    if (response?.credential) {
-      const payload = this.decodeJwtToken(response.credential);
-      const session: UserSession = {
-        token: response.credential,
-        email: payload.email,
-        name: payload.name,
-        picture: payload.picture,
-        expiresAt: payload.exp * 1000 // Convert to milliseconds
-      };
+      const result = response.result as GoogleLoginResponseOnline;
+      console.log('Google login response:', result);
 
-      await this.setSession(session);
-      return true;
+      console.log('ID TOken:', result?.idToken);
+      console.log('Access Token:', result?.accessToken?.token);
+
+      if (result?.accessToken?.token) {
+        const session: UserSession = {
+          token: result.accessToken.token || '',
+          email: result.profile.email || '',
+          name: result.profile.name || '',
+          picture: result.profile.imageUrl || '',
+          expiresAt: Date.now() + 3600000, // 1 hour from now
+        };
+
+        await this.setSession(session);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Login error:', error);
+      return false;
     }
-    return false;
-  }
-
-  private decodeJwtToken(token: string) {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    return JSON.parse(window.atob(base64));
   }
 
   async setSession(session: UserSession) {
@@ -98,8 +103,12 @@ export class AuthService {
     this._isAuthenticated.next(true);
     this._userSession.next(session);
   }
-
   async logout() {
+    try {
+      await SocialLogin.logout({ provider: 'google' });
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
     await this.storage.remove(this.STORAGE_KEY);
     this._isAuthenticated.next(false);
     this._userSession.next(null);
