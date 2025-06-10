@@ -37,8 +37,15 @@ declare const google: any;
         </ion-card-header>
         <ion-card-content>
           <div class="login-container">
-            <p>Please sign in to continue</p>
+            <div class="intro-text">Please sign in with your Google account to continue</div>
             <div id="googleButton"></div>
+            <div class="scope-info">
+              This app requires access to:
+              <ul>
+                <li>Google Sheets</li>
+                <li>Your email address</li>
+              </ul>
+            </div>
             <div *ngIf="error" class="error-message">
               {{ error }}
             </div>
@@ -58,7 +65,24 @@ declare const google: any;
     }
 
     #googleButton {
+      margin: 20px 0;
+    }
+
+    .scope-info {
       margin-top: 20px;
+      color: var(--ion-color-medium);
+      font-size: 0.9em;
+      text-align: left;
+    }
+
+    .scope-info ul {
+      margin: 8px 0;
+      padding-left: 20px;
+    }
+
+    .intro-text {
+      color: var(--ion-color-dark);
+      margin-bottom: 8px;
     }
 
     .error-message {
@@ -111,6 +135,7 @@ export class LoginPage implements OnInit {
 
     google.accounts.id.initialize({
       client_id: environment.googleClientId,
+      scope: 'https://spreadsheets.google.com/feeds https://www.googleapis.com/auth/userinfo.email',
       callback: (response: any) => {
         this.zone.run(() => this.handleGoogleSignIn(response));
       },
@@ -125,10 +150,12 @@ export class LoginPage implements OnInit {
     const buttonElement = document.getElementById('googleButton');
     if (buttonElement) {
       google.accounts.id.renderButton(buttonElement, {
+        type: 'standard',
         theme: 'outline',
         size: 'large',
-        width: 250,
-        text: 'continue_with'
+        width: 280,
+        text: 'continue_with',
+        shape: 'rectangular'
       });
     }
   }
@@ -145,7 +172,7 @@ export class LoginPage implements OnInit {
       }
     } catch (error) {
       console.error('Google Sign-In error:', error);
-      this.error = 'Authentication failed. Please try again.';
+      this.error = 'Authentication failed. Please ensure you grant all required permissions.';
       await this.showErrorToast('Authentication failed. Please try again.');
     }
   }

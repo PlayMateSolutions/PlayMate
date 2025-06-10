@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { ApiService } from './api.service';
 import { tap } from 'rxjs/operators';
 import { Storage } from '@ionic/storage-angular';
 import { environment } from '../../../environments/environment';
@@ -23,9 +22,7 @@ export class AuthService {
   private _userSession = new BehaviorSubject<UserSession | null>(null);
   private readonly STORAGE_KEY = 'user_session';
   private storageReady = false;
-
   constructor(
-    private apiService: ApiService,
     private storage: Storage
   ) {
     this.init();
@@ -62,10 +59,12 @@ export class AuthService {
   async initGoogleAuth() {
     return new Promise((resolve) => {
       google.accounts.id.initialize({
-        client_id: '${environment.googleClientId}',
+        client_id: environment.googleClientId,
         callback: (response: any) => {
           this.handleGoogleSignIn(response);
         },
+        auto_select: false,
+        scopes: ['email', 'profile']
       });
       resolve(true);
     });
@@ -73,7 +72,6 @@ export class AuthService {
 
   async handleGoogleSignIn(response: any) {
     if (response?.credential) {
-      // Decode the JWT token to get user info
       const payload = this.decodeJwtToken(response.credential);
       const session: UserSession = {
         token: response.credential,
@@ -109,6 +107,9 @@ export class AuthService {
 
   async getAuthToken(): Promise<string | null> {
     const session = await this.storage.get(this.STORAGE_KEY);
-    return session?.token || null;
+    if (session && session.expiresAt > Date.now()) {
+      return session.token;
+    }
+    return null;
   }
 }
