@@ -1,10 +1,17 @@
-import { Component, OnInit } from '@angular/core';
-import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
+import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+import { IonApp, IonRouterOutlet, IonAvatar, IonIcon, IonButton, IonButtons } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HttpClient, HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouteReuseStrategy } from '@angular/router';
 import { IonicRouteStrategy } from '@ionic/angular/standalone';
 import { HttpErrorInterceptor } from './core/interceptors/http-error.interceptor';
+import { AuthService, UserSession } from './core/services/auth.service';
+import { Observable } from 'rxjs';
+import { addIcons } from 'ionicons';
+import { personCircleOutline, logOutOutline } from 'ionicons/icons';
+import { PopoverController } from '@ionic/angular/standalone';
+import { ProfileMenuComponent } from './shared/components/profile-menu/profile-menu.component';
 
 @Component({
   selector: 'app-root',
@@ -14,17 +21,43 @@ import { HttpErrorInterceptor } from './core/interceptors/http-error.interceptor
     CommonModule,
     IonApp,
     IonRouterOutlet,
-    HttpClientModule
+    IonAvatar,
+    IonIcon,
+    IonButton,
+    IonButtons,
+    HttpClientModule,
+    ProfileMenuComponent
   ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     { provide: HTTP_INTERCEPTORS, useClass: HttpErrorInterceptor, multi: true }
   ]
 })
-export class AppComponent implements OnInit {
-  constructor() {}
+export class AppComponent {
+  userSession$: Observable<UserSession | null>;
 
-  ngOnInit() {
-    // Initialize any app-wide services here if needed
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private popoverController: PopoverController
+  ) {
+    addIcons({ personCircleOutline, logOutOutline });
+    this.userSession$ = this.authService.userSession$;
+  }
+
+  async showProfileMenu(event: Event) {
+    const popover = await this.popoverController.create({
+      component: ProfileMenuComponent,
+      event: event,
+      translucent: true
+    });
+    
+    await popover.present();
+
+    const { role } = await popover.onWillDismiss();
+    if (role === 'logout') {
+      await this.authService.logout();
+      await this.router.navigate(['/login']);
+    }
   }
 }

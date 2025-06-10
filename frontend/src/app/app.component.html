@@ -1,3 +1,15 @@
 <ion-app>
   <ion-router-outlet></ion-router-outlet>
 </ion-app>
+
+<!-- Add this to each page's toolbar where you want to show the user profile -->
+<ng-template #userProfile>
+  <ion-buttons slot="end" *ngIf="userSession$ | async as session">
+    <ion-button (click)="showProfileMenu($event)">
+      <ion-avatar slot="icon-only">
+        <img [src]="session.picture" *ngIf="session.picture">
+        <ion-icon name="person-circle-outline" *ngIf="!session.picture"></ion-icon>
+      </ion-avatar>
+    </ion-button>
+  </ion-buttons>
+</ng-template>

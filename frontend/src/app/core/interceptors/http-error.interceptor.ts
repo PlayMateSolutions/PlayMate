@@ -10,10 +10,16 @@ import {
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { ToastController } from '@ionic/angular/standalone';
+import { Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
 
 @Injectable()
 export class HttpErrorInterceptor implements HttpInterceptor {
-  constructor(private toastController: ToastController) {}
+  constructor(
+    private toastController: ToastController,
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return next.handle(request).pipe(
@@ -25,7 +31,11 @@ export class HttpErrorInterceptor implements HttpInterceptor {
           errorMessage = `Error: ${error.error.message}`;
         } else {
           // Server-side error
-          if (error.error?.error?.message) {
+          if (error.status === 401) {
+            this.authService.logout();
+            this.router.navigate(['/login']);
+            errorMessage = 'Session expired. Please log in again.';
+          } else if (error.error?.error?.message) {
             errorMessage = error.error.error.message;
           } else {
             errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;

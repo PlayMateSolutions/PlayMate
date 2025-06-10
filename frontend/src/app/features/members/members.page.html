@@ -1,0 +1,55 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Members</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="addMember()">
+        <ion-icon slot="icon-only" name="add-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar
+      (ionInput)="searchMembers($event)"
+      placeholder="Search members">
+    </ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list *ngIf="members.length > 0; else noMembers">
+    <ion-item-sliding *ngFor="let member of members">
+      <ion-item>
+        <ion-label>
+          <h2>{{member.firstName}} {{member.lastName}}</h2>
+          <p>{{member.email}}</p>
+          <p>{{member.sports.join(', ')}}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item-options>
+        <ion-item-option (click)="editMember(member)">
+          <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+        </ion-item-option>
+        <ion-item-option color="danger" (click)="deleteMember(member)">
+          <ion-icon slot="icon-only" name="trash"></ion-icon>
+        </ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
+  </ion-list>
+
+  <ng-template #noMembers>
+    <div class="empty-state">
+      <ion-icon name="people-outline" size="large"></ion-icon>
+      <h2>No Members Found</h2>
+      <p>There are no members matching your search criteria.</p>
+      <ion-button fill="clear" (click)="loadMembers()">
+        <ion-icon slot="start" name="refresh-outline"></ion-icon>
+        Refresh
+      </ion-button>
+    </div>
+  </ng-template>
+
+  <ion-infinite-scroll (ionInfinite)="loadMore($event)">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+</ion-content>

@@ -1,68 +1,71 @@
 import { Component, OnInit } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
+import { 
+  IonHeader, 
+  IonToolbar, 
+  IonTitle, 
+  IonButtons, 
+  IonButton, 
+  IonIcon,
+  IonSearchbar,
+  IonContent,
+  IonList,
+  IonItem,
+  IonLabel,
+  IonItemSliding,
+  IonItemOption,
+  IonItemOptions,
+  IonInfiniteScroll,
+  IonInfiniteScrollContent
+} from '@ionic/angular/standalone';
 import { Member } from '../../shared/interfaces/member.interface';
 import { MemberService } from './services/member.service';
 import { CommonModule } from '@angular/common';
+import { 
+  addOutline, 
+  createOutline, 
+  trashOutline, 
+  peopleOutline,
+  refreshOutline
+} from 'ionicons/icons';
+import { addIcons } from 'ionicons';
 
 @Component({
   selector: 'app-members',
-  template: `
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>Members</ion-title>
-        <ion-buttons slot="end">
-          <ion-button (click)="addMember()">
-            <ion-icon slot="icon-only" name="add"></ion-icon>
-          </ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-      <ion-toolbar>
-        <ion-searchbar
-          (ionInput)="searchMembers($event)"
-          placeholder="Search members">
-        </ion-searchbar>
-      </ion-toolbar>
-    </ion-header>
-
-    <ion-content>
-      <ion-list>
-        <ion-item-sliding *ngFor="let member of members">
-          <ion-item>
-            <ion-label>
-              <h2>{{member.firstName}} {{member.lastName}}</h2>
-              <p>{{member.email}}</p>
-              <p>{{member.sports.join(', ')}}</p>
-            </ion-label>
-          </ion-item>
-
-          <ion-item-options>
-            <ion-item-option (click)="editMember(member)">
-              <ion-icon slot="icon-only" name="create"></ion-icon>
-            </ion-item-option>
-            <ion-item-option color="danger" (click)="deleteMember(member)">
-              <ion-icon slot="icon-only" name="trash"></ion-icon>
-            </ion-item-option>
-          </ion-item-options>
-        </ion-item-sliding>
-      </ion-list>
-
-      <ion-infinite-scroll (ionInfinite)="loadMore($event)">
-        <ion-infinite-scroll-content></ion-infinite-scroll-content>
-      </ion-infinite-scroll>
-    </ion-content>
-  `,
-  styles: [`
-    ion-searchbar {
-      padding: 0 16px;
-    }
-  `],
+  templateUrl: './members.page.html',
+  styleUrls: ['./members.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule]
+  imports: [
+    CommonModule,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonButtons,
+    IonButton,
+    IonIcon,
+    IonSearchbar,
+    IonContent,
+    IonList,
+    IonItem,
+    IonLabel,
+    IonItemSliding,
+    IonItemOption,
+    IonItemOptions,
+    IonInfiniteScroll,
+    IonInfiniteScrollContent
+  ],
+  providers: [MemberService]
 })
 export class MembersPage implements OnInit {
   members: Member[] = [];
-
-  constructor(private memberService: MemberService) {}
+  constructor(private memberService: MemberService) {
+    addIcons({ 
+      addOutline, 
+      createOutline, 
+      trashOutline, 
+      peopleOutline,
+      refreshOutline
+    });
+  }
 
   ngOnInit() {
     this.loadMembers();
