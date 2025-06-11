@@ -1,53 +1,105 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>Members</ion-title>
+  <ion-toolbar color="primary">
+    <ion-title>Members List</ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="addMember()">
         <ion-icon slot="icon-only" name="add-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
+  
   <ion-toolbar>
-    <ion-searchbar
-      (ionInput)="searchMembers($event)"
-      placeholder="Search members">
+    <ion-searchbar 
+      [(ngModel)]="searchTerm" 
+      (ionChange)="searchMembers($event)" 
+      placeholder="Search by name, phone, or address...">
     </ion-searchbar>
+  </ion-toolbar>
+  
+  <ion-toolbar>
+    <ion-segment color="primary" [(ngModel)]="selectedSegment" (ionChange)="segmentChanged($event)">
+      <ion-segment-button value="all">
+        <ion-label>All</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="active">
+        <ion-label>Active</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="expiring">
+        <ion-label>Expiring</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="expired">
+        <ion-label>Expired</ion-label>
+      </ion-segment-button>
+    </ion-segment>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <ion-list *ngIf="members.length > 0; else noMembers">
-    <ion-item-sliding *ngFor="let member of members">
-      <ion-item>
-        <ion-label>
-          <h2>{{member.firstName}} {{member.lastName}}</h2>
-          <p>{{member.email}}</p>
-          <p>{{member.sports.join(', ')}}</p>
-        </ion-label>
-      </ion-item>
+  <!-- Sort options -->
+  <div class="sort-controls">
+    <ion-label>Sort by:</ion-label>    <ion-chip [class.active]="sortOption === 'name'" (click)="changeSortOption('name')">
+      <ion-label>Name</ion-label>
+      <ion-icon *ngIf="sortOption === 'name'" [name]="sortDirection === 'asc' ? 'arrow-up-outline' : 'arrow-down-outline'"></ion-icon>
+    </ion-chip>
+    <ion-chip [class.active]="sortOption === 'expiryDate'" (click)="changeSortOption('expiryDate')">
+      <ion-label>Expiry Date</ion-label>
+      <ion-icon *ngIf="sortOption === 'expiryDate'" [name]="sortDirection === 'asc' ? 'arrow-up-outline' : 'arrow-down-outline'"></ion-icon>
+    </ion-chip>
+    <ion-chip [class.active]="sortOption === 'createdDate'" (click)="changeSortOption('createdDate')">
+      <ion-label>Join Date</ion-label>
+      <ion-icon *ngIf="sortOption === 'createdDate'" [name]="sortDirection === 'asc' ? 'arrow-up-outline' : 'arrow-down-outline'"></ion-icon>
+    </ion-chip>
+  </div>
 
-      <ion-item-options>
-        <ion-item-option (click)="editMember(member)">
-          <ion-icon slot="icon-only" name="create-outline"></ion-icon>
-        </ion-item-option>
-        <ion-item-option color="danger" (click)="deleteMember(member)">
-          <ion-icon slot="icon-only" name="trash"></ion-icon>
-        </ion-item-option>
-      </ion-item-options>
-    </ion-item-sliding>
-  </ion-list>
+  <!-- Results count and loading state -->
+  <div class="results-count">
+    <ion-text color="medium" *ngIf="!loading">
+      Showing {{ members.length }} members
+    </ion-text>
+    <ion-spinner *ngIf="loading"></ion-spinner>
+    <ion-text color="danger" *ngIf="error">{{ error }}</ion-text>
+  </div>
 
+  <!-- Member list cards -->
+  <ng-container *ngIf="members.length > 0; else noMembers">
+    <ion-card *ngFor="let member of members" [ngClass]="getMembershipStatus(member.expiryDate)">
+      <ion-card-content class="card-content">
+        <div class="member-info">
+          <div class="member-name">
+            <strong>{{ member.firstName }} {{ member.lastName }}</strong>
+          </div>          <div>{{ member.email }}</div>
+          <div>Sports: {{ member.sports?.length ? member.sports.join(', ') : 'None' }}</div>
+          <div>Expires: {{ formatDate(member.expiryDate) }}</div>
+        </div>
+        <div class="card-actions">
+          <ion-button fill="clear" color="primary" (click)="editMember(member)" class="action-button">
+            <ion-icon name="create-outline"></ion-icon>
+          </ion-button>
+          <ion-button fill="clear" color="danger" (click)="deleteMember(member)" class="action-button">
+            <ion-icon name="trash-outline"></ion-icon>
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </ng-container>
+
+  <!-- Empty state when no members found -->
   <ng-template #noMembers>
     <div class="empty-state">
       <ion-icon name="people-outline" size="large"></ion-icon>
-      <h2>No Members Found</h2>
-      <p>There are no members matching your search criteria.</p>
-      <ion-button fill="clear" (click)="loadMembers()">
-        <ion-icon slot="start" name="refresh-outline"></ion-icon>
-        Refresh
-      </ion-button>
+      <h3>No members found</h3>
+      <p *ngIf="searchTerm">Try adjusting your search criteria</p>
+      <p *ngIf="!searchTerm">Add new members to see them listed here</p>
+      <ion-button (click)="addMember()">Add Member</ion-button>
     </div>
   </ng-template>
+
+  <!-- Floating action button for adding new members -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="addMember()">
+      <ion-icon name="person-add-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 
   <ion-infinite-scroll (ionInfinite)="loadMore($event)">
     <ion-infinite-scroll-content></ion-infinite-scroll-content>

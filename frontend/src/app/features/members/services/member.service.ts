@@ -102,23 +102,24 @@ export class MemberService {
     );
   }
 
-  addMember(member: Member): Observable<Member> {
+  addMember(member: Omit<Member, 'memberId'>): Observable<Member> {
     return from(this.getRequestPayload('addMember', member)).pipe(
       switchMap(payload => {
-        const headers = new HttpHeaders({
-          'Content-Type': 'text/plain;charset=utf-8'
-        });
+        const params = new HttpParams()
+          .set('action', 'addMember')
+          .set('payload', JSON.stringify(payload));
 
-        const options = {
-          headers,
-          responseType: 'json' as const,
-          observe: 'body' as const
-        };
-
-        return this.http.post<ApiResponse<Member>>(this.apiUrl, payload, options).pipe(
+        return this.http.post<ApiResponse<Member>>(this.apiUrl, null, {
+          params,
+          headers: new HttpHeaders({
+            'Content-Type': 'text/plain;charset=utf-8'
+          })
+        }).pipe(
           map(response => {
-            if (response.status === 'error') throw new Error(response.error?.message);
-            return response.data!;
+            if (response.status === 'success' && response.data) {
+              return response.data;
+            }
+            throw new Error('Failed to add member');
           })
         );
       })
