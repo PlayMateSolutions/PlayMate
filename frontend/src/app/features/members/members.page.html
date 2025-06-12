@@ -50,33 +50,30 @@
       <ion-icon *ngIf="sortOption === 'createdDate'" [name]="sortDirection === 'asc' ? 'arrow-up-outline' : 'arrow-down-outline'"></ion-icon>
     </ion-chip>
   </div>
-
   <!-- Results count and loading state -->
   <div class="results-count">
     <ion-text color="medium" *ngIf="!loading">
-      Showing {{ members.length }} members
+      Showing {{ filteredMembers.length }} members
     </ion-text>
     <ion-spinner *ngIf="loading"></ion-spinner>
     <ion-text color="danger" *ngIf="error">{{ error }}</ion-text>
   </div>
 
   <!-- Member list cards -->
-  <ng-container *ngIf="members.length > 0; else noMembers">
-    <ion-card *ngFor="let member of members" [ngClass]="getMembershipStatus(member.expiryDate)">
+  <ng-container *ngIf="filteredMembers.length > 0; else noMembers">
+    <ion-card *ngFor="let member of filteredMembers" [ngClass]="getMembershipStatus(member.expiryDate)">
       <ion-card-content class="card-content">
-        <div class="member-info">
-          <div class="member-name">
+        <div class="member-info">          <div class="member-name">
             <strong>{{ member.firstName }} {{ member.lastName }}</strong>
-          </div>          <div>{{ member.email }}</div>
-          <div>Sports: {{ member.sports?.length ? member.sports.join(', ') : 'None' }}</div>
+          </div>          
+          <div>Phone: {{ member.phone || 'N/A' }}</div>
           <div>Expires: {{ formatDate(member.expiryDate) }}</div>
-        </div>
-        <div class="card-actions">
-          <ion-button fill="clear" color="primary" (click)="editMember(member)" class="action-button">
-            <ion-icon name="create-outline"></ion-icon>
+        </div>        <div class="card-actions">
+          <ion-button fill="clear" color="success" (click)="renewMembership(member)" class="action-button">
+            <ion-icon name="refresh-outline"></ion-icon>
           </ion-button>
-          <ion-button fill="clear" color="danger" (click)="deleteMember(member)" class="action-button">
-            <ion-icon name="trash-outline"></ion-icon>
+          <ion-button fill="clear" color="success" (click)="openWhatsApp(member)" class="action-button">
+            <ion-icon name="logo-whatsapp"></ion-icon>
           </ion-button>
         </div>
       </ion-card-content>

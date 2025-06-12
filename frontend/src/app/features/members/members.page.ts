@@ -25,6 +25,7 @@ import {
   AlertController,
   ToastController
 } from '@ionic/angular/standalone';
+import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { Member } from '../../shared/interfaces/member.interface';
 import { MemberService } from './services/member.service';
 import { CommonModule } from '@angular/common';
@@ -45,10 +46,10 @@ import { addIcons } from 'ionicons';
 @Component({
   selector: 'app-members',
   templateUrl: './members.page.html',
-  styleUrls: ['./members.page.scss'],
-  standalone: true,  imports: [
+  styleUrls: ['./members.page.scss'],  standalone: true,  imports: [
     CommonModule,
     FormsModule,
+    TranslateModule,
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -83,12 +84,21 @@ export class MembersPage implements OnInit {
   selectedSegment: string = 'all';
   loading: boolean = false;
   error: string | null = null;
-
   constructor(
     private memberService: MemberService,
     private alertController: AlertController,
-    private toastController: ToastController
-  ) {    addIcons({ 
+    private toastController: ToastController,
+    private translateService: TranslateService
+  ) {    
+    // Initialize available languages
+    this.translateService.addLangs(['en', 'ta']);
+    this.translateService.setDefaultLang('en');
+
+    // Use browser language if available, otherwise use English
+    const browserLang = navigator.language;
+    this.translateService.use(browserLang.match(/en|ta/) ? browserLang : 'en');
+
+    addIcons({ 
       addOutline, 
       createOutline, 
       trashOutline, 
@@ -343,6 +353,52 @@ export class MembersPage implements OnInit {
   }
 
   async editMember(member: Member) {
+  }
+  async renewMembership(member: Member) {
+    // TODO: Implement membership renewal logic
+  }  
+    async openWhatsApp(member: Member) {
+    if (!member.phone) {
+      const noPhoneMessage = await this.translateService.get('whatsapp.noPhone').toPromise();
+      this.showToast(noPhoneMessage, 'warning');
+      return;
+    }
+    
+    // Format the phone number (remove spaces, dashes, etc.)
+    let phoneNumber = member.phone.toString().replace(/\s+/g, '').replace(/-/g, '');
+    
+    // If the phone number doesn't start with '+', add the country code
+    // Assuming India (+91) as default country code
+    if (!phoneNumber.startsWith('+')) {
+      // Remove leading zeros if any
+      phoneNumber = phoneNumber.replace(/^0+/, '');
+      
+      // If the number doesn't have country code, add it
+      if (!phoneNumber.startsWith('91')) {
+        phoneNumber = '91' + phoneNumber;
+      }
+    }
+      // Create message based on membership status using translations
+    const membershipStatus = this.getMembershipStatus(member.expiryDate);
+    const params = {
+      name: `${member.firstName} ${member.lastName}`,
+      date: this.formatDate(member.expiryDate),
+      days: this.getRemainingDays(member.expiryDate).toString()
+    };
+    
+    // Get translated message based on membership status
+    const message = await this.translateService
+      .get(`whatsapp.${membershipStatus}`, params)
+      .toPromise();
+    
+    // Encode message for URL
+    const encodedMessage = encodeURIComponent(message);
+    
+    // Create the WhatsApp URL with auto-filled message if applicable
+    const whatsappUrl = `https://wa.me/${phoneNumber}${message ? '?text=' + encodedMessage : ''}`;
+    
+    // Open in browser
+    window.open(whatsappUrl, '_blank');
   }
 
   private async showToast(message: string, color: 'success' | 'danger' | 'warning' = 'success') {
