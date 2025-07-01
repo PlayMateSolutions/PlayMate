@@ -18,10 +18,12 @@ function generateUniqueId(prefix) {
 /**
  * Gets settings from the Settings sheet
  * 
+ * @param {Spreadsheet} ss - The spreadsheet to get settings from
  * @return {Object} Settings as key-value pairs
  */
-function getSettings() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+function getSettings(ss = null) {
+  // If no spreadsheet provided, try to get active spreadsheet
+  ss = ss || SpreadsheetApp.getActiveSpreadsheet();
   const settingsSheet = ss.getSheetByName(SHEET_NAMES.SETTINGS);
   
   if (!settingsSheet) {
@@ -51,10 +53,12 @@ function getSettings() {
  * 
  * @param {string} key - Setting key
  * @param {string} value - Setting value
+ * @param {Spreadsheet} ss - The spreadsheet to update settings in
  * @return {boolean} True if update was successful
  */
-function updateSetting(key, value) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+function updateSetting(key, value, ss = null) {
+  // If no spreadsheet provided, try to get active spreadsheet
+  ss = ss || SpreadsheetApp.getActiveSpreadsheet();
   const settingsSheet = ss.getSheetByName(SHEET_NAMES.SETTINGS);
   
   if (!settingsSheet) {
@@ -73,30 +77,26 @@ function updateSetting(key, value) {
   }
   
   if (rowIndex === -1) {
-    // Add new setting
+    // Setting doesn't exist, append it
     settingsSheet.appendRow([key, value]);
-  } else {
-    // Update existing setting
-    settingsSheet.getRange(rowIndex, 2).setValue(value);
+    return true;
   }
   
-  // Update last updated timestamp
-  const lastUpdatedRow = settingsData.findIndex(row => row[0] === 'Last Updated') + 1;
-  if (lastUpdatedRow > 0) {
-    settingsSheet.getRange(lastUpdatedRow, 2).setValue(new Date().toISOString());
-  }
-  
+  // Update existing setting
+  settingsSheet.getRange(rowIndex, 2).setValue(value);
   return true;
 }
 
 /**
  * Gets all available sports
  * 
+ * @param {Spreadsheet} ss - The spreadsheet to get sports from
  * @param {boolean} activeOnly - If true, only returns active sports
  * @return {Array} Array of sport objects
  */
-function getAllSports(activeOnly = true) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+function getAllSports(ss = null, activeOnly = true) {
+  // If no spreadsheet provided, try to get active spreadsheet
+  ss = ss || SpreadsheetApp.getActiveSpreadsheet();
   const sportsSheet = ss.getSheetByName(SHEET_NAMES.SPORTS);
   
   if (!sportsSheet) {

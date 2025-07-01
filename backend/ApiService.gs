@@ -12,46 +12,68 @@ const LOCK = LockService.getScriptLock();
 /**
  * Initialize the web app service
  */
-function doGet(request) {
-  return handleRequest(request);
+function doGet(e) {
+  return handleRequest(e, 'GET');
 }
 
-/**
- * Handle POST requests (for data mutations)
- */
-function doPost(request) {
-  return handleRequest(request);
+function doPost(e) {
+  return handleRequest(e, 'POST');
 }
 
 /**
  * Main request handler for both GET and POST requests
  *
- * @param {Object} request - The request object from doGet or doPost
+ * @param {Object} e - The request object from doGet or doPost
+ * @param {string} method - 'GET' or 'POST'
  * @return {TextOutput} JSON response
  */
-function handleRequest(request) {
+function handleRequest(e, method) {
   try {
-    // Parse the request parameters
-    const action = request.parameter.action;
-    const payload = request.parameter.payload
-      ? JSON.parse(request.parameter.payload)
-      : {};
+    let action, sportsClubId, payload, parsedRequest = null;
+    if (method === 'POST' && e.postData && e.postData.contents) {
+      parsedRequest = JSON.parse(e.postData.contents);
+      action = parsedRequest.action;
+      sportsClubId = parsedRequest.sportsClubId;
+      payload = parsedRequest.payload || {};
+    } else if (method === 'GET' && e.parameter) {
+      parsedRequest = e.parameter;
+      action = parsedRequest.action;
+      sportsClubId = parsedRequest.sportsClubId;
+      payload = parsedRequest.payload ? JSON.parse(parsedRequest.payload) : {};
+    } else {
+      return createErrorResponse('Invalid request format', 400);
+    }
+
+    let spreadsheet = null;
     let userEmail = null;
     let authResult = { success: true };
 
     // List of public actions that only need basic auth token
     const publicActions = ["getMember", "recordAttendance"];
     if (!publicActions.includes(action)) {
-      // All other actions require OAuth and sheet access
-      const token = getBearerToken(request);
+      const token = getBearerToken(e, method, parsedRequest);
       Logger.log('token ' + token)
-      const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-      authResult = authorizeUserWithSheet(token, spreadsheet);
+      if (sportsClubId) {
+        spreadsheet = getSpreadsheetByClubId(sportsClubId);
+        if (!spreadsheet) {
+          return createErrorResponse(`Sports club not found: ${sportsClubId}`, 404);
+        }
+      } else {
+        spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+      }
+      authResult = authorizeUserWithSheet(token, spreadsheet, sportsClubId);
       if (!authResult.success) {
         return createErrorResponse(authResult.message, 403);
       }
       userEmail = authResult.userEmail;
     }
+
+    // Add context to payload for handlers
+    payload.context = {
+      spreadsheet,
+      userEmail,
+      sportsClubId
+    };
 
     // Route the request to the appropriate handler based on the action
     let result;
@@ -129,6 +151,20 @@ function handleRequest(request) {
         result = handleUpdateSettings(payload);
         break;
 
+      // Sports Club endpoints
+      case "getSportsClubs":
+        result = handleGetSportsClubs(payload);
+        break;
+      case "getSportsClub":
+        result = handleGetSportsClub(payload);
+        break;
+      case "addSportsClub":
+        result = handleAddSportsClub(payload);
+        break;
+      case "updateSportsClub":
+        result = handleUpdateSportsClub(payload);
+        break;
+
       // If action is not recognized
       default:
         return createErrorResponse("Unknown action: " + action, 400);
@@ -144,20 +180,25 @@ function handleRequest(request) {
 }
 
 
-function getBearerToken(e) {
+function getBearerToken(e, method, parsedRequest = null) {
   try {
-    Logger.log(e)
-    var headers = e.parameter; // Google Apps Script does not provide a direct headers object
-    if (!headers) {
-      headers = e;
+    if (method === 'GET') {
+      // For GET, take from parameter
+      var headers = e.parameter;
+      var authorization = headers["Authorization"] || headers["authorization"];
+      if (!authorization || !authorization.startsWith("Bearer ")) {
+        return null;
+      }
+      return authorization.replace("Bearer ", "").trim();
+    } else if (method === 'POST' && parsedRequest) {
+      // For POST, take from parsed postData.contents
+      var authorization = parsedRequest["Authorization"] || parsedRequest["authorization"];
+      if (!authorization || !authorization.startsWith("Bearer ")) {
+        return null;
+      }
+      return authorization.replace("Bearer ", "").trim();
     }
-    var authorization = headers["Authorization"] || headers["authorization"];
-
-    if (!authorization || !authorization.startsWith("Bearer ")) {
-      return null;
-    }
-
-    return authorization.replace("Bearer ", "").trim(); // Extract token after "Bearer "
+    return null;
   } catch (error) {
     Logger.log("Error extracting token: " + error);
     return null;
@@ -228,9 +269,10 @@ function validateAuthToken(token) {
  * Authorize user for sensitive actions using OAuth and sheet access
  * @param {string} token - OAuth Bearer token
  * @param {Spreadsheet} spreadsheet - The active spreadsheet
+ * @param {string} sportsClubId - Optional sports club ID
  * @return {Object} { success: boolean, userEmail?: string, message?: string }
  */
-function authorizeUserWithSheet(token, spreadsheet) {
+function authorizeUserWithSheet(token, spreadsheet, sportsClubId = null) {
   const tokenValidation = validateOAuthToken(token);
   if (!tokenValidation.valid) {
     return {
@@ -239,6 +281,20 @@ function authorizeUserWithSheet(token, spreadsheet) {
     };
   }
   const userEmail = tokenValidation.email;
+
+  // If sportsClubId is provided, validate club access
+  if (sportsClubId) {
+    if (!validateClubAccess(sportsClubId, userEmail)) {
+      return {
+        success: false,
+        message: "Unauthorized: You do not have access to this club",
+      };
+    }
+    // Club access validated, no need to check spreadsheet access
+    return { success: true, userEmail };
+  }
+  
+  // No sportsClubId provided, fall back to spreadsheet access check
   const viewers = spreadsheet.getViewers().map((user) => user.getEmail());
   const editors = spreadsheet.getEditors().map((user) => user.getEmail());
   if (!viewers.includes(userEmail) && !editors.includes(userEmail)) {
@@ -789,5 +845,90 @@ function handleUpdateSettings(payload) {
     return { success: true };
   } finally {
     LOCK.releaseLock();
+  }
+}
+
+// ----------------------
+// Sports Club API Handlers
+// ----------------------
+
+/**
+ * Handle get sports clubs request
+ * Returns list of all active sports clubs
+ *
+ * @param {Object} payload - Request payload
+ * @return {Object} Response object with clubs array
+ */
+function handleGetSportsClubs(payload) {
+  try {
+    const clubs = getAllSportsClubs();
+    return {
+      success: true,
+      clubs: clubs
+    };
+  } catch (e) {
+    throw new Error('Failed to get sports clubs: ' + e.message);
+  }
+}
+
+/**
+ * Handle get sports club by ID request
+ *
+ * @param {Object} payload - Request payload with sportsClubId
+ * @return {Object} Response object with club data
+ */
+function handleGetSportsClub(payload) {
+  try {
+    const club = getClubById(payload.sportsClubId);
+    if (!club) {
+      throw new Error('Sports club not found');
+    }
+    return {
+      success: true,
+      club: club
+    };
+  } catch (e) {
+    throw new Error('Failed to get sports club: ' + e.message);
+  }
+}
+
+/**
+ * Handle add sports club request
+ *
+ * @param {Object} payload - Request payload with club data
+ * @return {Object} Response object with new club ID
+ */
+function handleAddSportsClub(payload) {
+  try {
+    const clubId = addSportsClub(payload.clubData);
+    if (!clubId) {
+      throw new Error('Failed to create sports club');
+    }
+    return {
+      success: true,
+      clubId: clubId
+    };
+  } catch (e) {
+    throw new Error('Failed to add sports club: ' + e.message);
+  }
+}
+
+/**
+ * Handle update sports club request
+ *
+ * @param {Object} payload - Request payload with sportsClubId and updated data
+ * @return {Object} Response object indicating success
+ */
+function handleUpdateSportsClub(payload) {
+  try {
+    const success = updateSportsClub(payload.sportsClubId, payload.clubData);
+    if (!success) {
+      throw new Error('Sports club not found');
+    }
+    return {
+      success: true
+    };
+  } catch (e) {
+    throw new Error('Failed to update sports club: ' + e.message);
   }
 }
