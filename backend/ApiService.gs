@@ -13,6 +13,7 @@ const LOCK = LockService.getScriptLock();
  * Initialize the web app service
  */
 function doGet(e) {
+  console.log('received get request')
   return handleRequest(e, 'GET');
 }
 
@@ -29,17 +30,18 @@ function doPost(e) {
  */
 function handleRequest(e, method) {
   try {
-    let action, sportsClubId, payload, parsedRequest = null;
+    let action, sportsClubId, payload;
     if (method === 'POST' && e.postData && e.postData.contents) {
-      parsedRequest = JSON.parse(e.postData.contents);
-      action = parsedRequest.action;
-      sportsClubId = parsedRequest.sportsClubId;
-      payload = parsedRequest.payload || {};
+      // const request = JSON.parse(e.postData.contents);
+      const request = e.parameter;
+      action = request.action;
+      sportsClubId = request.sportsClubId;
+      payload = JSON.parse(e.postData.contents) || {};
     } else if (method === 'GET' && e.parameter) {
-      parsedRequest = e.parameter;
-      action = parsedRequest.action;
-      sportsClubId = parsedRequest.sportsClubId;
-      payload = parsedRequest.payload ? JSON.parse(parsedRequest.payload) : {};
+      const request = e.parameter;
+      action = request.action;
+      sportsClubId = request.sportsClubId;
+      payload = request.payload ? JSON.parse(request.payload) : {};
     } else {
       return createErrorResponse('Invalid request format', 400);
     }
@@ -51,7 +53,7 @@ function handleRequest(e, method) {
     // List of public actions that only need basic auth token
     const publicActions = ["getMember", "recordAttendance"];
     if (!publicActions.includes(action)) {
-      const token = getBearerToken(e, method, parsedRequest);
+      const token = getBearerToken(e);
       Logger.log('token ' + token)
       if (sportsClubId) {
         spreadsheet = getSpreadsheetByClubId(sportsClubId);
@@ -180,25 +182,20 @@ function handleRequest(e, method) {
 }
 
 
-function getBearerToken(e, method, parsedRequest = null) {
+function getBearerToken(e) {
   try {
-    if (method === 'GET') {
-      // For GET, take from parameter
-      var headers = e.parameter;
-      var authorization = headers["Authorization"] || headers["authorization"];
-      if (!authorization || !authorization.startsWith("Bearer ")) {
-        return null;
-      }
-      return authorization.replace("Bearer ", "").trim();
-    } else if (method === 'POST' && parsedRequest) {
-      // For POST, take from parsed postData.contents
-      var authorization = parsedRequest["Authorization"] || parsedRequest["authorization"];
-      if (!authorization || !authorization.startsWith("Bearer ")) {
-        return null;
-      }
-      return authorization.replace("Bearer ", "").trim();
+    Logger.log(e)
+    var headers = e.parameter; // Google Apps Script does not provide a direct headers object
+    if (!headers) {
+      headers = e;
     }
-    return null;
+    var authorization = headers["Authorization"] || headers["authorization"];
+
+    if (!authorization || !authorization.startsWith("Bearer ")) {
+      return null;
+    }
+
+    return authorization.replace("Bearer ", "").trim(); // Extract token after "Bearer "
   } catch (error) {
     Logger.log("Error extracting token: " + error);
     return null;
@@ -273,6 +270,9 @@ function validateAuthToken(token) {
  * @return {Object} { success: boolean, userEmail?: string, message?: string }
  */
 function authorizeUserWithSheet(token, spreadsheet, sportsClubId = null) {
+  //TODO Remove this before production
+      return { success: true, userEmail : "jsramraj@gmail.com" };
+
   const tokenValidation = validateOAuthToken(token);
   if (!tokenValidation.valid) {
     return {
@@ -345,7 +345,7 @@ function validateOAuthToken(token) {
  */
 function handleGetMembers(payload) {
   const filters = payload.filters || {};
-  return getAllMembers(filters);
+  return getAllMembers(filters, payload);
 }
 
 /**

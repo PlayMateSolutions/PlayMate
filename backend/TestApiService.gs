@@ -4,6 +4,8 @@
  */
 
 const token = 'Bearer TOKEN_HERE'; // Replace with your actual token
+const SPORTS_CLUB_ID = 'Herkley';
+const API_BASE_URL = 'https://script.google.com/macros/s/AKfycbwkIwh2XoG6k3r2BsPTLcbZK9S6EmqdDGSs4kGAMD1xc6qQ7jJCURjwjJbB8NeuuX2j/exec';
 
 function testAddMemberApi() {
   // Mock POST request data for addMember
@@ -11,7 +13,8 @@ function testAddMemberApi() {
     postData: {
       contents: JSON.stringify({
         action: "addMember",
-        authorization : token,
+        authorization: token,
+        sportsClubId: SPORTS_CLUB_ID,
         payload: {
           firstName: "John",
           lastName: "Doe",
@@ -33,11 +36,13 @@ function testAddMemberApi() {
 }
 
 function testGetMembers() {
-  // Mock event with URL parameters
+  // Mock GET event with parameters
   const mockEvent = {
     parameter: {
       action: "getMembers",
-      authorization: token
+      authorization: token,
+      sportsClubId: SPORTS_CLUB_ID,
+      payload: "{}"
     }
   };
 
@@ -46,6 +51,20 @@ function testGetMembers() {
   Logger.log(response.getContent());
 }
 
+function testGetMembersRest() {
+  const params = {
+    method: 'get',
+    muteHttpExceptions: true,
+    headers: {
+      'Authorization': token
+    }
+  };
+  // Build query string with authorization in the query itself
+  const query = `?action=getMembers&sportsClubId=${encodeURIComponent(SPORTS_CLUB_ID)}&authorization=${encodeURIComponent(token)}&payload={}`;
+  const response = UrlFetchApp.fetch(API_BASE_URL + query, params);
+  Logger.log('REST response:');
+  Logger.log(response.getContentText());
+}
 
 function testRecordAttendance() {
   // Mock event with URL parameters

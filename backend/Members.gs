@@ -10,7 +10,7 @@
  * @return {string} ID of the newly created member
  */
 function addMember(memberData) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = memberData.context.spreadsheet;
   const membersSheet = ss.getSheetByName(SHEET_NAMES.MEMBERS);
   
   // Generate sequential ID
@@ -172,8 +172,9 @@ function getMemberById(memberId) {
  * @param {Object} filters - Optional filters (status, sport)
  * @return {Array} Array of member objects
  */
-function getAllMembers(filters = {}) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+function getAllMembers(filters = {}, payload) {
+  Logger.log('getting all members');
+  const ss = payload.context.spreadsheet;
   const membersSheet = ss.getSheetByName(SHEET_NAMES.MEMBERS);
   
   // Get all data except header row
