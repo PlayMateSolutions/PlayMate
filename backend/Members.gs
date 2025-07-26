@@ -46,6 +46,7 @@ function addMember(memberData) {
     memberData.lastName,
     memberData.email,
     memberData.phone,
+    memberData.place || '',
     memberData.joinDate || new Date(),
     memberData.status || MEMBER_STATUS.ACTIVE,
     memberData.expiryDate || '',
@@ -107,19 +108,23 @@ function updateMember(memberId, updatedData) {
   if (updatedData.phone !== undefined) {
     membersSheet.getRange(rowIndex, MEMBERS_COLUMNS.PHONE + 1).setValue(updatedData.phone);
   }
-  
+
+  if (updatedData.place !== undefined) {
+    membersSheet.getRange(rowIndex, MEMBERS_COLUMNS.PLACE + 1).setValue(updatedData.place);
+  }
+
   if (updatedData.joinDate !== undefined) {
     membersSheet.getRange(rowIndex, MEMBERS_COLUMNS.JOIN_DATE + 1).setValue(updatedData.joinDate);
   }
-  
+
   if (updatedData.status !== undefined) {
     membersSheet.getRange(rowIndex, MEMBERS_COLUMNS.STATUS + 1).setValue(updatedData.status);
   }
-  
+
   if (updatedData.expiryDate !== undefined) {
     membersSheet.getRange(rowIndex, MEMBERS_COLUMNS.EXPIRY_DATE + 1).setValue(updatedData.expiryDate);
   }
-  
+
   if (updatedData.notes !== undefined) {
     membersSheet.getRange(rowIndex, MEMBERS_COLUMNS.NOTES + 1).setValue(updatedData.notes);
   }
@@ -159,6 +164,7 @@ function getMemberById(memberId) {
     lastName: memberRow[MEMBERS_COLUMNS.LAST_NAME],
     email: memberRow[MEMBERS_COLUMNS.EMAIL],
     phone: memberRow[MEMBERS_COLUMNS.PHONE],
+    place: memberRow[MEMBERS_COLUMNS.PLACE],
     joinDate: memberRow[MEMBERS_COLUMNS.JOIN_DATE],
     status: memberRow[MEMBERS_COLUMNS.STATUS],
     expiryDate: memberRow[MEMBERS_COLUMNS.EXPIRY_DATE],
@@ -201,6 +207,7 @@ function getAllMembers(filters = {}, payload) {
       lastName: row[MEMBERS_COLUMNS.LAST_NAME],
       email: row[MEMBERS_COLUMNS.EMAIL],
       phone: row[MEMBERS_COLUMNS.PHONE],
+      place: row[MEMBERS_COLUMNS.PLACE],
       joinDate: row[MEMBERS_COLUMNS.JOIN_DATE],
       status: row[MEMBERS_COLUMNS.STATUS],
       expiryDate: row[MEMBERS_COLUMNS.EXPIRY_DATE],
@@ -285,6 +292,7 @@ function searchMembers(searchTerm) {
         lastName: row[MEMBERS_COLUMNS.LAST_NAME],
         email: row[MEMBERS_COLUMNS.EMAIL],
         phone: row[MEMBERS_COLUMNS.PHONE],
+        place: row[MEMBERS_COLUMNS.PLACE],
         joinDate: row[MEMBERS_COLUMNS.JOIN_DATE],
         status: row[MEMBERS_COLUMNS.STATUS],
         expiryDate: row[MEMBERS_COLUMNS.EXPIRY_DATE],
@@ -346,6 +354,7 @@ function importMembers(csvData) {
         lastName: headerIndices['Last Name'] !== undefined ? (row[headerIndices['Last Name']] || '') : '',
         email: headerIndices['Email'] !== undefined ? (row[headerIndices['Email']] || '') : '',
         phone: row[headerIndices['Phone']],
+        place: headerIndices['Place'] !== undefined ? (row[headerIndices['Place']] || '') : '',
         joinDate: headerIndices['Join Date'] !== undefined ? new Date(row[headerIndices['Join Date']]) : new Date(),
         status: headerIndices['Status'] !== undefined ? row[headerIndices['Status']] : MEMBER_STATUS.ACTIVE,
         expiryDate: headerIndices['Expiry Date'] !== undefined ? new Date(row[headerIndices['Expiry Date']]) : '',

@@ -19,10 +19,11 @@ const MEMBERS_COLUMNS = {
   LAST_NAME: 2,
   EMAIL: 3,
   PHONE: 4,
-  JOIN_DATE: 5,
-  STATUS: 6,
-  EXPIRY_DATE: 7,
-  NOTES: 8
+  PLACE : 5,
+  JOIN_DATE: 6,
+  STATUS: 7,
+  EXPIRY_DATE: 8,
+  NOTES: 9
 };
 
 // Column indices for Attendance sheet
