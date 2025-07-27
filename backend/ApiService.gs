@@ -31,7 +31,8 @@ function doPost(e) {
 function handleRequest(e, method) {
   try {
     let action, sportsClubId, payload;
-    if (method === 'POST' && e.postData && e.postData.contents) {
+
+    if (method === 'POST' && e.parameter) {
       // const request = JSON.parse(e.postData.contents);
       const request = e.parameter;
       action = request.action;
