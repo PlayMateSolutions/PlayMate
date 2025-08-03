@@ -626,8 +626,8 @@ function handleUpdateAttendance(payload) {
  * @return {Object} Result with new payment ID
  */
 function handleRecordPayment(payload) {
-  if (!payload.memberId || !payload.amount || !payload.sport) {
-    throw new Error("Member ID, amount, and sport are required");
+  if (!payload.memberId || !payload.amount) {
+    throw new Error("Member ID, amount");
   }
 
   // Convert date strings to Date objects if present

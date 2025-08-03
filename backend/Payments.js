@@ -10,7 +10,7 @@
  * @return {string} ID of the newly created payment record
  */
 function recordPayment(paymentData) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = paymentData.context.spreadsheet;
   const paymentsSheet = ss.getSheetByName(SHEET_NAMES.PAYMENTS);
   
   // Generate a unique ID
@@ -47,7 +47,7 @@ function recordPayment(paymentData) {
   
   // Update member's expiry date if payment is successful and has an end period
   if (paymentData.status === PAYMENT_STATUS.PAID && paymentData.periodEnd) {
-    updateMemberExpiryDate(paymentData.memberId, paymentData.periodEnd);
+    updateMemberExpiryDate(paymentData);
   }
   
   return paymentId;
@@ -60,35 +60,41 @@ function recordPayment(paymentData) {
  * @param {Date} newExpiryDate - New expiry date
  * @return {boolean} True if update was successful, false otherwise
  */
-function updateMemberExpiryDate(memberId, newExpiryDate) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+function updateMemberExpiryDate(paymentData) {
+  const ss = paymentData.context.spreadsheet;
   const membersSheet = ss.getSheetByName(SHEET_NAMES.MEMBERS);
-  
+  const memberId = paymentData.memberId;
+  const newExpiryDate = paymentData.periodEnd;
+
   // Find the row with the member ID
   const memberData = membersSheet.getDataRange().getValues();
   let rowIndex = -1;
-  
+
   for (let i = 1; i < memberData.length; i++) {
-    if (memberData[i][MEMBERS_COLUMNS.ID] === memberId) {
+    if (String(memberData[i][MEMBERS_COLUMNS.ID]) === String(memberId)) {
       rowIndex = i + 1; // +1 because arrays are 0-indexed but sheet rows are 1-indexed
       break;
     }
   }
-  
+
   if (rowIndex === -1) {
+    Logger.log('[updateMemberExpiryDate] Member not found: ' + memberId);
     return false; // Member not found
   }
-  
+
   // Get current expiry date
   const currentExpiryDate = memberData[rowIndex-1][MEMBERS_COLUMNS.EXPIRY_DATE];
   const newDate = new Date(newExpiryDate);
-  
+
   // Only update if new date is later than current date
   if (!currentExpiryDate || new Date(currentExpiryDate) < newDate) {
     membersSheet.getRange(rowIndex, MEMBERS_COLUMNS.EXPIRY_DATE + 1).setValue(newDate);
     membersSheet.getRange(rowIndex, MEMBERS_COLUMNS.EXPIRY_DATE + 1).setNumberFormat('yyyy-mm-dd');
+    Logger.log('[updateMemberExpiryDate] Expiry date updated for memberId: ' + memberId + ' to ' + newDate);
+  } else {
+    Logger.log('[updateMemberExpiryDate] No update needed for memberId: ' + memberId + '. Current expiry date is later than new date.');
   }
-  
+
   return true;
 }
 
@@ -100,7 +106,7 @@ function updateMemberExpiryDate(memberId, newExpiryDate) {
  * @return {boolean} True if update was successful, false otherwise
  */
 function updatePayment(paymentId, updatedData) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = updatedData.context && updatedData.context.spreadsheet ? updatedData.context.spreadsheet : SpreadsheetApp.getActiveSpreadsheet();
   const paymentsSheet = ss.getSheetByName(SHEET_NAMES.PAYMENTS);
   
   // Find the row with the payment ID
@@ -161,7 +167,7 @@ function updatePayment(paymentId, updatedData) {
  * @return {Object|null} Payment object or null if not found
  */
 function getPaymentById(paymentId) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = arguments[1] && arguments[1].context && arguments[1].context.spreadsheet ? arguments[1].context.spreadsheet : SpreadsheetApp.getActiveSpreadsheet();
   const paymentsSheet = ss.getSheetByName(SHEET_NAMES.PAYMENTS);
   
   // Find the row with the payment ID
@@ -200,7 +206,7 @@ function getPaymentById(paymentId) {
  * @return {Array} Array of payment objects
  */
 function getPaymentRecords(filters = {}) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = filters.context && filters.context.spreadsheet ? filters.context.spreadsheet : SpreadsheetApp.getActiveSpreadsheet();
   const paymentsSheet = ss.getSheetByName(SHEET_NAMES.PAYMENTS);
   
   // Get all data except header row
@@ -268,7 +274,7 @@ function getPaymentRecords(filters = {}) {
  * @return {boolean} True if deletion was successful, false otherwise
  */
 function deletePayment(paymentId) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = arguments[1] && arguments[1].context && arguments[1].context.spreadsheet ? arguments[1].context.spreadsheet : SpreadsheetApp.getActiveSpreadsheet();
   const paymentsSheet = ss.getSheetByName(SHEET_NAMES.PAYMENTS);
   
   // Find the row with the payment ID
@@ -438,7 +444,7 @@ function getOverallPaymentSummary(options = {}) {
  * @return {Array} Array of members with payment status
  */
 function getMembersWithPaymentStatus(sport = null) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = arguments[1] && arguments[1].context && arguments[1].context.spreadsheet ? arguments[1].context.spreadsheet : SpreadsheetApp.getActiveSpreadsheet();
   const settingsSheet = ss.getSheetByName(SHEET_NAMES.SETTINGS);
   const settings = getSettings();
   
@@ -546,7 +552,7 @@ function getMembersWithPaymentStatus(sport = null) {
  * @return {number} Monthly fee for the sport
  */
 function getSportFee(sportName) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = arguments[1] && arguments[1].context && arguments[1].context.spreadsheet ? arguments[1].context.spreadsheet : SpreadsheetApp.getActiveSpreadsheet();
   const sportsSheet = ss.getSheetByName(SHEET_NAMES.SPORTS);
   
   // Get all sports data
