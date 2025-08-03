@@ -3,9 +3,8 @@
  * Test the addMember API workflow for PlayMate
  */
 
-const token = 'Bearer ya29.a0AS3H6Nw1P-mV2MjjKR5EvRe5eekzeOh0S5IAEmS6gzHCnLf9J2lWTcG1lYlZNm0_Uf1ngnMz_0QsQWiCsMcfUAPt5_Pw9v7q25t-xaLDqqdsxKRvV9vLaCZh53cWBEPecp6ZZK2vjeeSJBHX_Zm1b_u8QJNYz2eMkw_baTAZaCgYKAS4SARUSFQHGX2MifxS-oa5wfLw93yN7t1iQbA0175';
-const SPORTS_CLUB_ID = 'herkley';
-const API_BASE_URL = 'https://script.google.com/macros/s/AKfycby6AkZLrsbThfSSh87zLiHJIxppxTA0T6cIyFH-AGX_ErUt0-BI-l8l_V6dL_mz1t_W/exec';
+const tokenMethod = 'Bearer ya29.a0AS3H6Nw1P-mV2MjjKR5EvRe5eekzeOh0S5IAEmS6gzHCnLf9J2lWTcG1lYlZNm0_Uf1ngnMz_0QsQWiCsMcfUAPt5_Pw9v7q25t-xaLDqqdsxKRvV9vLaCZh53cWBEPecp6ZZK2vjeeSJBHX_Zm1b_u8QJNYz2eMkw_baTAZaCgYKAS4SARUSFQHGX2MifxS-oa5wfLw93yN7t1iQbA0175';
+const SPORTS_CLUB_ID_METHOD = 'herkley';
 
 
 function testAddMemberApi() {
@@ -34,22 +33,6 @@ function testAddMemberApi() {
   const request = { parameter: JSON.parse(mockEvent.postData.contents) };
   const response = doPost(request);
   Logger.log(response.getContent());
-}
-
-
-function testGetMembersRest() {
-  const params = {
-    method: 'get',
-    headers: {
-      'Authorization': token
-    },
-    muteHttpExceptions: true
-  };
-  // Build query string with authorization in the query itself
-  const query = `?action=getMembers&sportsClubId=${encodeURIComponent(SPORTS_CLUB_ID)}&authorization=${encodeURIComponent(token)}`;
-  const response = UrlFetchApp.fetch(API_BASE_URL + query);
-  Logger.log('REST response:');
-  Logger.log(response.getContentText());
 }
 
 function testGetMembers() {

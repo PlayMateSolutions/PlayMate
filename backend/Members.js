@@ -88,7 +88,7 @@ function addMember(memberData) {
  * @return {boolean} True if update was successful, false otherwise
  */
 function updateMember(memberId, updatedData) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = memberData.context.spreadsheet;
   const membersSheet = ss.getSheetByName(SHEET_NAMES.MEMBERS);
 
   // Find the row with the member ID
@@ -170,8 +170,8 @@ function updateMember(memberId, updatedData) {
  * @param {string} memberId - ID of the member to retrieve
  * @return {Object|null} Member object or null if not found
  */
-function getMemberById(memberId) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+function getMemberByPhoneNo(payload) {
+  const ss = payload.context.spreadsheet;
   const membersSheet = ss.getSheetByName(SHEET_NAMES.MEMBERS);
 
   // Find the row with the member ID
@@ -179,7 +179,9 @@ function getMemberById(memberId) {
   let memberRow = null;
 
   for (let i = 1; i < memberData.length; i++) {
-    if (memberData[i][MEMBERS_COLUMNS.ID] === memberId) {
+    Logger.log(memberData[i]);
+    Logger.log(payload.phoneNumber);
+    if (String(memberData[i][MEMBERS_COLUMNS.PHONE]) === String(payload.phoneNumber)) {
       memberRow = memberData[i];
       break;
     }
@@ -204,13 +206,7 @@ function getMemberById(memberId) {
   };
 }
 
-/**
- * Gets all members, optionally filtered by status or sport
- *
- * @param {Object} filters - Optional filters (status, sport)
- * @return {Array} Array of member objects
- */
-function getAllMembers(filters = {}, payload) {
+function getAllMembers(payload) {
   Logger.log("getting all members");
   const ss = payload.context.spreadsheet;
   const membersSheet = ss.getSheetByName(SHEET_NAMES.MEMBERS);
@@ -224,11 +220,6 @@ function getAllMembers(filters = {}, payload) {
 
     // Skip empty rows
     if (!row[MEMBERS_COLUMNS.ID]) {
-      continue;
-    }
-
-    // Apply filters
-    if (filters.status && row[MEMBERS_COLUMNS.STATUS] !== filters.status) {
       continue;
     }
 
@@ -248,189 +239,4 @@ function getAllMembers(filters = {}, payload) {
   }
 
   return members;
-}
-
-/**
- * Deletes a member by ID
- *
- * @param {string} memberId - ID of the member to delete
- * @return {boolean} True if deletion was successful, false otherwise
- */
-function deleteMember(memberId) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const membersSheet = ss.getSheetByName(SHEET_NAMES.MEMBERS);
-
-  // Find the row with the member ID
-  const memberData = membersSheet.getDataRange().getValues();
-  let rowIndex = -1;
-
-  for (let i = 1; i < memberData.length; i++) {
-    if (memberData[i][MEMBERS_COLUMNS.ID] === memberId) {
-      rowIndex = i + 1; // +1 because arrays are 0-indexed but sheet rows are 1-indexed
-      break;
-    }
-  }
-
-  if (rowIndex === -1) {
-    return false; // Member not found
-  }
-
-  // Delete the row
-  membersSheet.deleteRow(rowIndex);
-
-  return true;
-}
-
-/**
- * Searches for members based on a search term
- * Searches in name, email, and phone fields
- *
- * @param {string} searchTerm - Term to search for
- * @return {Array} Array of matching member objects
- */
-function searchMembers(searchTerm) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const membersSheet = ss.getSheetByName(SHEET_NAMES.MEMBERS);
-
-  // Get all data except header row
-  const memberData = membersSheet.getDataRange().getValues();
-  const members = [];
-  const searchTermLower = searchTerm.toLowerCase();
-
-  for (let i = 1; i < memberData.length; i++) {
-    const row = memberData[i];
-
-    // Skip empty rows
-    if (!row[MEMBERS_COLUMNS.ID]) {
-      continue;
-    }
-
-    // Check if the search term is in any of the searchable fields
-    const firstName = row[MEMBERS_COLUMNS.FIRST_NAME].toString().toLowerCase();
-    const lastName = row[MEMBERS_COLUMNS.LAST_NAME].toString().toLowerCase();
-    const email = row[MEMBERS_COLUMNS.EMAIL].toString().toLowerCase();
-    const phone = row[MEMBERS_COLUMNS.PHONE].toString().toLowerCase();
-
-    if (
-      firstName.includes(searchTermLower) ||
-      lastName.includes(searchTermLower) ||
-      email.includes(searchTermLower) ||
-      phone.includes(searchTermLower) ||
-      (firstName + " " + lastName).includes(searchTermLower)
-    ) {
-      // Convert row data to a member object
-      members.push({
-        id: row[MEMBERS_COLUMNS.ID],
-        firstName: row[MEMBERS_COLUMNS.FIRST_NAME],
-        lastName: row[MEMBERS_COLUMNS.LAST_NAME],
-        email: row[MEMBERS_COLUMNS.EMAIL],
-        phone: row[MEMBERS_COLUMNS.PHONE],
-        place: row[MEMBERS_COLUMNS.PLACE],
-        joinDate: row[MEMBERS_COLUMNS.JOIN_DATE],
-        status: row[MEMBERS_COLUMNS.STATUS],
-        expiryDate: row[MEMBERS_COLUMNS.EXPIRY_DATE],
-        notes: row[MEMBERS_COLUMNS.NOTES],
-      });
-    }
-  }
-
-  return members;
-}
-
-/**
- * Imports members from CSV data
- *
- * @param {string} csvData - CSV data with headers
- * @return {Object} Import results with success count and errors
- */
-function importMembers(csvData) {
-  const result = {
-    success: 0,
-    errors: [],
-  };
-
-  // Parse CSV data
-  const rows = Utilities.parseCsv(csvData);
-
-  // Validate headers
-  const expectedHeaders = [
-    "First Name",
-    "Last Name",
-    "Email",
-    "Phone",
-    "Join Date",
-    "Status",
-    "Sports",
-    "Notes",
-  ];
-  const headers = rows[0];
-
-  // Check if required headers are present
-  const requiredHeaders = ["First Name", "Phone"];
-  for (const header of requiredHeaders) {
-    if (!headers.includes(header)) {
-      result.errors.push(`Required header "${header}" is missing.`);
-      return result;
-    }
-  }
-
-  // Map headers to indices
-  const headerIndices = {};
-  for (let i = 0; i < headers.length; i++) {
-    headerIndices[headers[i]] = i;
-  }
-
-  // Process each row
-  for (let i = 1; i < rows.length; i++) {
-    const row = rows[i];
-
-    // Skip empty rows
-    if (row.length === 0 || !row[headerIndices["First Name"]]) {
-      continue;
-    }
-
-    try {
-      // Prepare member data
-      const memberData = {
-        firstName: row[headerIndices["First Name"]],
-        lastName:
-          headerIndices["Last Name"] !== undefined
-            ? row[headerIndices["Last Name"]] || ""
-            : "",
-        email:
-          headerIndices["Email"] !== undefined
-            ? row[headerIndices["Email"]] || ""
-            : "",
-        phone: row[headerIndices["Phone"]],
-        place:
-          headerIndices["Place"] !== undefined
-            ? row[headerIndices["Place"]] || ""
-            : "",
-        joinDate:
-          headerIndices["Join Date"] !== undefined
-            ? new Date(row[headerIndices["Join Date"]])
-            : new Date(),
-        status:
-          headerIndices["Status"] !== undefined
-            ? row[headerIndices["Status"]]
-            : MEMBER_STATUS.ACTIVE,
-        expiryDate:
-          headerIndices["Expiry Date"] !== undefined
-            ? new Date(row[headerIndices["Expiry Date"]])
-            : "",
-        notes:
-          headerIndices["Notes"] !== undefined
-            ? row[headerIndices["Notes"]]
-            : "",
-      };
-
-      // Add the member
-      addMember(memberData);
-      result.success++;
-    } catch (error) {
-      result.errors.push(`Error importing row ${i + 1}: ${error.message}`);
-    }
-  }
-
-  return result;
 }

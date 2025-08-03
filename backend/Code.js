@@ -33,9 +33,12 @@ function onOpen() {
  * Initializes the spreadsheet with the necessary sheets and headers
  * This should be run manually once when setting up the app
  */
+/**
+ * Initializes the spreadsheet with the necessary sheets and headers
+ * @param {string} [spreadsheetId] - Optional spreadsheet ID to initialize. If not provided, uses the active spreadsheet.
+ */
 function initializeSpreadsheet() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  
+  const ss = SpreadsheetApp.openById("17mw699ag7t3Qqs6YRsDdpJnOYSVpwiVWOwGvf8q5bVY");  
   // Create Members sheet if it doesn't exist
   if (!ss.getSheetByName(SHEET_NAMES.MEMBERS)) {
     const membersSheet = ss.insertSheet(SHEET_NAMES.MEMBERS);
@@ -112,16 +115,16 @@ function initializeSpreadsheet() {
   }
   
   // Format date columns
-  formatDateColumns();
+  formatDateColumns(ss);
   
   // Set column widths
-  setColumnWidths();
+  setColumnWidths(ss);
   
   // Create data validations
-  setupDataValidations();
+  setupDataValidations(ss);
   
   // Create dashboard as the first sheet
-  createDashboard();
+  createDashboard(ss);
   
   SpreadsheetApp.getUi().alert('Spreadsheet initialized successfully!');
 }
@@ -129,9 +132,7 @@ function initializeSpreadsheet() {
 /**
  * Sets up data validations for various columns
  */
-function setupDataValidations() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  
+function setupDataValidations(ss) {  
   // Member status validation
   const membersSheet = ss.getSheetByName(SHEET_NAMES.MEMBERS);
   const statusValues = Object.values(MEMBER_STATUS);
@@ -165,20 +166,18 @@ function setupDataValidations() {
     .build();
   
   // Apply sport validation to payments and attendance sheets
-  paymentsSheet.getRange(2, PAYMENTS_COLUMNS.SPORT + 1, paymentsSheet.getMaxRows() - 1, 1)
+  paymentsSheet.getRange(2, PAYMENTS_COLUMNS.PAYMENT_TYPE + 1, paymentsSheet.getMaxRows() - 1, 1)
     .setDataValidation(sportValidation);
   
   const attendanceSheet = ss.getSheetByName(SHEET_NAMES.ATTENDANCE);
-  attendanceSheet.getRange(2, ATTENDANCE_COLUMNS.SPORT + 1, attendanceSheet.getMaxRows() - 1, 1)
+  attendanceSheet.getRange(2, ATTENDANCE_COLUMNS.DATE + 1, attendanceSheet.getMaxRows() - 1, 1)
     .setDataValidation(sportValidation);
 }
 
 /**
  * Formats date columns in all sheets
  */
-function formatDateColumns() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  
+function formatDateColumns(ss) {
   // Format join date in Members sheet
   const membersSheet = ss.getSheetByName(SHEET_NAMES.MEMBERS);
   membersSheet.getRange(2, MEMBERS_COLUMNS.JOIN_DATE + 1, membersSheet.getMaxRows() - 1, 1)
@@ -212,9 +211,7 @@ function formatDateColumns() {
 /**
  * Sets appropriate column widths for all sheets
  */
-function setColumnWidths() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  
+function setColumnWidths(ss) {  
   // Members sheet column widths
   const membersSheet = ss.getSheetByName(SHEET_NAMES.MEMBERS);
   membersSheet.setColumnWidth(1, 70);  // ID

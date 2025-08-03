@@ -11,7 +11,7 @@ function showDashboard() {
   const ui = SpreadsheetApp.getUi();
   
   // Create dashboard sheet if it doesn't exist
-  createDashboard();
+  createDashboard(ss);
   
   // Activate the Dashboard sheet
   const dashboardSheet = ss.getSheetByName('Dashboard');
@@ -25,9 +25,7 @@ function showDashboard() {
 /**
  * Creates the dashboard sheet
  */
-function createDashboard() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  
+function createDashboard(ss) {  
   // Check if Dashboard sheet already exists
   let dashboardSheet = ss.getSheetByName('Dashboard');
   

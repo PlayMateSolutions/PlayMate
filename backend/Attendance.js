@@ -10,7 +10,7 @@
  * @return {string} ID of the newly created attendance record
  */
 function recordAttendance(attendanceData) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = memberData.context.spreadsheet;
   const attendanceSheet = ss.getSheetByName(SHEET_NAMES.ATTENDANCE);
   
   // Generate a unique ID

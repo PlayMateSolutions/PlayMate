@@ -31,6 +31,8 @@ function doPost(e) {
 function handleRequest(e, method) {
   try {
     let action, sportsClubId, payload;
+    Logger.log(method);
+    Logger.log(JSON.stringify(e));
 
     if (method === 'POST' && e.parameter) {
       // const request = JSON.parse(e.postData.contents);
@@ -85,20 +87,14 @@ function handleRequest(e, method) {
       case "getMembers":
         result = handleGetMembers(payload);
         break;
-      case "getMember":
-        result = handleGetMember(payload);
+      case "getMemberByPhoneNo":
+        result = getMemberByPhoneNo(payload);
         break;
       case "addMember":
         result = handleAddMember(payload);
         break;
       case "updateMember":
         result = handleUpdateMember(payload);
-        break;
-      case "deleteMember":
-        result = handleDeleteMember(payload);
-        break;
-      case "searchMembers":
-        result = handleSearchMembers(payload);
         break;
 
       // Attendance endpoints
@@ -271,9 +267,6 @@ function validateAuthToken(token) {
  * @return {Object} { success: boolean, userEmail?: string, message?: string }
  */
 function authorizeUserWithSheet(token, spreadsheet, sportsClubId = null) {
-  //TODO Remove this before production
-      return { success: true, userEmail : "jsramraj@gmail.com" };
-
   const tokenValidation = validateOAuthToken(token);
   if (!tokenValidation.valid) {
     return {
@@ -281,7 +274,9 @@ function authorizeUserWithSheet(token, spreadsheet, sportsClubId = null) {
       message: "Invalid or expired OAuth token: " + tokenValidation.error,
     };
   }
+  console.log(JSON.stringify(tokenValidation));
   const userEmail = tokenValidation.email;
+  console.log("User email from token: " + userEmail);
 
   // If sportsClubId is provided, validate club access
   if (sportsClubId) {
@@ -308,13 +303,29 @@ function authorizeUserWithSheet(token, spreadsheet, sportsClubId = null) {
 }
 
 function validateOAuthToken(token) {
+  Logger.log("Validating OAuth token: " + token);
   var url =
-    "https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=" + token;
+    "https://www.googleapis.com/oauth2/v3/tokeninfo";
 
   try {
-    var response = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
-    var json = JSON.parse(response.getContentText());
-    Logger.log(json)
+    var options = {
+      muteHttpExceptions: true
+    };
+    var response = UrlFetchApp.fetch(url + "?access_token=" + encodeURIComponent(token), options);
+    var responseCode = response.getResponseCode();
+    var json = {};
+    try {
+      json = JSON.parse(response.getContentText());
+    } catch (parseError) {
+      Logger.log("Error parsing tokeninfo response: " + parseError);
+    }
+    console.log(response.getContentText());
+    console.log(json);
+
+    if (responseCode !== 200) {
+      Logger.log("Invalid Token: HTTP " + responseCode);
+      return { valid: false, error: (json.error_description || json.error || ("HTTP " + responseCode)) };
+    }
 
     if (json.error) {
       Logger.log("Invalid Token: " + json.error_description);
@@ -345,8 +356,7 @@ function validateOAuthToken(token) {
  * @return {Object} List of members
  */
 function handleGetMembers(payload) {
-  const filters = payload.filters || {};
-  return getAllMembers(filters, payload);
+  return getAllMembers(payload);
 }
 
 /**
@@ -355,12 +365,12 @@ function handleGetMembers(payload) {
  * @param {Object} payload - Request payload with memberId
  * @return {Object} Member details
  */
-function handleGetMember(payload) {
-  if (!payload.memberId) {
-    throw new Error("Member ID is required");
+function getMemberByPhoneNo(payload) {
+  if (!payload.phoneNumber) {
+    throw new Error("Phone number is required");
   }
 
-  const member = getMemberById(payload.memberId);
+  const member = getMemberByPhoneNo(payload.phoneNumber);
   if (!member) {
     throw new Error("Member not found");
   }
@@ -431,49 +441,6 @@ function handleUpdateMember(payload) {
   } finally {
     LOCK.releaseLock();
   }
-}
-
-/**
- * Handle delete member request
- *
- * @param {Object} payload - Request with memberId
- * @return {Object} Result indicating success
- */
-function handleDeleteMember(payload) {
-  if (!payload.memberId) {
-    throw new Error("Member ID is required");
-  }
-
-  // Try to acquire lock to prevent concurrent writes
-  if (!LOCK.tryLock(10000)) {
-    throw new Error(
-      "Failed to acquire lock. The system is busy. Please try again."
-    );
-  }
-
-  try {
-    const success = deleteMember(payload.memberId);
-    if (!success) {
-      throw new Error("Member not found or deletion failed");
-    }
-    return { success: true };
-  } finally {
-    LOCK.releaseLock();
-  }
-}
-
-/**
- * Handle search members request
- *
- * @param {Object} payload - Request with search term
- * @return {Object} List of matching members
- */
-function handleSearchMembers(payload) {
-  if (!payload.searchTerm) {
-    throw new Error("Search term is required");
-  }
-
-  return searchMembers(payload.searchTerm);
 }
 
 // ----------------------
