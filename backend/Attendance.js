@@ -1,4 +1,29 @@
 /**
+ * Records bulk attendance for multiple members
+ * @param {Array<Object>} attendanceList - Array of attendance data objects
+ * @param {Object} context - Context object (spreadsheet, userEmail, sportsClubId)
+ * @return {Object} Summary: { successCount, failureCount, results: Array<{success, error?, index, attendanceId?}> }
+ */
+function recordBulkAttendance(attendanceList, context) {
+  let successCount = 0;
+  let failureCount = 0;
+  const results = [];
+  for (let i = 0; i < attendanceList.length; i++) {
+    const data = attendanceList[i];
+    try {
+      // Attach context for each record
+      data.context = context;
+      const attendanceId = recordAttendance(data);
+      results.push({ success: true, index: i, attendanceId });
+      successCount++;
+    } catch (err) {
+      results.push({ success: false, index: i, error: err && err.message ? err.message : String(err) });
+      failureCount++;
+    }
+  }
+  return { successCount, failureCount, results };
+}
+/**
  * Functions for managing attendance in the Sports Membership Management App
  * Created: May 25, 2025
  */
@@ -10,7 +35,7 @@
  * @return {string} ID of the newly created attendance record
  */
 function recordAttendance(attendanceData) {
-  const ss = memberData.context.spreadsheet;
+  const ss = attendanceData.context.spreadsheet;
   const attendanceSheet = ss.getSheetByName(SHEET_NAMES.ATTENDANCE);
   
   // Generate a unique ID

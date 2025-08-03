@@ -54,7 +54,7 @@ function handleRequest(e, method) {
     let authResult = { success: true };
 
     // List of public actions that only need basic auth token
-    const publicActions = ["getMember", "recordAttendance"];
+    const publicActions = ["getMember"];
     if (!publicActions.includes(action)) {
       const token = getBearerToken(e);
       Logger.log('token ' + token)
@@ -100,6 +100,9 @@ function handleRequest(e, method) {
       // Attendance endpoints
       case "recordAttendance":
         result = handleRecordAttendance(payload);
+        break;
+      case "recordBulkAttendance":
+        result = handleRecordBulkAttendance(payload);
         break;
       case "getAttendance":
         result = handleGetAttendance(payload);
@@ -171,6 +174,30 @@ function handleRequest(e, method) {
 
     // Return successful response
     return createSuccessResponse(result);
+/**
+ * Handle bulk attendance request
+ * @param {Object} payload - Should contain attendanceList: Array<Object>
+ * @return {Object} Summary of results
+ */
+function handleRecordBulkAttendance(payload) {
+  if (!Array.isArray(payload.attendanceList)) {
+    throw new Error("attendanceList (array) is required");
+  }
+
+  // Try to acquire lock to prevent concurrent writes
+  if (!LOCK.tryLock(10000)) {
+    throw new Error("Failed to acquire lock. The system is busy. Please try again.");
+  }
+
+  try {
+    // Pass context to each record
+    const context = payload.context;
+    const results = recordBulkAttendance(payload.attendanceList, context);
+    return results;
+  } finally {
+    LOCK.releaseLock();
+  }
+}
   } catch (error) {
     // Log the error and return an error response
     console.error("API error:", error);
