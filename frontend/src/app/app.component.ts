@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
+import { ClubContextService } from './core/services/club-context.service';
 import { IonApp, IonRouterOutlet, IonAvatar, IonIcon, IonButton, IonButtons } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -38,16 +39,30 @@ import { SocialLogin } from '@capgo/capacitor-social-login';
 export class AppComponent implements OnInit {
   userSession$: Observable<UserSession | null>;
 
+
   constructor(
     private authService: AuthService,
     private router: Router,
-    private popoverController: PopoverController
+    private popoverController: PopoverController,
+    private route: ActivatedRoute,
+    private clubContext: ClubContextService
   ) {
     addIcons({ personCircleOutline, logOutOutline });
     this.userSession$ = this.authService.userSession$;
   }
 
   async ngOnInit() {
+    // Read sportsClubId from query params and store in ClubContextService
+    this.route.queryParams.subscribe(async params => {
+      const clubId = params['sportsClubId'];
+      if (clubId) {
+        this.clubContext.setSportsClubId(clubId);
+      }
+      // If not set, redirect to settings
+      if (!this.clubContext.getSportsClubId()) {
+        await this.router.navigate(['/settings']);
+      }
+    });
     try {
       await SocialLogin.initialize({
         google: {

@@ -12,6 +12,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/login.page').then(m => m.LoginPage)
   },
   {
+    path: 'settings',
+    loadComponent: () => import('./features/settings/settings.page').then(m => m.SettingsPage)
+  },
+  {
     path: 'tabs',
     canActivate: [AuthGuard],
     loadChildren: () => import('./tabs/tabs.routes').then((m) => m.routes)

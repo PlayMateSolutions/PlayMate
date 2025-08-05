@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Observable, catchError, from, switchMap } from 'rxjs';
 import { ApiService } from '../../../core/services/api.service';
-import { Member, MemberFilters } from '../../../shared/interfaces/member.interface';
+import { Member } from '../../../shared/interfaces/member.interface';
 import { map } from 'rxjs/operators';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../core/services/auth.service';
+import { ClubContextService } from '../../../core/services/club-context.service';
 
 interface ApiResponse<T> {
   status: 'success' | 'error';
@@ -24,7 +25,8 @@ export class MemberService {
 
   constructor(
     private http: HttpClient,
-    private authService: AuthService
+    private authService: AuthService,
+    private clubContext: ClubContextService
   ) { }
 
   private async getRequestPayload(action: string, data: any = {}): Promise<any> {
@@ -36,12 +38,13 @@ export class MemberService {
     };
   }
 
-  getMembers(filters?: MemberFilters): Observable<Member[]> {
+  getMembers(): Observable<Member[]> {
     return from(this.authService.getAuthToken()).pipe(
       switchMap(token => {
+        const clubId = this.clubContext.getSportsClubId() || '';
         const params = new HttpParams()
+          .set('sportsClubId', clubId)
           .set('action', 'getMembers')
-          .set('payload', JSON.stringify({ filters }))
           .set('authorization', token ? 'Bearer ' + token : '');
 
         const headers = new HttpHeaders({

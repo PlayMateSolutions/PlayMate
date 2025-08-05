@@ -14,16 +14,6 @@ export interface Member {
   notes?: string;
 }
 
-export interface MemberFilters {
-  status?: 'active' | 'inactive';
-  sport?: string;
-  membershipType?: string;
-  searchTerm?: string;
-  dateRange?: {
-    start: Date;
-    end: Date;
-  };
-}
 
 export interface MemberResponse {
   status: 'success' | 'error';

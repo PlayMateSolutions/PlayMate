@@ -1,41 +1,50 @@
-import { Component } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
+
+import { Component, OnInit } from '@angular/core';
+import { IonicModule, ToastController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ClubContextService } from '../../core/services/club-context.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-settings',
-  template: `
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>Settings</ion-title>
-      </ion-toolbar>
-    </ion-header>
-
-    <ion-content>
-      <ion-list>
-        <ion-item>
-          <ion-label>
-            <h2>API Token</h2>
-            <p>Configure API access token</p>
-          </ion-label>
-        </ion-item>
-        <ion-item>
-          <ion-label>
-            <h2>Theme</h2>
-            <p>Light/Dark mode settings</p>
-          </ion-label>
-        </ion-item>
-        <ion-item button (click)="logout()">
-          <ion-icon slot="start" name="log-out"></ion-icon>
-          <ion-label>Logout</ion-label>
-        </ion-item>
-      </ion-list>
-    </ion-content>
-  `,
+  templateUrl: './settings.page.html',
   standalone: true,
-  imports: [IonicModule, CommonModule]
+  imports: [IonicModule, CommonModule, FormsModule]
 })
-export class SettingsPage {
+export class SettingsPage implements OnInit {
+  sportsClubId: string = '';
+
+  constructor(
+    private clubContext: ClubContextService,
+    private toastCtrl: ToastController,
+    private router: Router
+  ) {}
+
+  ngOnInit() {
+    this.sportsClubId = this.clubContext.getSportsClubId() || '';
+  }
+
+  async saveClubId() {
+    if (this.sportsClubId.trim()) {
+      this.clubContext.setSportsClubId(this.sportsClubId.trim());
+      const toast = await this.toastCtrl.create({
+        message: 'Sports Club ID saved!',
+        duration: 1500,
+        color: 'success'
+      });
+      toast.present();
+      // Optionally navigate away or reload
+    } else {
+      const toast = await this.toastCtrl.create({
+        message: 'Please enter a valid Sports Club ID.',
+        duration: 1500,
+        color: 'danger'
+      });
+      toast.present();
+    }
+  }
+
   logout() {
     // TODO: Implement logout
   }
