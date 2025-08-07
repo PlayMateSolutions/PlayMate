@@ -77,6 +77,11 @@ function addMember(memberData) {
       .setNumberFormat("yyyy-mm-dd");
   }
 
+  // Update last updated timestamp for members
+  if (memberData.context && memberData.context.spreadsheet) {
+    updateSetting('Members Last Updated', new Date().toISOString(), memberData.context.spreadsheet);
+  }
+
   return memberId;
 }
 

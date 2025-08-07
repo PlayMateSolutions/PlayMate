@@ -19,11 +19,10 @@ function generateUniqueId(prefix) {
  * Gets settings from the Settings sheet
  * 
  * @param {Spreadsheet} ss - The spreadsheet to get settings from
- * @return {Object} Settings as key-value pairs
+ * @return {Object} Settings as key-value pairs (all rows, including member last updated fields)
  */
-function getSettings(ss = null) {
-  // If no spreadsheet provided, try to get active spreadsheet
-  ss = ss || SpreadsheetApp.getActiveSpreadsheet();
+function getSettings(payload) {
+  const ss = payload.context.spreadsheet;
   const settingsSheet = ss.getSheetByName(SHEET_NAMES.SETTINGS);
   
   if (!settingsSheet) {
@@ -32,7 +31,13 @@ function getSettings(ss = null) {
       adminEmail: '',
       currency: 'USD',
       latePaymentDays: 5,
-      version: '1.0.0'
+      apiToken: '',
+      apiUrl: '',
+      version: '1.0.0',
+      lastUpdated: '',
+      membersLastUpdated: '',
+      attendanceLastUpdated: '',
+      paymentsLastUpdated: ''
     };
   }
   
@@ -42,9 +47,20 @@ function getSettings(ss = null) {
   // Skip header row
   for (let i = 1; i < settingsData.length; i++) {
     const [key, value] = settingsData[i];
-    settings[key.toLowerCase().replace(/\s+/g, '')] = value;
+    if (key) {
+      // Convert to camelCase for JSON keys
+      const camelKey = key
+        .toLowerCase()
+        .replace(/\s+(.)/g, (m, chr) => chr.toUpperCase())
+        .replace(/\s/g, '')
+        .replace(/^(.)/, (m, chr) => chr.toLowerCase());
+      settings[camelKey] = value;
+    }
   }
-  
+  // Ensure member/attendance/payment last updated fields exist
+  if (!settings.membersLastUpdated) settings.membersLastUpdated = '';
+  if (!settings.attendanceLastUpdated) settings.attendanceLastUpdated = '';
+  if (!settings.paymentsLastUpdated) settings.paymentsLastUpdated = '';
   return settings;
 }
 

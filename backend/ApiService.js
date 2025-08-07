@@ -815,7 +815,7 @@ function handleUpdateSport(payload) {
  * @return {Object} App settings
  */
 function handleGetSettings(payload) {
-  return getSettings();
+  return getSettings(payload);
 }
 
 /**

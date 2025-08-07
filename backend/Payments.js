@@ -31,7 +31,7 @@ function recordPayment(paymentData) {
   
   // Add the new row to the sheet
   paymentsSheet.appendRow(newRow);
-  
+
   // Format the new row
   const lastRow = paymentsSheet.getLastRow();
   paymentsSheet.getRange(lastRow, PAYMENTS_COLUMNS.DATE + 1).setNumberFormat('yyyy-mm-dd');
@@ -44,12 +44,17 @@ function recordPayment(paymentData) {
   if (paymentData.periodEnd) {
     paymentsSheet.getRange(lastRow, PAYMENTS_COLUMNS.PERIOD_END + 1).setNumberFormat('yyyy-mm-dd');
   }
-  
+
+  // Update last updated timestamp for payments
+  if (paymentData.context && paymentData.context.spreadsheet) {
+    updateSetting('Payments Last Updated', new Date().toISOString(), paymentData.context.spreadsheet);
+  }
+
   // Update member's expiry date if payment is successful and has an end period
   if (paymentData.status === PAYMENT_STATUS.PAID && paymentData.periodEnd) {
     updateMemberExpiryDate(paymentData);
   }
-  
+
   return paymentId;
 }
 

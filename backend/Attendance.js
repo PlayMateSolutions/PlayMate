@@ -63,7 +63,7 @@ function recordAttendance(attendanceData) {
   
   // Add the new row to the sheet
   attendanceSheet.appendRow(newRow);
-  
+
   // Format the new row
   const lastRow = attendanceSheet.getLastRow();
   attendanceSheet.getRange(lastRow, ATTENDANCE_COLUMNS.DATE + 1).setNumberFormat('yyyy-mm-dd');
@@ -72,7 +72,12 @@ function recordAttendance(attendanceData) {
   if (attendanceData.checkOutTime) {
     attendanceSheet.getRange(lastRow, ATTENDANCE_COLUMNS.CHECK_OUT_TIME + 1).setNumberFormat('hh:mm:ss am/pm');
   }
-  
+
+  // Update last updated timestamp for attendance
+  if (attendanceData.context && attendanceData.context.spreadsheet) {
+    updateSetting('Attendance Last Updated', new Date().toISOString(), attendanceData.context.spreadsheet);
+  }
+
   return attendanceId;
 }
 
