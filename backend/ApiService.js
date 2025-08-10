@@ -465,22 +465,7 @@ function handleUpdateMember(payload) {
  * @param {Object} payload - Attendance data
  * @return {Object} Result with new attendance ID
  */
-function handleRecordAttendance(payload) {
-  if (!payload.memberId) {
-    throw new Error("Member ID and sport are required");
-  }
-
-  // Convert date strings to Date objects if present
-  if (payload.date) {
-    payload.date = new Date(payload.date);
-  }
-  if (payload.checkInTime) {
-    payload.checkInTime = new Date(payload.checkInTime);
-  }
-  if (payload.checkOutTime) {
-    payload.checkOutTime = new Date(payload.checkOutTime);
-  }
-
+function handleRecordAttendance(payload) { 
   // Try to acquire lock to prevent concurrent writes
   if (!LOCK.tryLock(10000)) {
     throw new Error(
