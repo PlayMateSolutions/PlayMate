@@ -42,9 +42,12 @@ function handleRequest(e, method) {
       payload = JSON.parse(e.postData.contents) || {};
     } else if (method === 'GET' && e.parameter) {
       const request = e.parameter;
+      Logger.log('GET parameter: ' + request);
+      Logger.log('GET request: ' + JSON.stringify(request));
       action = request.action;
       sportsClubId = request.sportsClubId;
-      payload = request.payload ? JSON.parse(request.payload) : {};
+      payload = request ?? {};
+      Logger.log('GET request payload: ' + JSON.stringify(payload));
     } else {
       return createErrorResponse('Invalid request format', 400);
     }
@@ -397,7 +400,7 @@ function getMemberByPhoneNo(payload) {
     throw new Error("Phone number is required");
   }
 
-  const member = getMemberByPhoneNo(payload.phoneNumber);
+  const member = getMemberByPhoneNo(payload);
   if (!member) {
     throw new Error("Member not found");
   }
@@ -412,15 +415,6 @@ function getMemberByPhoneNo(payload) {
  * @return {Object} Result with new member ID
  */
 function handleAddMember(payload) {
-  if (!payload.firstName || !payload.lastName || !payload.email) {
-    throw new Error("First name, last name, and email are required");
-  }
-
-  // Convert date strings to Date objects if present
-  if (payload.joinDate) {
-    payload.joinDate = new Date(payload.joinDate);
-  }
-
   // Try to acquire lock to prevent concurrent writes
   if (!LOCK.tryLock(10000)) {
     throw new Error(
@@ -442,16 +436,7 @@ function handleAddMember(payload) {
  * @param {Object} payload - Updated member data with memberId
  * @return {Object} Result indicating success
  */
-function handleUpdateMember(payload) {
-  if (!payload.memberId) {
-    throw new Error("Member ID is required");
-  }
-
-  // Convert date strings to Date objects if present
-  if (payload.joinDate) {
-    payload.joinDate = new Date(payload.joinDate);
-  }
-
+function handleUpdateMember(payload) {  
   // Try to acquire lock to prevent concurrent writes
   if (!LOCK.tryLock(10000)) {
     throw new Error(
@@ -460,7 +445,7 @@ function handleUpdateMember(payload) {
   }
 
   try {
-    const success = updateMember(payload.memberId, payload);
+    const success = updateMember(payload.ID, payload);
     if (!success) {
       throw new Error("Member not found or update failed");
     }
