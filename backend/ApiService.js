@@ -596,21 +596,6 @@ function handleUpdateAttendance(payload) {
  * @return {Object} Result with new payment ID
  */
 function handleRecordPayment(payload) {
-  if (!payload.memberId || !payload.amount) {
-    throw new Error("Member ID, amount");
-  }
-
-  // Convert date strings to Date objects if present
-  if (payload.date) {
-    payload.date = new Date(payload.date);
-  }
-  if (payload.periodStart) {
-    payload.periodStart = new Date(payload.periodStart);
-  }
-  if (payload.periodEnd) {
-    payload.periodEnd = new Date(payload.periodEnd);
-  }
-
   // Try to acquire lock to prevent concurrent writes
   if (!LOCK.tryLock(10000)) {
     throw new Error(

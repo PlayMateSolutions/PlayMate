@@ -1,3 +1,44 @@
+/**
+ * Extends a member's expiry date based on payment
+ * @param {Object} params - { memberId, periodStart, periodEnd, context }
+ * @return {boolean} True if update was successful, false otherwise
+ */
+function extendMemberExpiryDate(params) {
+  Logger.log('[extendMemberExpiryDate] params: ' + JSON.stringify(params));
+  var Member = getMemberTable(params.context);
+  Logger.log('[extendMemberExpiryDate] Member table initialized');
+  var member = Member.find(1);
+  if (!member) {
+    Logger.log('[extendMemberExpiryDate] Member not found: ' + params.memberId);
+    return false;
+  }
+  var currentExpiry = member['Expiry Date'] ? new Date(member['Expiry Date']) : null;
+  var periodStart = params.periodStart ? new Date(params.periodStart) : null;
+  var periodEnd = params.periodEnd ? new Date(params.periodEnd) : null;
+  if (!periodEnd) {
+    Logger.log('[extendMemberExpiryDate] No periodEnd provided.');
+    return false;
+  }
+  var newExpiry;
+  if (!currentExpiry || currentExpiry < new Date()) {
+    // Expired or no expiry: set to period end
+    newExpiry = periodEnd;
+  } else {
+    // Not expired: extend by the difference between periodEnd and periodStart
+    if (periodStart && periodEnd) {
+      var diffMs = periodEnd.getTime() - periodStart.getTime();
+      newExpiry = new Date(currentExpiry.getTime() + diffMs);
+    } else {
+      // Fallback: just set to period end
+      newExpiry = periodEnd;
+    }
+  }
+  member['Expiry Date'] = newExpiry;
+  member.save();
+  Logger.log('[extendMemberExpiryDate] Expiry date set for memberId: ' + params.memberId + ' to ' + newExpiry);
+  return true;
+}
+
 // Helper to get Tamotsu Member table
 function getMemberTable(context) {
   Tamotsu.initialize(context.spreadsheet);
