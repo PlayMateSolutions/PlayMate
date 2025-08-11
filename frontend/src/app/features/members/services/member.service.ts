@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Observable, catchError, from, switchMap } from 'rxjs';
+import { Observable, catchError, from, switchMap, of, concat, mergeMap } from 'rxjs';
+import { MembersDB } from './members-db';
 import { ApiService } from '../../../core/services/api.service';
 import { Member } from '../../../shared/interfaces/member.interface';
 import { map } from 'rxjs/operators';
@@ -39,7 +40,13 @@ export class MemberService {
   }
 
   getMembers(): Observable<Member[]> {
-    return from(this.authService.getAuthToken()).pipe(
+    // 1. Emit cached members from IndexedDB immediately (if any)
+    const cached$ = from(MembersDB.getAll()).pipe(
+      catchError(() => of([]))
+    );
+
+    // 2. Fetch from backend, update cache, emit fresh data
+    const fresh$ = from(this.authService.getAuthToken()).pipe(
       switchMap(token => {
         const clubId = this.clubContext.getSportsClubId() || '';
         const params = new HttpParams()
@@ -63,6 +70,7 @@ export class MemberService {
             if (response.status === 'error') throw new Error(response.error?.message);
             return response.data || [];
           }),
+          switchMap(members => from(MembersDB.setAll(members)).pipe(map(() => members))),
           catchError(error => {
             console.error('Error fetching members:', error);
             throw error;
@@ -70,6 +78,9 @@ export class MemberService {
         );
       })
     );
+
+    // 3. Emit cached first, then fresh
+    return concat(cached$, fresh$);
   }
 
   searchMembers(searchTerm: string): Observable<Member[]> {
