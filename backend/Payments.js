@@ -15,8 +15,8 @@ function getPaymentsTable(context) {
     {
       validate: function (on) {
         this.errors = {};
-        if (!this["Member ID"]) this.errors["Member ID"] = "can't be blank";
-        if (!this["Amount"]) this.errors["Amount"] = "can't be blank";
+        if (!this["memberId"]) this.errors["memberId"] = "can't be blank";
+        if (!this["amount"]) this.errors["amount"] = "can't be blank";
         if (Object.keys(this.errors).length > 0) {
           Logger.log("Validation errors: " + JSON.stringify(this.errors));
         }
@@ -34,8 +34,8 @@ function getPaymentsTable(context) {
 function recordPayment(paymentData) {
   var Payments = getPaymentsTable(paymentData.context);
   // Set defaults if not present
-  if (!paymentData["Payment Type"]) paymentData["Payment Type"] = "Cash";
-  if (!paymentData["Date"]) paymentData["Date"] = new Date();
+  if (!paymentData["paymentType"]) paymentData["paymentType"] = "Cash";
+  if (!paymentData["date"]) paymentData["date"] = new Date();
   // Make a shallow copy and remove context for Tamotsu
   var paymentRow = Object.assign({}, paymentData);
   delete paymentRow.context;
@@ -59,23 +59,23 @@ function recordPayment(paymentData) {
 
   // Extend member's expiry date if payment is successful and has an end period
   if (
-    paymentData["Status"] ===
+    paymentData["status"] ===
     (typeof PAYMENT_STATUS !== "undefined" ? PAYMENT_STATUS.PAID : "Paid")
   ) {
     Logger.log(
-      "Extending member expiry date for payment to " + paymentData["Period End"]
+      "Extending member expiry date for payment to " + paymentData["periodEnd"]
     );
     // print the context
     Logger.log("Payment context: " + JSON.stringify(paymentData.context));
 
     extendMemberExpiryDate({
-      memberId: paymentData["Member ID"],
-      periodStart: paymentData["Period Start"],
-      periodEnd: paymentData["Period End"],
+      memberId: paymentData["memberId"],
+      periodStart: paymentData["periodStart"],
+      periodEnd: paymentData["periodEnd"],
       context: paymentData.context,
     });
   }
-  return newPayment["ID"] ? String(newPayment["ID"]) : null;
+  return newPayment["id"] ? String(newPayment["id"]) : null;
 }
 
 /**

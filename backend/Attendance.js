@@ -9,8 +9,8 @@ function getAttendanceTable(context) {
     {
       validate: function (on) {
         this.errors = {};
-        if (!this["Member ID"]) this.errors["Member ID"] = "can't be blank";
-        if (!this["Date"]) this.errors["Date"] = "can't be blank";
+        if (!this["memberId"]) this.errors["memberId"] = "can't be blank";
+        if (!this["date"]) this.errors["date"] = "can't be blank";
 
         if (Object.keys(this.errors).length > 0) {
           Logger.log("Validation errors: " + JSON.stringify(this.errors));
@@ -64,10 +64,10 @@ function recordAttendance(attendanceData) {
   var Attendance = getAttendanceTable(attendanceData.context);
   // Calculate duration if check-in and check-out times are provided
   var attrs = Object.assign({}, attendanceData);
-  if (!attrs["Duration"] && attrs["Check In Time"] && attrs["Check Out Time"]) {
-    var checkIn = new Date(attrs["Check In Time"]);
-    var checkOut = new Date(attrs["Check Out Time"]);
-    attrs["Duration"] = Math.round((checkOut - checkIn) / (1000 * 60));
+  if (!attrs["duration"] && attrs["checkInTime"] && attrs["checkOutTime"]) {
+    var checkIn = new Date(attrs["checkInTime"]);
+    var checkOut = new Date(attrs["checkOutTime"]);
+    attrs["duration"] = Math.round((checkOut - checkIn) / (1000 * 60));
   }
   delete attrs.context;
   var newAttendance = Attendance.create(attrs);
@@ -82,7 +82,7 @@ function recordAttendance(attendanceData) {
       attendanceData.context.spreadsheet
     );
   }
-  return newAttendance["ID"] ? String(newAttendance["ID"]) : null;
+  return newAttendance["id"] ? String(newAttendance["id"]) : null;
 }
 
 /**
@@ -98,7 +98,7 @@ function updateAttendance(attendanceId, updatedData) {
     return false;
   }
   Object.keys(updatedData).forEach(function (key) {
-    if (key !== "context" && key !== "ID") {
+    if (key !== "context" && key !== "id") {
       attendance[key] = updatedData[key];
     }
   });
@@ -128,24 +128,24 @@ function getAttendanceRecords(payload = {}) {
   // Apply filters
   if (payload.memberId) {
     records = records.filter(function (r) {
-      return r["Member ID"] === payload.memberId;
+      return r["memberId"] === payload.memberId;
     });
   }
   if (payload.sport) {
     records = records.filter(function (r) {
-      return r["Sport"] === payload.sport;
+      return r["sport"] === payload.sport;
     });
   }
   if (payload.startDate) {
     var startDate = new Date(payload.startDate);
     records = records.filter(function (r) {
-      return new Date(r["Date"]) >= startDate;
+      return new Date(r["date"]) >= startDate;
     });
   }
   if (payload.endDate) {
     var endDate = new Date(payload.endDate);
     records = records.filter(function (r) {
-      return new Date(r["Date"]) <= endDate;
+      return new Date(r["date"]) <= endDate;
     });
   }
   return records;
@@ -184,20 +184,20 @@ function getMemberAttendanceSummary(payload) {
   }
   for (var i = 0; i < attendanceRecords.length; i++) {
     var record = attendanceRecords[i];
-    if (record["Duration"]) {
-      summary.totalDuration += parseInt(record["Duration"]);
+    if (record["duration"]) {
+      summary.totalDuration += parseInt(record["duration"]);
     }
-    var sport = record["Sport"];
+    var sport = record["sport"];
     if (!summary.sportBreakdown[sport]) {
       summary.sportBreakdown[sport] = { sessions: 0, duration: 0 };
     }
     summary.sportBreakdown[sport].sessions += 1;
-    if (record["Duration"]) {
-      summary.sportBreakdown[sport].duration += parseInt(record["Duration"]);
+    if (record["duration"]) {
+      summary.sportBreakdown[sport].duration += parseInt(record["duration"]);
     }
   }
   summary.lastAttendance = attendanceRecords.reduce(function (latest, record) {
-    if (!latest || new Date(record["Date"]) > new Date(latest["Date"])) {
+    if (!latest || new Date(record["date"]) > new Date(latest["date"])) {
       return record;
     }
     return latest;
@@ -225,11 +225,11 @@ function getOverallAttendanceSummary(payload = {}) {
   }
   for (var i = 0; i < attendanceRecords.length; i++) {
     var record = attendanceRecords[i];
-    summary.uniqueMembers.add(record["Member ID"]);
-    if (record["Duration"]) {
-      summary.totalDuration += parseInt(record["Duration"]);
+    summary.uniqueMembers.add(record["memberId"]);
+    if (record["duration"]) {
+      summary.totalDuration += parseInt(record["duration"]);
     }
-    var sport = record["Sport"];
+    var sport = record["sport"];
     if (!summary.sportBreakdown[sport]) {
       summary.sportBreakdown[sport] = {
         sessions: 0,
@@ -238,12 +238,12 @@ function getOverallAttendanceSummary(payload = {}) {
       };
     }
     summary.sportBreakdown[sport].sessions += 1;
-    summary.sportBreakdown[sport].uniqueMembers.add(record["Member ID"]);
-    if (record["Duration"]) {
-      summary.sportBreakdown[sport].duration += parseInt(record["Duration"]);
+    summary.sportBreakdown[sport].uniqueMembers.add(record["memberId"]);
+    if (record["duration"]) {
+      summary.sportBreakdown[sport].duration += parseInt(record["duration"]);
     }
     var dateStr = Utilities.formatDate(
-      new Date(record["Date"]),
+      new Date(record["date"]),
       Session.getScriptTimeZone(),
       "yyyy-MM-dd"
     );
@@ -254,7 +254,7 @@ function getOverallAttendanceSummary(payload = {}) {
       };
     }
     summary.dateBreakdown[dateStr].sessions += 1;
-    summary.dateBreakdown[dateStr].uniqueMembers.add(record["Member ID"]);
+    summary.dateBreakdown[dateStr].uniqueMembers.add(record["memberId"]);
   }
   summary.uniqueMembers = summary.uniqueMembers.size;
   for (var sport in summary.sportBreakdown) {

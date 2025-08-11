@@ -12,7 +12,7 @@ function extendMemberExpiryDate(params) {
     Logger.log('[extendMemberExpiryDate] Member not found: ' + params.memberId);
     return false;
   }
-  var currentExpiry = member['Expiry Date'] ? new Date(member['Expiry Date']) : null;
+  var currentExpiry = member['expiryDate'] ? new Date(member['expiryDate']) : null;
   var periodStart = params.periodStart ? new Date(params.periodStart) : null;
   var periodEnd = params.periodEnd ? new Date(params.periodEnd) : null;
   if (!periodEnd) {
@@ -33,7 +33,7 @@ function extendMemberExpiryDate(params) {
       newExpiry = periodEnd;
     }
   }
-  member['Expiry Date'] = newExpiry;
+  member['expiryDate'] = newExpiry;
   member.save();
   Logger.log('[extendMemberExpiryDate] Expiry date set for memberId: ' + params.memberId + ' to ' + newExpiry);
   return true;
@@ -51,31 +51,31 @@ function getMemberTable(context) {
       validate: function (on) {
         this.errors = {};
         // Required fields
-        if (!this["First Name"]) this.errors["First Name"] = "can't be blank";
-        if (!this["Phone"]) this.errors["Phone"] = "can't be blank";
+        if (!this["firstName"]) this.errors["firstName"] = "can't be blank";
+        if (!this["phone"]) this.errors["phone"] = "can't be blank";
         // Email format
         if (
-          this["Email"] &&
-          !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(this["Email"])
+          this["email"] &&
+          !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(this["email"])
         ) {
-          this.errors["Email"] = "is not a valid email";
+          this.errors["email"] = "is not a valid email";
         }
         // Status allowed values
         var allowedStatus = ["Active", "Inactive"];
-        if (this["Status"] && allowedStatus.indexOf(this["Status"]) === -1) {
-          this.errors["Status"] = "must be Active or Inactive";
+        if (this["status"] && allowedStatus.indexOf(this["status"]) === -1) {
+          this.errors["status"] = "must be Active or Inactive";
         }
         // Dates
-        if (this["Join Date"] && isNaN(Date.parse(this["Join Date"]))) {
-          this.errors["Join Date"] = "is not a valid date";
+        if (this["joinDate"] && isNaN(Date.parse(this["joinDate"]))) {
+          this.errors["joinDate"] = "is not a valid date";
         }
-        if (this["Expiry Date"] && isNaN(Date.parse(this["Expiry Date"]))) {
-          this.errors["Expiry Date"] = "is not a valid date";
+        if (this["expiryDate"] && isNaN(Date.parse(this["expiryDate"]))) {
+          this.errors["expiryDate"] = "is not a valid date";
         }
 
         // ID must exist on update
-        if (on === "update" && !this["ID"]) {
-          this.errors["ID"] = "is required for update";
+        if (on === "update" && !this["id"]) {
+          this.errors["id"] = "is required for update";
         }
 
         if (Object.keys(this.errors).length > 0) {
@@ -103,7 +103,7 @@ function addMember(memberData) {
 
   // Check for duplicate phone number
   var existing = Member.where(function (m) {
-    return String(m["Phone"]) === String(memberData["Phone"]);
+    return String(m["phone"]) === String(memberData["phone"]);
   }).first();
   if (existing) {
     throw new Error("A member with this phone number already exists.");
@@ -129,7 +129,7 @@ function addMember(memberData) {
   }
 
   // Return the new member's ID
-  return newMember["ID"] ? String(newMember["ID"]) : null;
+  return newMember["id"] ? String(newMember["id"]) : null;
 }
 
 /**
@@ -147,7 +147,7 @@ function updateMember(memberId, payload) {
   }
   // Update only the fields present in the payload (column header keys)
   Object.keys(payload).forEach(function (key) {
-    if (key !== "context" && key !== "ID") {
+    if (key !== "context" && key !== "id") {
       member[key] = payload[key];
     }
   });
@@ -164,7 +164,7 @@ function updateMember(memberId, payload) {
 function getMemberByPhoneNo(payload) {
   var Member = getMemberTable(payload.context);
   var result = Member.where(function (m) {
-    return String(m["Phone"]) === String(payload["Phone"]);
+    return String(m["phone"]) === String(payload["phone"]);
   }).first();
   return result || null;
 }
