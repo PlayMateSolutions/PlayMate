@@ -1,0 +1,21 @@
+.add-member-modal {
+  padding: 1.5rem;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.add-member-modal h2 {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.modal-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+ion-list {
+  margin-bottom: 1rem;
+}

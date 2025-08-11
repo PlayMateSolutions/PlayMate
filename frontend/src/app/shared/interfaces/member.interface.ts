@@ -3,7 +3,8 @@ export interface Member {
   firstName: string;
   lastName: string;
   email: string;
-  phone?: string;
+  phone: string;
+  place: string;
   joinDate: Date;
   createdDate: string;
   expiryDate: string;

@@ -22,9 +22,12 @@ import {
   IonChip,
   IonSpinner,
   IonText,
+  IonModal,
   AlertController,
-  ToastController
+  ToastController,
+  ModalController
 } from '@ionic/angular/standalone';
+import { AddMemberComponent } from './add-member.component';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { Member } from '../../shared/interfaces/member.interface';
 import { MemberService } from './services/member.service';
@@ -58,8 +61,6 @@ import { addIcons } from 'ionicons';
     IonIcon,
     IonSearchbar,
     IonContent,
-    IonList,
-    IonItem,
     IonLabel,
     IonInfiniteScroll,
     IonInfiniteScrollContent,
@@ -71,7 +72,8 @@ import { addIcons } from 'ionicons';
     IonSegmentButton,
     IonChip,
     IonSpinner,
-    IonText
+    IonText,
+    IonModal
   ],
   providers: [MemberService]
 })
@@ -88,7 +90,8 @@ export class MembersPage implements OnInit {
     private memberService: MemberService,
     private alertController: AlertController,
     private toastController: ToastController,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private modalController: ModalController
   ) {    
     // Initialize available languages
     this.translateService.addLangs(['en', 'ta']);
@@ -278,78 +281,33 @@ export class MembersPage implements OnInit {
     await alert.present();
   }
   async addMember() {
-    const alert = await this.alertController.create({
-      header: 'Add New Member',
-      inputs: [
-        {
-          name: 'firstName',
-          type: 'text',
-          placeholder: 'First Name'
-        },
-        {
-          name: 'lastName',
-          type: 'text',
-          placeholder: 'Last Name'
-        },
-        {
-          name: 'email',
-          type: 'email',
-          placeholder: 'Email'
-        },
-        {
-          name: 'phone',
-          type: 'tel',
-          placeholder: 'Phone Number'
-        }
-      ],
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel'
-        },
-        {
-          text: 'Add',
-          handler: (data): boolean => {
-            if (!data.firstName?.trim() || !data.lastName?.trim()) {
-              this.showToast('First name and last name are required', 'danger');
-              return false;
-            }
-
-            const newMember: Omit<Member, 'memberId'> = {
-              firstName: data.firstName.trim(),
-              lastName: data.lastName.trim(),
-              email: data.email?.trim() || '',
-              phone: data.phone?.trim(),
-              joinDate: new Date(),
-              createdDate: new Date().toISOString(),
-              expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-              sports: [],
-              status: 'active',
-              membershipType: 'basic',
-              lastPaymentDate: new Date()
-            };
-
-            this.loading = true;
-            this.memberService.addMember(newMember).subscribe({
-              next: () => {
-                this.showToast('Member added successfully');
-                this.loadMembers();
-                return true;
-              },
-              error: (error) => {
-                console.error('Error adding member:', error);
-                this.showToast('Failed to add member', 'danger');
-                this.loading = false;
-                return false;
-              }
-            });
-            return true;
-          }
-        }
-      ]
+    const modal = await this.modalController.create({
+      component: AddMemberComponent,
+      componentProps: {},
+      showBackdrop: true,
+      backdropDismiss: false,
+      cssClass: 'add-member-modal',
     });
 
-    await alert.present();
+    modal.onWillDismiss().then((result) => {
+      const data = result.data;
+      if (data && data.member) {
+        this.loading = true;
+        this.memberService.addMember(data.member).subscribe({
+          next: () => {
+            this.showToast('Member added successfully');
+            this.loadMembers();
+          },
+          error: (error) => {
+            console.error('Error adding member:', error);
+            this.showToast('Failed to add member', 'danger');
+            this.loading = false;
+          }
+        });
+      }
+    });
+
+    await modal.present();
   }
 
   async editMember(member: Member) {

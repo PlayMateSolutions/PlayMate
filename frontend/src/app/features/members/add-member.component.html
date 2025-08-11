@@ -1,0 +1,41 @@
+<div class="add-member-modal">
+  <h2>Add New Member</h2>
+  <form (ngSubmit)="submit()">
+    <ion-list>
+      <ion-item>
+        <ion-label position="stacked">First Name <ion-text color="danger">*</ion-text></ion-label>
+        <ion-input [(ngModel)]="firstName" name="firstName" required></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Phone <ion-text color="danger">*</ion-text></ion-label>
+        <ion-input [(ngModel)]="phone" name="phone" required></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Place <ion-text color="danger">*</ion-text></ion-label>
+        <ion-input [(ngModel)]="place" name="place" required></ion-input>
+      </ion-item>
+    </ion-list>
+    <ion-button expand="block" fill="outline" (click)="toggleOptional()" type="button">
+      {{ showOptional ? 'Hide' : 'Show' }} Optional Fields
+    </ion-button>
+    <ion-list *ngIf="showOptional">
+      <ion-item>
+        <ion-label position="stacked">Last Name</ion-label>
+        <ion-input [(ngModel)]="lastName" name="lastName"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Email</ion-label>
+        <ion-input [(ngModel)]="email" name="email" type="email"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Notes</ion-label>
+        <ion-input [(ngModel)]="notes" name="notes"></ion-input>
+      </ion-item>
+    </ion-list>
+    <ion-text color="danger" *ngIf="error">{{ error }}</ion-text>
+    <div class="modal-actions">
+      <ion-button expand="block" type="submit">Add Member</ion-button>
+      <ion-button expand="block" fill="clear" color="medium" (click)="cancel()">Cancel</ion-button>
+    </div>
+  </form>
+</div>
