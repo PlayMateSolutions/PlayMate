@@ -1,8 +1,8 @@
 {
-  "name": "frontend",
+  "name": "playmate",
   "version": "0.0.1",
-  "author": "Ionic Framework",
-  "homepage": "https://ionicframework.com/",
+  "author": "PlayMate Team",
+  "homepage": "https://jsramraj.github.io/PlayMate/",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
