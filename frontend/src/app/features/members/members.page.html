@@ -44,7 +44,7 @@
   <!-- Results count and loading state -->
   <div class="results-count">
     <ion-text color="medium" *ngIf="!loading">
-      Showing {{ filteredMembers.length }} members
+      {{ filteredMembers.length }} members
     </ion-text>
     <ion-spinner *ngIf="loading"></ion-spinner>
     <ion-text color="danger" *ngIf="error">{{ error }}</ion-text>

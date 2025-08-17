@@ -19,10 +19,10 @@ import {
   IonSegmentButton,
   IonSpinner,
   IonText,
-  IonModal,
   AlertController,
   ToastController,
-  ModalController
+  ModalController,
+  IonChip
 } from '@ionic/angular/standalone';
 import { AddMemberComponent } from './add-member.component';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
@@ -76,7 +76,7 @@ import { addIcons } from 'ionicons';
     IonSegmentButton,
     IonSpinner,
     IonText,
-    IonModal
+    IonChip
   ],
   providers: [MemberService]
 })

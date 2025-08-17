@@ -24,38 +24,49 @@ ion-searchbar {
 
 // Segments toolbar styling
 .segments-toolbar {
-  padding: 4px 12px;
-  background: var(--ion-color-light);
-  min-height: 48px;
+  padding: 8px 16px;
+  background: white;
+  min-height: 56px;
+  border-bottom: 1px solid var(--ion-color-light-shade);
   
   ion-segment {
-    --background: white;
-    --border-radius: 8px;
-    --border-width: 1px;
-    --border-color: var(--ion-color-light-shade);
+    --background: var(--ion-color-light);
+    --border-radius: 12px;
+    --border-width: 0;
+    --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     
     ion-segment-button {
       --color: var(--ion-color-medium);
       --color-checked: var(--ion-color-primary);
       --indicator-color: var(--ion-color-primary);
-      --indicator-height: 3px;
-      --padding-top: 6px;
-      --padding-bottom: 6px;
-      --padding-start: 8px;
-      --padding-end: 8px;
-      font-size: 13px;
-      font-weight: 500;
-      min-height: 36px;
+      --indicator-height: 4px;
+      --padding-top: 8px;
+      --padding-bottom: 8px;
+      --padding-start: 12px;
+      --padding-end: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      min-height: 40px;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        --background: var(--ion-color-light-shade);
+      }
       
       ion-label {
-        font-size: 13px;
-        font-weight: 500;
+        font-size: 14px;
+        font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 0.3px;
+        letter-spacing: 0.5px;
       }
       
       &::part(indicator) {
         border-radius: 2px;
+        margin: 0 8px;
+      }
+      
+      &::part(indicator-background) {
+        background: transparent;
       }
     }
   }
@@ -117,6 +128,19 @@ ion-searchbar {
     display: flex;
     align-items: center;
     gap: 8px;
+    background: var(--ion-color-light);
+    border-bottom: 1px solid var(--ion-color-light-shade);
+    font-size: 14px;
+    font-weight: 500;
+    
+    ion-text {
+      color: var(--ion-color-medium) !important;
+    }
+    
+    ion-spinner {
+      width: 16px;
+      height: 16px;
+    }
   }
 
   ion-card {
@@ -299,21 +323,21 @@ ion-searchbar.search-enhanced {
 // Mobile optimizations for segments
 @media (max-width: 576px) {
   .segments-toolbar {
-    padding: 2px 8px;
-    min-height: 40px;
+    padding: 6px 12px;
+    min-height: 48px;
     
     ion-segment {
       ion-segment-button {
-        --padding-top: 4px;
-        --padding-bottom: 4px;
-        --padding-start: 6px;
-        --padding-end: 6px;
-        min-height: 32px;
-        font-size: 12px;
+        --padding-top: 6px;
+        --padding-bottom: 6px;
+        --padding-start: 8px;
+        --padding-end: 8px;
+        min-height: 36px;
+        font-size: 13px;
         
         ion-label {
-          font-size: 12px;
-          letter-spacing: 0.2px;
+          font-size: 13px;
+          letter-spacing: 0.4px;
         }
       }
     }
