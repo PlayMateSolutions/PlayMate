@@ -46,10 +46,14 @@ jobs:
         echo "export const environment = {" > src/environments/environment.prod.ts
         echo "  production: true," >> src/environments/environment.prod.ts
         echo "  apiUrl: '${{ secrets.API_URL }}'," >> src/environments/environment.prod.ts
+        echo "  googleSignInClientId: '${{ secrets.GOOGLE_CLIENT_ID }}'," >> src/environments/environment.prod.ts
         echo "};" >> src/environments/environment.prod.ts
 
     - name: Build
       run: |
+        # Clean build artifacts
+        rm -rf www/
+        # Run production build
         ionic build --prod -- --base-href 'https://jsramraj.github.io/PlayMate/'
         ls www
 
