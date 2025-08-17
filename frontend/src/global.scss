@@ -235,19 +235,3 @@
     transform: translateX(0);
   }
 }
-
-/* Sort Popover Custom Styling */
-.sort-popover {
-  --width: 320px;
-  --max-width: 90vw;
-  
-  .popover-content {
-    border-radius: 16px;
-    overflow: hidden;
-  }
-}
-
-.sort-popover::part(content) {
-  border-radius: 16px;
-  overflow: hidden;
-}

@@ -69,24 +69,45 @@ ion-searchbar {
     gap: 8px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    background: var(--ion-color-light);
+    border-bottom: 1px solid var(--ion-color-light-shade);
 
     &::-webkit-scrollbar {
       display: none;
     }
 
-    ion-chip {
+    .sort-chip {
       cursor: pointer;
       transition: all 0.2s ease;
       margin: 0;
+      --background: white;
+      --color: var(--ion-color-medium);
+      --border-color: var(--ion-color-light-shade);
+      --border-width: 2px;
+      font-weight: 500;
+      white-space: nowrap;
+
+      &:hover {
+        --background: var(--ion-color-light-shade);
+        transform: translateY(-1px);
+      }
 
       &.active {
         --background: var(--ion-color-primary);
         --color: var(--ion-color-primary-contrast);
-        transform: scale(1.05);
+        --border-color: var(--ion-color-primary);
+        box-shadow: 0 2px 8px rgba(220, 38, 38, 0.2);
       }
 
-      &:not(.active):hover {
-        --background: var(--ion-color-light-shade);
+      ion-icon:first-child {
+        margin-right: 6px;
+        font-size: 16px;
+      }
+
+      .direction-icon {
+        margin-left: 6px;
+        font-size: 14px;
+        opacity: 0.8;
       }
     }
   }

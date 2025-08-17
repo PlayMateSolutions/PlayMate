@@ -5,9 +5,6 @@
       <ion-button class="btn-primary" (click)="toggleSearch()">
         <ion-icon slot="icon-only" [name]="isSearchVisible ? 'close-outline' : 'search-outline'"></ion-icon>
       </ion-button>
-      <ion-button class="btn-primary" (click)="presentSortMenu($event)">
-        <ion-icon slot="icon-only" name="options-outline"></ion-icon>
-      </ion-button>
       <ion-button class="btn-primary" (click)="addMember()">
         <ion-icon slot="icon-only" name="add-outline"></ion-icon>
       </ion-button>
@@ -51,6 +48,48 @@
     </ion-text>
     <ion-spinner *ngIf="loading"></ion-spinner>
     <ion-text color="danger" *ngIf="error">{{ error }}</ion-text>
+  </div>
+
+  <!-- Sort controls -->
+  <div class="sort-controls">
+    <ion-chip 
+      [class.active]="sortOption === 'name'"
+      (click)="changeSortOption('name')"
+      class="sort-chip">
+      <ion-icon name="person-outline"></ion-icon>
+      <ion-label>Name</ion-label>
+      <ion-icon 
+        *ngIf="sortOption === 'name'"
+        [name]="sortDirection === 'asc' ? 'arrow-up-outline' : 'arrow-down-outline'"
+        class="direction-icon">
+      </ion-icon>
+    </ion-chip>
+
+    <ion-chip 
+      [class.active]="sortOption === 'expiryDate'"
+      (click)="changeSortOption('expiryDate')"
+      class="sort-chip">
+      <ion-icon name="calendar-outline"></ion-icon>
+      <ion-label>Expiry Date</ion-label>
+      <ion-icon 
+        *ngIf="sortOption === 'expiryDate'"
+        [name]="sortDirection === 'asc' ? 'arrow-up-outline' : 'arrow-down-outline'"
+        class="direction-icon">
+      </ion-icon>
+    </ion-chip>
+
+    <ion-chip 
+      [class.active]="sortOption === 'createdDate'"
+      (click)="changeSortOption('createdDate')"
+      class="sort-chip">
+      <ion-icon name="time-outline"></ion-icon>
+      <ion-label>Join Date</ion-label>
+      <ion-icon 
+        *ngIf="sortOption === 'createdDate'"
+        [name]="sortDirection === 'asc' ? 'arrow-up-outline' : 'arrow-down-outline'"
+        class="direction-icon">
+      </ion-icon>
+    </ion-chip>
   </div>
 
   <!-- Member list cards -->

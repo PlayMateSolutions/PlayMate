@@ -8,8 +8,6 @@ import {
   IonIcon,
   IonSearchbar,
   IonContent,
-  IonList,
-  IonItem,
   IonLabel,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
@@ -24,11 +22,9 @@ import {
   IonModal,
   AlertController,
   ToastController,
-  ModalController,
-  PopoverController
+  ModalController
 } from '@ionic/angular/standalone';
 import { AddMemberComponent } from './add-member.component';
-import { SortPopoverComponent } from './sort-popover.component';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { Member } from '../../shared/interfaces/member.interface';
 import { MemberService } from './services/member.service';
@@ -50,8 +46,7 @@ import {
   mailOutline,
   callOutline,
   calendarOutline,
-  footballOutline
-} from 'ionicons/icons';
+  footballOutline, personOutline, timeOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 
 
@@ -101,7 +96,6 @@ export class MembersPage implements OnInit {
     private toastController: ToastController,
     private translateService: TranslateService,
     private modalController: ModalController,
-    private popoverController: PopoverController
   ) {    
     // Initialize available languages
     this.translateService.addLangs(['en', 'ta']);
@@ -111,24 +105,7 @@ export class MembersPage implements OnInit {
     const browserLang = navigator.language;
     this.translateService.use(browserLang.match(/en|ta/) ? browserLang : 'en');
 
-    addIcons({
-      addOutline,
-      refreshOutline,
-      logoWhatsapp,
-      createOutline,
-      trashOutline,
-      mailOutline,
-      callOutline,
-      calendarOutline,
-      footballOutline,
-      peopleOutline,
-      personAddOutline,
-      arrowUpOutline,
-      arrowDownOutline,
-      searchOutline,
-      closeOutline,
-      optionsOutline
-    });
+    addIcons({addOutline,personOutline,calendarOutline,timeOutline,refreshOutline,logoWhatsapp,peopleOutline,personAddOutline,createOutline,trashOutline,mailOutline,callOutline,footballOutline,arrowUpOutline,arrowDownOutline,searchOutline,closeOutline});
   }
 
   ngOnInit() {
@@ -402,58 +379,8 @@ export class MembersPage implements OnInit {
     event.target.complete();
   }
 
-  async presentSortMenu(event?: any) {
-    console.log('presentSortMenu called with event:', event);
-    console.log('SortPopoverComponent:', SortPopoverComponent);
-    
-    try {
-      const popover = await this.popoverController.create({
-        component: SortPopoverComponent,
-        componentProps: {
-          currentSort: this.sortOption,
-          sortDirection: this.sortDirection
-        },
-        event: event,
-        translucent: true,
-        cssClass: 'sort-popover'
-      });
-
-      popover.onDidDismiss().then((result) => {
-        if (result.data) {
-          const { sortOption, sortDirection } = result.data;
-          this.sortOption = sortOption;
-          this.sortDirection = sortDirection;
-          this.sortMembers();
-        }
-      });
-
-      await popover.present();
-    } catch (error) {
-      console.error('Error creating popover:', error);
-      // Fallback to alert if popover fails
-      const alert = await this.alertController.create({
-        header: 'Sort Members',
-        message: 'Choose how to sort the member list:',
-        buttons: [
-          {
-            text: 'Cancel',
-            role: 'cancel'
-          },
-          {
-            text: 'Name',
-            handler: () => this.changeSortOption('name')
-          },
-          {
-            text: 'Expiry Date',
-            handler: () => this.changeSortOption('expiryDate')
-          },
-          {
-            text: 'Join Date',
-            handler: () => this.changeSortOption('createdDate')
-          }
-        ]
-      });
-      await alert.present();
-    }
+  toggleSortDirection() {
+    this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    this.sortMembers();
   }
 }
