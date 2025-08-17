@@ -4,7 +4,7 @@ import { AuthGuard } from './core/guards/auth.guard';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'tabs',
+    redirectTo: 'login',
     pathMatch: 'full'
   },
   {
@@ -13,6 +13,7 @@ export const routes: Routes = [
   },
   {
     path: 'settings',
+    canActivate: [AuthGuard],
     loadComponent: () => import('./features/settings/settings.page').then(m => m.SettingsPage)
   },
   {

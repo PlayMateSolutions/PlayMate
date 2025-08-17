@@ -16,6 +16,7 @@ import {
   ToastController
 } from '@ionic/angular/standalone';
 import { AuthService } from '../../core/services/auth.service';
+import { ClubContextService } from '../../core/services/club-context.service';
 import { addIcons } from 'ionicons';
 import { logoGoogle, personCircleOutline } from 'ionicons/icons';
 import { environment } from '../../../environments/environment';
@@ -47,7 +48,9 @@ export class LoginPage implements OnInit {
     private router: Router,
     private platform: Platform,
     private zone: NgZone,
-    private toastController: ToastController  ) {
+    private toastController: ToastController,
+    private clubContext: ClubContextService
+  ) {
     addIcons({ 
       logoGoogle,
       personCircleOutline 
@@ -77,7 +80,12 @@ export class LoginPage implements OnInit {
       this.error = null;
       const success = await this.zone.run(() => this.authService.login());
       if (success) {
-        await this.router.navigate(['/tabs']);
+        // Check if club context is set, if not go to settings first
+        if (this.clubContext.getSportsClubId()) {
+          await this.router.navigate(['/tabs']);
+        } else {
+          await this.router.navigate(['/settings']);
+        }
       } else {
         throw new Error('Authentication failed');
       }

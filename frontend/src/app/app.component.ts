@@ -51,17 +51,7 @@ export class AppComponent implements OnInit {
   }
 
   async ngOnInit() {
-    // Read sportsClubId from query params and store in ClubContextService
-    this.route.queryParams.subscribe(async params => {
-      const clubId = params['sportsClubId'];
-      if (clubId) {
-        this.clubContext.setSportsClubId(clubId);
-      }
-      // If not set, redirect to settings
-      if (!this.clubContext.getSportsClubId()) {
-        await this.router.navigate(['/settings']);
-      }
-    });
+    // Initialize Social Login
     try {
       await SocialLogin.initialize({
         google: {
@@ -71,6 +61,26 @@ export class AppComponent implements OnInit {
     } catch (error) {
       console.error('Failed to initialize Social Login:', error);
     }
+
+    // Handle club context only after authentication is confirmed
+    this.authService.isAuthenticated$.subscribe(async (isAuthenticated) => {
+      if (isAuthenticated) {
+        // Read sportsClubId from query params and store in ClubContextService
+        this.route.queryParams.subscribe(async params => {
+          const clubId = params['sportsClubId'];
+          if (clubId) {
+            this.clubContext.setSportsClubId(clubId);
+          }
+          // If not set and user is authenticated, redirect to settings
+          if (!this.clubContext.getSportsClubId()) {
+            await this.router.navigate(['/settings']);
+          } else {
+            // If club is set, navigate to tabs
+            await this.router.navigate(['/tabs']);
+          }
+        });
+      }
+    });
   }
 
   async showProfileMenu(event: Event) {

@@ -1,3 +1,22 @@
+ion-content {
+  --background: linear-gradient(135deg, var(--ion-color-light) 0%, var(--ion-color-light-shade) 100%);
+}
+
+ion-card {
+  margin: 20px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  --background: white;
+  
+  ion-card-header {
+    padding-bottom: 8px;
+  }
+  
+  ion-card-content {
+    padding-top: 0;
+  }
+}
+
 .login-container {
   display: flex;
   flex-direction: column;
@@ -5,6 +24,31 @@
   justify-content: center;
   padding: 20px;
   text-align: center;
+}
+
+.app-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.logo-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+  transition: transform 0.3s ease;
+}
+
+.logo-image:hover {
+  transform: scale(1.05);
+}
+
+ion-card-title {
+  text-align: center;
+  color: var(--ion-color-primary);
+  font-weight: 600;
+  font-size: 1.4em;
 }
 
 .scope-info {
@@ -33,4 +77,16 @@
 ion-button {
   margin: 20px 0;
   width: 250px;
+  --border-radius: 8px;
+  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-weight: 500;
+  
+  &:hover {
+    --box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+  }
+  
+  ion-icon {
+    margin-right: 8px;
+  }
 }
