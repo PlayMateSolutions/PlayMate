@@ -28,8 +28,7 @@ import { SocialLogin } from '@capgo/capacitor-social-login';
     IonIcon,
     IonButton,
     IonButtons,
-    HttpClientModule,
-    ProfileMenuComponent
+    HttpClientModule
   ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },

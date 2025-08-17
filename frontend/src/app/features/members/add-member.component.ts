@@ -2,7 +2,7 @@ import { ModalController } from '@ionic/angular';
 import { Component, EventEmitter, Output } from '@angular/core';
 import { Member } from '../../shared/interfaces/member.interface';
 import { FormsModule } from '@angular/forms';
-import { IonModal, IonInput, IonButton, IonLabel, IonItem, IonList, IonText } from '@ionic/angular/standalone';
+import { IonInput, IonButton, IonLabel, IonItem, IonList, IonText } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -10,7 +10,7 @@ import { CommonModule } from '@angular/common';
   templateUrl: './add-member.component.html',
   styleUrls: ['./add-member.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonModal, IonInput, IonButton, IonLabel, IonItem, IonList, IonText],
+  imports: [CommonModule, FormsModule, IonInput, IonButton, IonLabel, IonItem, IonList, IonText],
   providers: [ModalController]
 })
 export class AddMemberComponent {

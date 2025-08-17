@@ -13,7 +13,7 @@
   
   <!-- Segments always visible -->
   <ion-toolbar class="segments-toolbar">
-    <ion-segment class="segment-enhanced" [(ngModel)]="selectedSegment" (ionChange)="segmentChanged($event)">
+    <ion-segment mode="ios" class="segment-enhanced" [(ngModel)]="selectedSegment" (ionChange)="segmentChanged($event)">
       <ion-segment-button value="all">
         <ion-label>All</ion-label>
       </ion-segment-button>
@@ -44,7 +44,7 @@
   <!-- Results count and loading state -->
   <div class="results-count">
     <ion-text color="medium" *ngIf="!loading">
-      {{ filteredMembers.length }} members
+      Showing {{ filteredMembers.length }} members
     </ion-text>
     <ion-spinner *ngIf="loading"></ion-spinner>
     <ion-text color="danger" *ngIf="error">{{ error }}</ion-text>
