@@ -6,7 +6,6 @@ export const environment = {
   production: false,
   apiUrl: 'https://script.google.com/macros/s/AKfycbyMDOC9nYxJv8mgpqE6i6VFF3UUy9NGPSTAGxXzihntX4KLXMnFz6moNR9ZcDJm3vZ2/dev',
   defaultAuthToken: 'dev-token-playmate-api',
-  googleClientId: '1031239235658-04jeuifg37vruvmkiu71m45tskj94tnv.apps.googleusercontent.com',
   googleSignInClientId: '1031239235658-04jeuifg37vruvmkiu71m45tskj94tnv.apps.googleusercontent.com', // Used for Capacitor Social Login
   authConfig: {
     allowedDomains: ['localhost:4200', 'localhost:8100'],
