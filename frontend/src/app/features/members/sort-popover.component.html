@@ -1,0 +1,81 @@
+<ion-header class="sort-header">
+  <ion-toolbar class="sort-toolbar">
+    <ion-title>Sort & Filter</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()" fill="clear">
+        <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="sort-content">
+  <div class="sort-section">
+    <h3>Sort by</h3>
+    <div class="chips-container">
+      <ion-chip 
+        [class.active]="currentSort === 'name'"
+        (click)="selectSort('name')"
+        class="sort-chip">
+        <ion-icon name="person-outline"></ion-icon>
+        <ion-label>Name</ion-label>
+        <ion-icon 
+          *ngIf="currentSort === 'name'"
+          [name]="sortDirection === 'asc' ? 'arrow-up-outline' : 'arrow-down-outline'"
+          class="direction-icon">
+        </ion-icon>
+      </ion-chip>
+
+      <ion-chip 
+        [class.active]="currentSort === 'expiryDate'"
+        (click)="selectSort('expiryDate')"
+        class="sort-chip">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <ion-label>Expiry Date</ion-label>
+        <ion-icon 
+          *ngIf="currentSort === 'expiryDate'"
+          [name]="sortDirection === 'asc' ? 'arrow-up-outline' : 'arrow-down-outline'"
+          class="direction-icon">
+        </ion-icon>
+      </ion-chip>
+
+      <ion-chip 
+        [class.active]="currentSort === 'createdDate'"
+        (click)="selectSort('createdDate')"
+        class="sort-chip">
+        <ion-icon name="time-outline"></ion-icon>
+        <ion-label>Join Date</ion-label>
+        <ion-icon 
+          *ngIf="currentSort === 'createdDate'"
+          [name]="sortDirection === 'asc' ? 'arrow-up-outline' : 'arrow-down-outline'"
+          class="direction-icon">
+        </ion-icon>
+      </ion-chip>
+    </div>
+  </div>
+
+  <!-- Placeholder for future filter sections -->
+  <!-- <div class="filter-section">
+    <h3>Filter by</h3>
+    <div class="chips-container">
+      <ion-chip class="filter-chip">
+        <ion-icon name="people-outline"></ion-icon>
+        <ion-label>Active Only</ion-label>
+      </ion-chip>
+    </div>
+  </div> -->
+
+  <div class="actions">
+    <ion-button 
+      fill="outline" 
+      class="btn-secondary" 
+      (click)="dismiss()">
+      Cancel
+    </ion-button>
+    <ion-button 
+      class="btn-primary" 
+      (click)="applySort()">
+      Apply
+    </ion-button>
+  </div>
+</ion-content>

@@ -1,2 +1,164 @@
 // For information on how to create your own theme, please see:
 // http://ionicframework.com/docs/theming/
+
+// Red-Focused Color Scheme for PlayMate Sports App
+// Primary: Energetic Red | Secondary: Professional Gray | Accent: Warm Orange
+
+// Primary Colors
+:root {
+  // Main Brand Colors
+  --ion-color-primary: #dc2626;
+  --ion-color-primary-rgb: 220, 38, 38;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #c12222;
+  --ion-color-primary-tint: #e03b3b;
+
+  // Secondary Colors
+  --ion-color-secondary: #1f2937;
+  --ion-color-secondary-rgb: 31, 41, 55;
+  --ion-color-secondary-contrast: #ffffff;
+  --ion-color-secondary-contrast-rgb: 255, 255, 255;
+  --ion-color-secondary-shade: #1b232f;
+  --ion-color-secondary-tint: #353e4b;
+
+  // Tertiary Colors
+  --ion-color-tertiary: #f97316;
+  --ion-color-tertiary-rgb: 249, 115, 22;
+  --ion-color-tertiary-contrast: #ffffff;
+  --ion-color-tertiary-contrast-rgb: 255, 255, 255;
+  --ion-color-tertiary-shade: #db6614;
+  --ion-color-tertiary-tint: #fa812d;
+
+  // Success Colors (Active Memberships)
+  --ion-color-success: #16a34a;
+  --ion-color-success-rgb: 22, 163, 74;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade: #138f41;
+  --ion-color-success-tint: #2dad5c;
+
+  // Warning Colors (Expiring Memberships)
+  --ion-color-warning: #f59e0b;
+  --ion-color-warning-rgb: 245, 158, 11;
+  --ion-color-warning-contrast: #000000;
+  --ion-color-warning-contrast-rgb: 0, 0, 0;
+  --ion-color-warning-shade: #d88b0a;
+  --ion-color-warning-tint: #f6a824;
+
+  // Danger Colors (Expired Memberships)
+  --ion-color-danger: #dc2626;
+  --ion-color-danger-rgb: 220, 38, 38;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #c12222;
+  --ion-color-danger-tint: #e03b3b;
+
+  // Medium Colors
+  --ion-color-medium: #6b7280;
+  --ion-color-medium-rgb: 107, 114, 128;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-shade: #5e646e;
+  --ion-color-medium-tint: #7a808c;
+
+  // Light Colors
+  --ion-color-light: #f3f4f6;
+  --ion-color-light-rgb: 243, 244, 246;
+  --ion-color-light-contrast: #000000;
+  --ion-color-light-contrast-rgb: 0, 0, 0;
+  --ion-color-light-shade: #d6d7d8;
+  --ion-color-light-tint: #f4f5f7;
+
+  // Dark Colors
+  --ion-color-dark: #111827;
+  --ion-color-dark-rgb: 17, 24, 39;
+  --ion-color-dark-contrast: #ffffff;
+  --ion-color-dark-contrast-rgb: 255, 255, 255;
+  --ion-color-dark-shade: #0f1415;
+  --ion-color-dark-tint: #292e3e;
+
+  // Custom Status Colors
+  --ion-color-active: #16a34a;
+  --ion-color-expiring: #f59e0b;
+  --ion-color-expired: #dc2626;
+
+  // Background Colors
+  --ion-background-color: #ffffff;
+  --ion-background-color-rgb: 255, 255, 255;
+  --ion-text-color: #1f2937;
+  --ion-text-color-rgb: 31, 41, 55;
+
+  // Card Colors
+  --ion-card-background: #ffffff;
+  --ion-card-color: #1f2937;
+
+  // Toolbar Colors
+  --ion-toolbar-background: #dc2626;
+  --ion-toolbar-color: #ffffff;
+  --ion-toolbar-border-color: #c12222;
+
+  // Tab Bar Colors
+  --ion-tab-bar-background: #ffffff;
+  --ion-tab-bar-color: #6b7280;
+  --ion-tab-bar-color-selected: #dc2626;
+
+  // Segment Colors
+  --ion-segment-background: #f3f4f6;
+  --ion-segment-color: #6b7280;
+  --ion-segment-color-checked: #dc2626;
+
+  // Button Colors
+  --ion-button-background: #dc2626;
+  --ion-button-color: #ffffff;
+  --ion-button-background-hover: #c12222;
+
+  // Input Colors
+  --ion-input-background: #f9fafb;
+  --ion-input-border-color: #d1d5db;
+  --ion-input-color: #1f2937;
+
+  // List Colors
+  --ion-item-background: #ffffff;
+  --ion-item-color: #1f2937;
+  --ion-item-border-color: #e5e7eb;
+
+  // Chip Colors
+  --ion-chip-background: #f3f4f6;
+  --ion-chip-color: #374151;
+}
+
+// Dark Mode Support
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ion-background-color: #111827;
+    --ion-background-color-rgb: 17, 24, 39;
+    --ion-text-color: #f9fafb;
+    --ion-text-color-rgb: 249, 250, 251;
+
+    --ion-card-background: #1f2937;
+    --ion-card-color: #f9fafb;
+
+    --ion-toolbar-background: #dc2626;
+    --ion-toolbar-color: #ffffff;
+
+    --ion-tab-bar-background: #1f2937;
+    --ion-tab-bar-color: #9ca3af;
+    --ion-tab-bar-color-selected: #dc2626;
+
+    --ion-segment-background: #374151;
+    --ion-segment-color: #9ca3af;
+    --ion-segment-color-checked: #dc2626;
+
+    --ion-item-background: #1f2937;
+    --ion-item-color: #f9fafb;
+    --ion-item-border-color: #374151;
+
+    --ion-input-background: #374151;
+    --ion-input-border-color: #4b5563;
+    --ion-input-color: #f9fafb;
+
+    --ion-chip-background: #374151;
+    --ion-chip-color: #d1d5db;
+  }
+}

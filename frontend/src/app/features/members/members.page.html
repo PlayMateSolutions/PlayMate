@@ -1,23 +1,22 @@
 <ion-header>
-  <ion-toolbar color="primary">
+  <ion-toolbar class="toolbar-primary">
     <ion-title>Members List</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="addMember()">
+      <ion-button class="btn-primary" (click)="toggleSearch()">
+        <ion-icon slot="icon-only" [name]="isSearchVisible ? 'close-outline' : 'search-outline'"></ion-icon>
+      </ion-button>
+      <ion-button class="btn-primary" (click)="presentSortMenu($event)">
+        <ion-icon slot="icon-only" name="options-outline"></ion-icon>
+      </ion-button>
+      <ion-button class="btn-primary" (click)="addMember()">
         <ion-icon slot="icon-only" name="add-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
   
-  <ion-toolbar>
-    <ion-searchbar 
-      [(ngModel)]="searchTerm" 
-      (ionChange)="searchMembers($event)" 
-      placeholder="Search by name, phone, or address...">
-    </ion-searchbar>
-  </ion-toolbar>
-  
-  <ion-toolbar>
-    <ion-segment color="primary" [(ngModel)]="selectedSegment" (ionChange)="segmentChanged($event)">
+  <!-- Segments always visible -->
+  <ion-toolbar class="segments-toolbar">
+    <ion-segment class="segment-enhanced" [(ngModel)]="selectedSegment" (ionChange)="segmentChanged($event)">
       <ion-segment-button value="all">
         <ion-label>All</ion-label>
       </ion-segment-button>
@@ -32,24 +31,19 @@
       </ion-segment-button>
     </ion-segment>
   </ion-toolbar>
+  
+  <!-- Collapsible search bar -->
+  <ion-toolbar class="search-toolbar" [class.search-visible]="isSearchVisible">
+    <ion-searchbar 
+      class="search-enhanced"
+      [(ngModel)]="searchTerm" 
+      (ionChange)="searchMembers($event)" 
+      placeholder="Search by name, phone, or address...">
+    </ion-searchbar>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <!-- Sort options -->
-  <div class="sort-controls">
-    <ion-label>Sort by:</ion-label>    <ion-chip [class.active]="sortOption === 'name'" (click)="changeSortOption('name')">
-      <ion-label>Name</ion-label>
-      <ion-icon *ngIf="sortOption === 'name'" [name]="sortDirection === 'asc' ? 'arrow-up-outline' : 'arrow-down-outline'"></ion-icon>
-    </ion-chip>
-    <ion-chip [class.active]="sortOption === 'expiryDate'" (click)="changeSortOption('expiryDate')">
-      <ion-label>Expiry Date</ion-label>
-      <ion-icon *ngIf="sortOption === 'expiryDate'" [name]="sortDirection === 'asc' ? 'arrow-up-outline' : 'arrow-down-outline'"></ion-icon>
-    </ion-chip>
-    <ion-chip [class.active]="sortOption === 'createdDate'" (click)="changeSortOption('createdDate')">
-      <ion-label>Join Date</ion-label>
-      <ion-icon *ngIf="sortOption === 'createdDate'" [name]="sortDirection === 'asc' ? 'arrow-up-outline' : 'arrow-down-outline'"></ion-icon>
-    </ion-chip>
-  </div>
   <!-- Results count and loading state -->
   <div class="results-count">
     <ion-text color="medium" *ngIf="!loading">
@@ -63,12 +57,14 @@
   <ng-container *ngIf="filteredMembers.length > 0; else noMembers">
     <ion-card *ngFor="let member of filteredMembers" [ngClass]="getMembershipStatus(member.expiryDate)">
       <ion-card-content class="card-content">
-        <div class="member-info">          <div class="member-name">
+        <div class="member-info">
+          <div class="member-name">
             <strong>{{ member.firstName }} {{ member.lastName }}</strong>
           </div>          
           <div>Phone: {{ member.phone || 'N/A' }}</div>
           <div>Expires: {{ formatDate(member.expiryDate) }}</div>
-        </div>        <div class="card-actions">
+        </div>
+        <div class="card-actions">
           <ion-button fill="clear" color="success" (click)="renewMembership(member)" class="action-button">
             <ion-icon name="refresh-outline"></ion-icon>
           </ion-button>

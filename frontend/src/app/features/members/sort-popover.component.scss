@@ -1,0 +1,180 @@
+.sort-header {
+  .sort-toolbar {
+    --background: var(--ion-color-primary);
+    --color: var(--ion-color-primary-contrast);
+    --border-color: var(--ion-color-primary-shade);
+    
+    ion-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+  }
+}
+
+.sort-content {
+  --background: var(--ion-color-light);
+  
+  .sort-section {
+    padding: 20px 20px 16px 20px;
+    
+    h3 {
+      margin: 0 0 16px 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--ion-color-dark);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .chips-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      
+      .sort-chip {
+        --background: white;
+        --color: var(--ion-color-medium);
+        --border-color: var(--ion-color-light-shade);
+        --border-width: 2px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-weight: 500;
+        
+        &:hover {
+          --background: var(--ion-color-light-shade);
+          transform: translateY(-1px);
+        }
+        
+        &.active {
+          --background: var(--ion-color-primary);
+          --color: var(--ion-color-primary-contrast);
+          --border-color: var(--ion-color-primary);
+          box-shadow: 0 2px 8px rgba(220, 38, 38, 0.2);
+        }
+        
+        ion-icon:first-child {
+          margin-right: 8px;
+          font-size: 16px;
+        }
+        
+        .direction-icon {
+          margin-left: 8px;
+          font-size: 14px;
+          opacity: 0.8;
+        }
+      }
+    }
+  }
+  
+  .filter-section {
+    padding: 0 20px 16px 20px;
+    border-top: 1px solid var(--ion-color-light-shade);
+    
+    h3 {
+      margin: 16px 0 16px 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--ion-color-dark);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .chips-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      
+      .filter-chip {
+        --background: var(--ion-color-light-shade);
+        --color: var(--ion-color-dark);
+        --border-color: var(--ion-color-medium);
+        --border-width: 1px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-weight: 500;
+        
+        &:hover {
+          --background: var(--ion-color-medium);
+          --color: white;
+        }
+        
+        ion-icon {
+          margin-right: 8px;
+          font-size: 16px;
+        }
+      }
+    }
+  }
+  
+  .actions {
+    display: flex;
+    gap: 12px;
+    margin: 20px 20px 20px 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--ion-color-light-shade);
+    
+    ion-button {
+      flex: 1;
+      --border-radius: 8px;
+      --padding-start: 16px;
+      --padding-end: 16px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      
+      &.btn-secondary {
+        --background: transparent;
+        --color: var(--ion-color-medium);
+        --border-color: var(--ion-color-medium);
+        --border-width: 2px;
+        
+        &:hover {
+          --background: var(--ion-color-light-shade);
+        }
+      }
+      
+      &.btn-primary {
+        --background: var(--ion-color-primary);
+        --color: var(--ion-color-primary-contrast);
+        --box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+        
+        &:hover {
+          --background: var(--ion-color-primary-shade);
+          --box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+        }
+      }
+    }
+  }
+}
+
+// Mobile optimizations
+@media (max-width: 576px) {
+  .sort-content {
+    .sort-section {
+      padding: 16px 16px 12px 16px;
+      
+      .chips-container {
+        gap: 8px;
+        
+        .sort-chip {
+          font-size: 14px;
+        }
+      }
+    }
+    
+    .filter-section {
+      padding: 0 16px 12px 16px;
+    }
+    
+    .actions {
+      margin: 16px 16px 16px 16px;
+      padding-top: 12px;
+      
+      ion-button {
+        --padding-start: 12px;
+        --padding-end: 12px;
+        font-size: 14px;
+      }
+    }
+  }
+}

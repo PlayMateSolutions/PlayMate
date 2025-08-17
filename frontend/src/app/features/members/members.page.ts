@@ -19,15 +19,16 @@ import {
   IonCardContent,
   IonSegment,
   IonSegmentButton,
-  IonChip,
   IonSpinner,
   IonText,
   IonModal,
   AlertController,
   ToastController,
-  ModalController
+  ModalController,
+  PopoverController
 } from '@ionic/angular/standalone';
 import { AddMemberComponent } from './add-member.component';
+import { SortPopoverComponent } from './sort-popover.component';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { Member } from '../../shared/interfaces/member.interface';
 import { MemberService } from './services/member.service';
@@ -41,7 +42,15 @@ import {
   refreshOutline,
   arrowUpOutline,
   arrowDownOutline,
-  personAddOutline
+  personAddOutline,
+  searchOutline,
+  closeOutline,
+  optionsOutline,
+  logoWhatsapp,
+  mailOutline,
+  callOutline,
+  calendarOutline,
+  footballOutline
 } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 
@@ -70,7 +79,6 @@ import { addIcons } from 'ionicons';
     IonCardContent,
     IonSegment,
     IonSegmentButton,
-    IonChip,
     IonSpinner,
     IonText,
     IonModal
@@ -86,12 +94,14 @@ export class MembersPage implements OnInit {
   selectedSegment: string = 'all';
   loading: boolean = false;
   error: string | null = null;
+  isSearchVisible: boolean = false;
   constructor(
     private memberService: MemberService,
     private alertController: AlertController,
     private toastController: ToastController,
     private translateService: TranslateService,
-    private modalController: ModalController
+    private modalController: ModalController,
+    private popoverController: PopoverController
   ) {    
     // Initialize available languages
     this.translateService.addLangs(['en', 'ta']);
@@ -101,20 +111,37 @@ export class MembersPage implements OnInit {
     const browserLang = navigator.language;
     this.translateService.use(browserLang.match(/en|ta/) ? browserLang : 'en');
 
-    addIcons({ 
-      addOutline, 
-      createOutline, 
-      trashOutline, 
-      peopleOutline,
+    addIcons({
+      addOutline,
       refreshOutline,
+      logoWhatsapp,
+      createOutline,
+      trashOutline,
+      mailOutline,
+      callOutline,
+      calendarOutline,
+      footballOutline,
+      peopleOutline,
+      personAddOutline,
       arrowUpOutline,
       arrowDownOutline,
-      personAddOutline
+      searchOutline,
+      closeOutline,
+      optionsOutline
     });
   }
 
   ngOnInit() {
     this.loadMembers();
+  }
+
+  toggleSearch() {
+    this.isSearchVisible = !this.isSearchVisible;
+    if (!this.isSearchVisible) {
+      // Clear search when hiding
+      this.searchTerm = '';
+      this.filterMembers();
+    }
   }
 
   loadMembers() {
@@ -373,5 +400,60 @@ export class MembersPage implements OnInit {
     // Implement pagination logic here
     // For now, just complete the event
     event.target.complete();
+  }
+
+  async presentSortMenu(event?: any) {
+    console.log('presentSortMenu called with event:', event);
+    console.log('SortPopoverComponent:', SortPopoverComponent);
+    
+    try {
+      const popover = await this.popoverController.create({
+        component: SortPopoverComponent,
+        componentProps: {
+          currentSort: this.sortOption,
+          sortDirection: this.sortDirection
+        },
+        event: event,
+        translucent: true,
+        cssClass: 'sort-popover'
+      });
+
+      popover.onDidDismiss().then((result) => {
+        if (result.data) {
+          const { sortOption, sortDirection } = result.data;
+          this.sortOption = sortOption;
+          this.sortDirection = sortDirection;
+          this.sortMembers();
+        }
+      });
+
+      await popover.present();
+    } catch (error) {
+      console.error('Error creating popover:', error);
+      // Fallback to alert if popover fails
+      const alert = await this.alertController.create({
+        header: 'Sort Members',
+        message: 'Choose how to sort the member list:',
+        buttons: [
+          {
+            text: 'Cancel',
+            role: 'cancel'
+          },
+          {
+            text: 'Name',
+            handler: () => this.changeSortOption('name')
+          },
+          {
+            text: 'Expiry Date',
+            handler: () => this.changeSortOption('expiryDate')
+          },
+          {
+            text: 'Join Date',
+            handler: () => this.changeSortOption('createdDate')
+          }
+        ]
+      });
+      await alert.present();
+    }
   }
 }
