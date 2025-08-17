@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { Storage } from '@ionic/storage-angular';
+import { Router, ActivatedRoute } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import {
   GoogleLoginResponseOnline,
@@ -25,7 +26,7 @@ export class AuthService {
   private readonly STORAGE_KEY = 'user_session';
   private storageReady = false;
 
-  constructor(private storage: Storage) {
+  constructor(private storage: Storage, private router: Router, private route: ActivatedRoute) {
     this.init();
   }
 
@@ -66,6 +67,9 @@ export class AuthService {
   }
   async login(): Promise<boolean> {
     try {
+      // Remove query params before login to avoid COOP issues
+      this.removeQueryParams();
+
       const response = await SocialLogin.login({
         provider: 'google',
         options: {
@@ -73,10 +77,13 @@ export class AuthService {
         },
       });
 
+      // Restore query params after login
+      this.restoreQueryParams();
+
       const result = response.result as GoogleLoginResponseOnline;
       console.log('Google login response:', result);
 
-      console.log('ID TOken:', result?.idToken);
+      console.log('ID Token:', result?.idToken);
       console.log('Access Token:', result?.accessToken?.token);
 
       if (result?.accessToken?.token) {
@@ -94,7 +101,32 @@ export class AuthService {
       return false;
     } catch (error) {
       console.error('Login error:', error);
+      // Restore query params even if login fails
+      this.restoreQueryParams();
       return false;
+    }
+  }
+
+  private removeQueryParams() {
+    // Store current query params in localStorage
+    // Because Google SignIn requires exact redirect URL
+    const currentQueryParams = this.route.snapshot.queryParams;
+    localStorage.setItem('queryParams', JSON.stringify(currentQueryParams));
+    this.router.navigate([], {
+      replaceUrl: true,
+    });
+  }
+
+  private restoreQueryParams() {
+    const queryParams = localStorage.getItem('queryParams');
+    if (queryParams) {
+      const parsedQueryParams = JSON.parse(queryParams);
+      this.router.navigate([], {
+        queryParams: parsedQueryParams,
+        replaceUrl: true,
+      });
+      // Clean up stored params
+      localStorage.removeItem('queryParams');
     }
   }
 
