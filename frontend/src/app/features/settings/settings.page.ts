@@ -33,8 +33,12 @@ export class SettingsPage implements OnInit {
         duration: 1500,
         color: 'success'
       });
-      toast.present();
-      // Optionally navigate away or reload
+      await toast.present();
+      
+      // Navigate to tabs after successful save
+      setTimeout(() => {
+        this.router.navigate(['/tabs']);
+      }, 1500);
     } else {
       const toast = await this.toastCtrl.create({
         message: 'Please enter a valid Sports Club ID.',

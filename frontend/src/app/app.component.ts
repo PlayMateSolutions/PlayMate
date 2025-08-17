@@ -65,17 +65,24 @@ export class AppComponent implements OnInit {
     // Handle club context only after authentication is confirmed
     this.authService.isAuthenticated$.subscribe(async (isAuthenticated) => {
       if (isAuthenticated) {
+        // Check current route to avoid unnecessary navigation
+        const currentUrl = this.router.url;
+        
         // Read sportsClubId from query params and store in ClubContextService
         this.route.queryParams.subscribe(async params => {
           const clubId = params['sportsClubId'];
           if (clubId) {
             this.clubContext.setSportsClubId(clubId);
           }
-          // If not set and user is authenticated, redirect to settings
-          if (!this.clubContext.getSportsClubId()) {
+          
+          // Only navigate if we're not already on the target page
+          const existingClubId = this.clubContext.getSportsClubId();
+          
+          if (!existingClubId && !currentUrl.includes('/settings')) {
+            // No club ID set and not on settings page, go to settings
             await this.router.navigate(['/settings']);
-          } else {
-            // If club is set, navigate to tabs
+          } else if (existingClubId && !currentUrl.includes('/tabs') && !currentUrl.includes('/settings')) {
+            // Club ID is set and not on tabs or settings, go to tabs
             await this.router.navigate(['/tabs']);
           }
         });
