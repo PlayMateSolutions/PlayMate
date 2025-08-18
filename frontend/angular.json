@@ -38,7 +38,8 @@
                 "glob": "manifest.json",
                 "input": "src",
                 "output": ""
-              }
+              },
+              "src/404.html"
             ],
             "styles": ["src/global.scss", "src/theme/variables.scss"],
             "scripts": [],
