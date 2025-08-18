@@ -47,19 +47,38 @@
     // the correct url will be waiting in the browser's history for
     // the single page app to route accordingly.
     (function (l) {
+      console.log('SPA GitHub Pages Script - Current location:', l.href);
+      console.log('SPA GitHub Pages Script - Pathname:', l.pathname);
+      console.log('SPA GitHub Pages Script - Search:', l.search);
+      console.log('SPA GitHub Pages Script - Hash:', l.hash);
+      console.log('SPA GitHub Pages Script - Search[1]:', l.search[1]);
+      
       if (l.search[1] === "/") {
+        console.log('SPA GitHub Pages Script - Redirect detected, processing...');
+        
         var decoded = l.search
           .slice(1)
           .split("&")
           .map(function (s) {
+            console.log('SPA GitHub Pages Script - Processing segment:', s);
             return s.replace(/~and~/g, "&");
           })
           .join("?");
+
+        console.log('SPA GitHub Pages Script - Decoded:', decoded);
+        
+        var newUrl = l.pathname.slice(0, -1) + decoded + l.hash;
+        console.log('SPA GitHub Pages Script - New URL:', newUrl);
+        
         window.history.replaceState(
           null,
           null,
-          l.pathname.slice(0, -1) + decoded + l.hash
+          newUrl
         );
+        
+        console.log('SPA GitHub Pages Script - URL updated via replaceState');
+      } else {
+        console.log('SPA GitHub Pages Script - No redirect detected, normal page load');
       }
     })(window.location);
   </script>
