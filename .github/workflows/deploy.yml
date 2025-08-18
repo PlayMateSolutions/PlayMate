@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'frontend/**'  # Only trigger on changes in frontend directory
+    # paths:
+    #   - 'frontend/**'  # Only trigger on changes in frontend directory
       
 permissions:
   contents: write
