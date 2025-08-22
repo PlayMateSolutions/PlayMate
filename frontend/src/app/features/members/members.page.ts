@@ -25,6 +25,7 @@ import {
   IonChip
 } from '@ionic/angular/standalone';
 import { AddMemberComponent } from './add-member.component';
+import { RecordPaymentComponent } from './record-payment.component';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { Member } from '../../shared/interfaces/member.interface';
 import { MemberService } from './services/member.service';
@@ -250,6 +251,49 @@ export class MembersPage implements OnInit {
     }
   }
 
+  async sendPaymentReminder(member: Member) {
+    const expiryDate = this.formatDate(member.expiryDate);
+    const message = `Hi ${member.firstName}, your gym membership expires on ${expiryDate}. Please renew your membership to continue enjoying our services.`;
+    const whatsappUrl = `https://wa.me/${member.phone}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_system');
+  }
+
+  async renewMembership(member: Member) {
+    const modal = await this.modalController.create({
+      component: RecordPaymentComponent,
+      componentProps: {
+        member: member
+      },
+      showBackdrop: true,
+      backdropDismiss: false,
+      cssClass: 'payment-modal'
+    });
+
+    modal.onWillDismiss().then((result) => {
+      if (result.data) {
+        this.loading = true;
+        this.memberService.updateMember({
+          ...member,
+          expiryDate: result.data.periodEnd.split('T')[0],
+          status: 'active'
+        }).subscribe({
+          next: () => {
+            this.showToast(`Payment recorded successfully for ${member.firstName} ${member.lastName}`);
+            this.loadMembers();
+            this.loading = false;
+          },
+          error: (error) => {
+            this.showToast('Error recording payment', 'danger');
+            this.loading = false;
+            console.error('Error recording payment:', error);
+          }
+        });
+      }
+    });
+
+    await modal.present();
+  }
+
   async deleteMember(member: Member) {
     const alert = await this.alertController.create({
       header: 'Confirm Delete',
@@ -315,10 +359,8 @@ export class MembersPage implements OnInit {
 
   async editMember(member: Member) {
   }
-  async renewMembership(member: Member) {
-    // TODO: Implement membership renewal logic
-  }  
-    async openWhatsApp(member: Member) {
+
+  async openWhatsApp(member: Member) {
     if (!member.phone) {
       const noPhoneMessage = await this.translateService.get('whatsapp.noPhone').toPromise();
       this.showToast(noPhoneMessage, 'warning');

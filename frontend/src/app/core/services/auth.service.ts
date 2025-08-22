@@ -147,10 +147,58 @@ export class AuthService {
   }
 
   async getAuthToken(): Promise<string | null> {
+    console.log('Getting auth token...');
     const session = await this.storage.get(this.STORAGE_KEY);
-    if (session && session.expiresAt > Date.now()) {
-      return session.token;
+    if (!session) {
+      console.log('No session found');
+      return null;
     }
-    return null;
+    console.log('Session found, expires:', new Date(session.expiresAt).toISOString());
+
+    if (session.expiresAt <= Date.now()) {
+      console.log('Token expired at:', new Date(session.expiresAt).toISOString());
+      console.log('Current time:', new Date().toISOString());
+      
+      try {
+        console.log('Attempting to refresh token...');
+        // Try to refresh the token
+        await SocialLogin.refresh({
+          provider: 'google',
+          options: {
+            scopes: ['email', 'profile'],
+            forceRefreshToken: true
+          }
+        });
+        console.log('Token refresh successful');
+        
+        // Get the refreshed token
+        console.log('Fetching new access token...');
+        const authCode = await SocialLogin.getAuthorizationCode({
+          provider: 'google'
+        });
+        
+        if (authCode.accessToken) {
+          console.log('New access token received');
+          const newSession: UserSession = {
+            ...session,
+            token: authCode.accessToken,
+            expiresAt: Date.now() + 3600000, // 1 hour from now
+          };
+          console.log('Updating session with new token, expires:', new Date(newSession.expiresAt).toISOString());
+          await this.setSession(newSession);
+          return newSession.token;
+        } else {
+          console.warn('Refresh succeeded but no access token received');
+          return null;
+        }
+      } catch (error) {
+        console.error('Token refresh failed:', error);
+        console.error('Stack trace:', error instanceof Error ? error.stack : 'No stack trace available');
+        return null;
+      }
+    }
+    
+    console.log('Returning valid token');
+    return session.token;
   }
 }

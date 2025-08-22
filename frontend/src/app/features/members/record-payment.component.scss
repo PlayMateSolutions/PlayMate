@@ -1,0 +1,17 @@
+ion-datetime {
+  --background: var(--ion-color-light);
+  padding: 16px;
+  border-radius: 8px;
+}
+
+ion-text {
+  font-weight: 500;
+  margin-inline-start: 8px;
+}
+
+ion-input {
+  --padding-start: 12px;
+  --background: var(--ion-color-light-shade);
+  border-radius: 8px;
+  margin-top: 4px;
+}

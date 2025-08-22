@@ -1,0 +1,94 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Record Payment</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-list>
+    <ion-item>
+      <ion-label>Member</ion-label>
+      <ion-text>{{ member.firstName }} {{ member.lastName }}</ion-text>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Payment Date</ion-label>
+      <ion-input value="{{ payment.date | date: 'dd MMM yyyy' }}" id="paymentDate"></ion-input>
+      <ion-popover trigger="paymentDate" >
+        <ng-template>
+          <ion-datetime 
+            presentation="date" 
+            [(ngModel)]="payment.date" 
+            [showDefaultButtons]="true"
+            locale="en-US">
+          </ion-datetime>
+        </ng-template>
+      </ion-popover>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Amount</ion-label>
+      <ion-input
+        type="number"
+        [(ngModel)]="payment.amount"
+        placeholder="Enter amount">
+      </ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Payment Type</ion-label>
+      <ion-select [(ngModel)]="payment.paymentType">
+        <ion-select-option value="Cash">Cash</ion-select-option>
+        <ion-select-option value="Card">Card</ion-select-option>
+        <ion-select-option value="UPI">UPI</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Period Start</ion-label>
+      <ion-input value="{{ payment.periodStart | date: 'dd MMM yyyy' }}" id="periodStart"></ion-input>
+      <ion-popover trigger="periodStart">
+        <ng-template>
+          <ion-datetime 
+            presentation="date" 
+            [(ngModel)]="payment.periodStart" 
+            [showDefaultButtons]="true"
+            locale="en-US">
+          </ion-datetime>
+        </ng-template>
+      </ion-popover>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Period End</ion-label>
+      <ion-input value="{{ payment.periodEnd | date: 'dd MMM yyyy' }}" id="periodEnd"></ion-input>
+      <ion-popover trigger="periodEnd">
+        <ng-template>
+          <ion-datetime 
+            presentation="date" 
+            [(ngModel)]="payment.periodEnd" 
+            [showDefaultButtons]="true"
+            locale="en-US">
+          </ion-datetime>
+        </ng-template>
+      </ion-popover>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Notes</ion-label>
+      <ion-textarea
+        [(ngModel)]="payment.notes"
+        placeholder="Add notes (optional)">
+      </ion-textarea>
+    </ion-item>
+  </ion-list>
+
+  <div class="ion-padding">
+    <ion-button expand="block" (click)="recordPayment()" [disabled]="!isValid()">
+      Record Payment
+    </ion-button>
+  </div>
+</ion-content>
