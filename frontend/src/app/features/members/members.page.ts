@@ -140,7 +140,7 @@ export class MembersPage implements OnInit {
   }
 
   searchMembers(event: any) {
-    this.searchTerm = event.target.value;
+    this.searchTerm = event.target.value || '';
     this.filterMembers();
   }
 
@@ -152,10 +152,9 @@ export class MembersPage implements OnInit {
       const term = this.searchTerm.toLowerCase().trim();
       result = result.filter(
         (member) =>
-          member.firstName.toLowerCase().includes(term) ||
-          member.lastName.toLowerCase().includes(term) ||
-          member.email.toLowerCase().includes(term) ||
-          (member.sports && member.sports.some(sport => sport.toLowerCase().includes(term)))
+          (member.firstName && member.firstName.toLowerCase().includes(term)) ||
+          (member.lastName && member.lastName.toLowerCase().includes(term)) ||
+          (member.phone && String(member.phone).toLowerCase().includes(term))
       );
     }
 

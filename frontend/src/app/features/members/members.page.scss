@@ -105,22 +105,31 @@ ion-searchbar {
         transform: translateY(-1px);
       }
 
-      &.active {
-        --background: var(--ion-color-primary);
-        --color: var(--ion-color-primary-contrast);
-        --border-color: var(--ion-color-primary);
-        box-shadow: 0 2px 8px rgba(220, 38, 38, 0.2);
-      }
-
       ion-icon:first-child {
         margin-right: 6px;
         font-size: 16px;
+        color: var(--ion-color-dark);
+        opacity: 0.8;
       }
 
       .direction-icon {
         margin-left: 6px;
         font-size: 14px;
         opacity: 0.8;
+        color: var(--ion-color-dark);
+      }
+
+      &.active {
+        --background: var(--ion-color-primary);
+        --color: var(--ion-color-primary-contrast);
+        --border-color: var(--ion-color-primary);
+        box-shadow: 0 2px 8px rgba(220, 38, 38, 0.2);
+
+        ion-icon:first-child,
+        .direction-icon {
+          color: white;
+          opacity: 1;
+        }
       }
     }
   }

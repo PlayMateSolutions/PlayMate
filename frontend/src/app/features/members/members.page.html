@@ -33,8 +33,10 @@
     <ion-searchbar 
       class="search-enhanced"
       [(ngModel)]="searchTerm" 
-      (ionChange)="searchMembers($event)" 
-      placeholder="Search by name, phone, or address...">
+      (ionInput)="searchMembers($event)" 
+      (ionClear)="searchMembers($event)"
+      placeholder="Search by name or phone..."
+      debounce="300">
     </ion-searchbar>
   </ion-toolbar>
 </ion-header>
