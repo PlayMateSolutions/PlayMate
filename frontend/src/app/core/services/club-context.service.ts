@@ -21,4 +21,9 @@ export class ClubContextService {
   getSportsClubId(): string | null {
     return this.sportsClubId;
   }
+
+  clear() {
+    this.sportsClubId = null;
+    localStorage.removeItem(this.STORAGE_KEY);
+  }
 }

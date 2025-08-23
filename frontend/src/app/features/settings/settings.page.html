@@ -1,21 +1,84 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
     <ion-title>Settings</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="saveSettings()" [disabled]="!hasChanges">
+        <ion-icon slot="start" name="save-outline"></ion-icon>
+        Save
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content class="ion-padding">
   <ion-list>
-    <ion-item>
-      <ion-label position="stacked">Sports Club ID</ion-label>
-      <ion-input [(ngModel)]="sportsClubId" placeholder="Enter Sports Club ID"></ion-input>
-    </ion-item>
-    <ion-item lines="none">
-      <ion-button expand="block" (click)="saveClubId()">Save</ion-button>
-    </ion-item>
-    <ion-item button (click)="logout()">
-      <ion-icon slot="start" name="log-out"></ion-icon>
-      <ion-label>Logout</ion-label>
-    </ion-item>
+    <!-- Club Settings -->
+    <ion-item-group>
+      <ion-item-divider>
+        <ion-label>Club Settings</ion-label>
+      </ion-item-divider>
+      <ion-item>
+        <ion-label position="stacked">Sports Club ID</ion-label>
+        <ion-input 
+          [value]="sportsClubId"
+          (ionInput)="sportsClubId = $any($event).target.value; settingsChanged()"
+          placeholder="Enter Sports Club ID"
+          type="text">
+        </ion-input>
+        <ion-note>This ID is used to identify your club in the system</ion-note>
+      </ion-item>
+    </ion-item-group>
+
+    <!-- App Settings -->
+    <ion-item-group>
+      <ion-item-divider>
+        <ion-label>App Settings</ion-label>
+      </ion-item-divider>
+      <ion-item>
+        <ion-label>Dark Mode</ion-label>
+        <ion-toggle [(ngModel)]="darkMode" (ionChange)="toggleDarkMode()"></ion-toggle>
+      </ion-item>
+      <ion-item>
+        <ion-label>Language</ion-label>
+        <ion-select [(ngModel)]="language" (ionChange)="changeLanguage()">
+          <ion-select-option value="en">English</ion-select-option>
+          <ion-select-option value="ta">Tamil</ion-select-option>
+        </ion-select>
+      </ion-item>
+    </ion-item-group>
+
+    <!-- Account Settings -->
+    <ion-item-group>
+      <ion-item-divider>
+        <ion-label>Account</ion-label>
+      </ion-item-divider>
+      <ion-item lines="none">
+        <ion-avatar slot="start" *ngIf="userPicture">
+          <img [src]="userPicture" alt="Profile Picture">
+        </ion-avatar>
+        <ion-label>
+          <h2>{{ userName }}</h2>
+          <p>{{ userEmail }}</p>
+          <p>Google Account</p>
+        </ion-label>
+        <ion-button slot="end" fill="clear" color="danger" (click)="logout()">
+          <ion-icon slot="start" name="log-out-outline"></ion-icon>
+          Logout
+        </ion-button>
+      </ion-item>
+    </ion-item-group>
+
+    <ion-item-group>
+      <ion-item-divider>
+        <ion-label>About</ion-label>
+      </ion-item-divider>
+      <ion-item>
+        <ion-label>Version</ion-label>
+        <ion-note slot="end">1.0.0</ion-note>
+      </ion-item>
+    </ion-item-group>
   </ion-list>
 </ion-content>

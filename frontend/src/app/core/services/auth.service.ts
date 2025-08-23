@@ -26,7 +26,11 @@ export class AuthService {
   private readonly STORAGE_KEY = 'user_session';
   private storageReady = false;
 
-  constructor(private storage: Storage, private router: Router, private route: ActivatedRoute) {
+  constructor(
+    private storage: Storage,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {
     this.init();
   }
 
@@ -59,11 +63,12 @@ export class AuthService {
   }
 
   async initGoogleAuth(): Promise<boolean> {
- await SocialLogin.initialize({
-        google: {
-          webClientId: environment.googleSignInClientId, // the web client id for Android and Web
-        },
-      });    return true;
+    await SocialLogin.initialize({
+      google: {
+        webClientId: environment.googleSignInClientId, // the web client id for Android and Web
+      },
+    });
+    return true;
   }
   async login(): Promise<boolean> {
     try {
@@ -153,12 +158,18 @@ export class AuthService {
       console.log('No session found');
       return null;
     }
-    console.log('Session found, expires:', new Date(session.expiresAt).toISOString());
+    console.log(
+      'Session found, expires:',
+      new Date(session.expiresAt).toISOString()
+    );
 
     if (session.expiresAt <= Date.now()) {
-      console.log('Token expired at:', new Date(session.expiresAt).toISOString());
+      console.log(
+        'Token expired at:',
+        new Date(session.expiresAt).toISOString()
+      );
       console.log('Current time:', new Date().toISOString());
-      
+
       try {
         console.log('Attempting to refresh token...');
         // Try to refresh the token
@@ -166,17 +177,17 @@ export class AuthService {
           provider: 'google',
           options: {
             scopes: ['email', 'profile'],
-            forceRefreshToken: true
-          }
+            forceRefreshToken: true,
+          },
         });
         console.log('Token refresh successful');
-        
+
         // Get the refreshed token
         console.log('Fetching new access token...');
         const authCode = await SocialLogin.getAuthorizationCode({
-          provider: 'google'
+          provider: 'google',
         });
-        
+
         if (authCode.accessToken) {
           console.log('New access token received');
           const newSession: UserSession = {
@@ -184,7 +195,10 @@ export class AuthService {
             token: authCode.accessToken,
             expiresAt: Date.now() + 3600000, // 1 hour from now
           };
-          console.log('Updating session with new token, expires:', new Date(newSession.expiresAt).toISOString());
+          console.log(
+            'Updating session with new token, expires:',
+            new Date(newSession.expiresAt).toISOString()
+          );
           await this.setSession(newSession);
           return newSession.token;
         } else {
@@ -193,11 +207,14 @@ export class AuthService {
         }
       } catch (error) {
         console.error('Token refresh failed:', error);
-        console.error('Stack trace:', error instanceof Error ? error.stack : 'No stack trace available');
+        console.error(
+          'Stack trace:',
+          error instanceof Error ? error.stack : 'No stack trace available'
+        );
         return null;
       }
     }
-    
+
     console.log('Returning valid token');
     return session.token;
   }

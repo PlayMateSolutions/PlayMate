@@ -1,12 +1,27 @@
 import { Component } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
+import { 
+  IonHeader, 
+  IonToolbar, 
+  IonTitle, 
+  IonContent, 
+  IonList,
+  IonItem, 
+  IonLabel, 
+  IonButton,
+  IonIcon,
+  IonButtons,
+  IonMenuButton
+} from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-payments',
   template: `
     <ion-header>
-      <ion-toolbar>
+      <ion-toolbar color="primary">
+        <ion-buttons slot="start">
+          <ion-menu-button></ion-menu-button>
+        </ion-buttons>
         <ion-title>Payments</ion-title>
         <ion-buttons slot="end">
           <ion-button (click)="recordPayment()">
@@ -29,7 +44,20 @@ import { CommonModule } from '@angular/common';
     </ion-content>
   `,
   standalone: true,
-  imports: [IonicModule, CommonModule]
+  imports: [
+    CommonModule,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    IonList,
+    IonItem,
+    IonLabel,
+    IonButton,
+    IonIcon,
+    IonButtons,
+    IonMenuButton
+  ]
 })
 export class PaymentsPage {
   recordPayment() {

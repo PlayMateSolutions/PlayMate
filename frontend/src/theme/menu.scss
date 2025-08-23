@@ -1,0 +1,52 @@
+/* Add to your global.scss */
+ion-menu {
+  --width: 280px;
+  
+  ion-toolbar {
+    --background: var(--ion-color-primary);
+    --color: var(--ion-color-primary-contrast);
+  }
+
+  ion-content {
+    --background: var(--ion-background-color);
+  }
+
+  ion-list {
+    background: transparent;
+    padding: 0;
+
+    ion-item {
+      --background: transparent;
+      --background-hover: var(--ion-color-light);
+      --background-activated: var(--ion-color-light);
+      --padding-start: 16px;
+      --padding-end: 16px;
+      --min-height: 48px;
+      margin: 4px 8px;
+      border-radius: 8px;
+
+      ion-icon {
+        color: var(--ion-color-medium);
+        margin-right: 8px;
+      }
+
+      &.selected {
+        --background: var(--ion-color-light);
+        ion-icon, ion-label {
+          color: var(--ion-color-primary);
+        }
+      }
+    }
+
+    ion-item-divider {
+      --background: transparent;
+      --color: var(--ion-color-medium);
+      --padding-start: 16px;
+      font-size: 12px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-top: 16px;
+      min-height: 24px;
+    }
+  }
+}

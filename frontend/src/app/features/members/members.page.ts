@@ -22,7 +22,8 @@ import {
   AlertController,
   ToastController,
   ModalController,
-  IonChip
+  IonChip,
+  IonMenuButton
 } from '@ionic/angular/standalone';
 import { AddMemberComponent } from './add-member.component';
 import { RecordPaymentComponent } from './record-payment.component';
@@ -77,7 +78,8 @@ import { addIcons } from 'ionicons';
     IonSegmentButton,
     IonSpinner,
     IonText,
-    IonChip
+    IonChip,
+    IonMenuButton
   ],
   providers: [MemberService]
 })

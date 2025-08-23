@@ -21,11 +21,7 @@ export const routes: Routes = [
         loadComponent: () =>
           import('../features/payments/payments.page').then((m) => m.PaymentsPage),
       },
-      {
-        path: 'settings',
-        loadComponent: () =>
-          import('../features/settings/settings.page').then((m) => m.SettingsPage),
-      },
+
       {
         path: '',
         redirectTo: 'members',

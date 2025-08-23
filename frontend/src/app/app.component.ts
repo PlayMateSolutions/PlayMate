@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ClubContextService } from './core/services/club-context.service';
-import { IonApp, IonRouterOutlet, IonAvatar, IonIcon, IonButton, IonButtons } from '@ionic/angular/standalone';
+import { IonApp, IonRouterOutlet, IonAvatar, IonIcon, IonButton, IonButtons, MenuController } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { MenuComponent } from './core/components/menu.component';
 import { RouteReuseStrategy } from '@angular/router';
 import { IonicRouteStrategy } from '@ionic/angular/standalone';
 import { environment } from '../environments/environment';
@@ -28,7 +29,8 @@ import { SocialLogin } from '@capgo/capacitor-social-login';
     IonIcon,
     IonButton,
     IonButtons,
-    HttpClientModule
+    HttpClientModule,
+    MenuComponent
   ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },

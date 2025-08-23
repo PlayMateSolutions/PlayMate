@@ -1,0 +1,46 @@
+:host {
+  ion-content {
+    --background: var(--ion-color-light);
+  }
+
+  ion-item-divider {
+    --background: transparent;
+    --padding-start: 16px;
+    --ion-color-base: var(--ion-color-medium);
+    font-weight: 600;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 16px;
+  }
+
+  ion-item {
+    --background: var(--ion-background-color);
+    margin-bottom: 2px;
+    border-radius: 8px;
+
+    ion-label {
+      h2 {
+        font-weight: 500;
+        font-size: 1rem;
+      }
+      p {
+        color: var(--ion-color-medium);
+      }
+    }
+
+    ion-note {
+      font-size: 0.85rem;
+      color: var(--ion-color-medium);
+      padding-top: 4px;
+    }
+  }
+
+  ion-item-group {
+    margin-bottom: 16px;
+  }
+
+  ion-button[slot="end"] {
+    margin: 0;
+  }
+}

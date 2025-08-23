@@ -1,44 +1,115 @@
 
 import { Component, OnInit } from '@angular/core';
-import { IonicModule, ToastController } from '@ionic/angular';
+import { 
+  ToastController,
+  IonHeader,
+  IonToolbar,
+  IonButtons,
+  IonMenuButton,
+  IonTitle,
+  IonButton,
+  IonIcon,
+  IonContent,
+  IonList,
+  IonItemGroup,
+  IonItemDivider,
+  IonItem,
+  IonLabel,
+  IonInput,
+  IonNote,
+  IonToggle,
+  IonSelect,
+  IonSelectOption,
+  IonAvatar
+} from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ClubContextService } from '../../core/services/club-context.service';
 import { Router } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.page.html',
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule]
+  imports: [
+    CommonModule,
+    FormsModule,
+    IonHeader,
+    IonToolbar,
+    IonButtons,
+    IonMenuButton,
+    IonTitle,
+    IonButton,
+    IonIcon,
+    IonContent,
+    IonList,
+    IonItemGroup,
+    IonItemDivider,
+    IonItem,
+    IonLabel,
+    IonInput,
+    IonNote,
+    IonToggle,
+    IonSelect,
+    IonSelectOption,
+    IonAvatar
+  ]
 })
 export class SettingsPage implements OnInit {
   sportsClubId: string = '';
+  hasChanges: boolean = false;
+  darkMode: boolean = false;
+  language: string = 'en';
+  userEmail: string = '';
+  userName: string = '';
+  userPicture: string = '';
 
   constructor(
     private clubContext: ClubContextService,
     private toastCtrl: ToastController,
-    private router: Router
-  ) {}
-
-  ngOnInit() {
-    this.sportsClubId = this.clubContext.getSportsClubId() || '';
+    private router: Router,
+    private authService: AuthService
+  ) {
+    // Get the stored theme preference or system preference
+    this.darkMode = document.body.classList.contains('dark-theme');
+    // Get stored language preference
+    this.language = localStorage.getItem('language') || 'en';
   }
 
-  async saveClubId() {
+  ngOnInit() {
+    // Load Sports Club ID
+    const storedClubId = this.clubContext.getSportsClubId();
+    this.sportsClubId = storedClubId || '';
+    
+    // Load user info
+    this.loadUserInfo();
+  }
+
+  loadUserInfo() {
+    this.authService.userSession$.subscribe(session => {
+      if (session) {
+        this.userEmail = session.email;
+        this.userName = session.name;
+        this.userPicture = session.picture || '';
+      }
+    });
+  }
+
+  settingsChanged() {
+    this.hasChanges = true;
+  }
+
+  async saveSettings() {
     if (this.sportsClubId.trim()) {
       this.clubContext.setSportsClubId(this.sportsClubId.trim());
       const toast = await this.toastCtrl.create({
-        message: 'Sports Club ID saved!',
+        message: 'Settings saved successfully!',
         duration: 1500,
         color: 'success'
       });
       await toast.present();
-      
-      // Navigate to tabs after successful save
-      setTimeout(() => {
-        this.router.navigate(['/tabs']);
-      }, 1500);
+      this.hasChanges = false;
     } else {
       const toast = await this.toastCtrl.create({
         message: 'Please enter a valid Sports Club ID.',
@@ -49,7 +120,46 @@ export class SettingsPage implements OnInit {
     }
   }
 
-  logout() {
-    // TODO: Implement logout
+  toggleDarkMode() {
+    document.body.classList.toggle('dark-theme', this.darkMode);
+    localStorage.setItem('darkMode', this.darkMode.toString());
+  }
+
+  changeLanguage() {
+    localStorage.setItem('language', this.language);
+    // You can add translation logic here
+  }
+
+  async logout() {
+    try {
+      // Clear auth session
+      await this.authService.logout();
+
+      // Clear local storage
+      localStorage.clear();
+
+      // Clear IndexedDB members database
+      const request = window.indexedDB.deleteDatabase('members');
+      request.onsuccess = () => {
+        console.log('Members database deleted successfully');
+      };
+      request.onerror = () => {
+        console.error('Error deleting members database');
+      };
+
+      // Clear club context
+      this.clubContext.clear();
+
+      // Navigate to login page
+      await this.router.navigate(['/login'], { replaceUrl: true });
+    } catch (error) {
+      console.error('Logout error:', error);
+      const toast = await this.toastCtrl.create({
+        message: 'Error during logout. Please try again.',
+        duration: 2000,
+        color: 'danger'
+      });
+      await toast.present();
+    }
   }
 }
