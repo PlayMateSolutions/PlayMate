@@ -89,6 +89,7 @@ export class MembersPage implements OnInit {
   sortDirection: 'asc' | 'desc' = 'asc';
   selectedSegment: string = 'all';
   loading: boolean = false;
+  isLoading: boolean = false; // For API calls loading indicator
   error: string | null = null;
   isSearchVisible: boolean = false;
   constructor(
@@ -124,6 +125,7 @@ export class MembersPage implements OnInit {
 
   loadMembers() {
     this.loading = true;
+    this.isLoading = true;
     this.error = null;
     this.memberService.getMembers().subscribe({
       next: (members) => {
@@ -131,10 +133,12 @@ export class MembersPage implements OnInit {
         this.filteredMembers = [...members];
         this.sortMembers();
         this.loading = false;
+        this.isLoading = false;
       },
       error: (error) => {
         this.error = 'Error loading members';
         this.loading = false;
+        this.isLoading = false;
         console.error('Error loading members:', error);
       }
     });
@@ -304,6 +308,7 @@ export class MembersPage implements OnInit {
           role: 'destructive',
           handler: () => {
             this.loading = true;
+            this.isLoading = true;
             this.memberService.deleteMember(member.id).subscribe({
               next: () => {
                 this.showToast(`${member.firstName} ${member.lastName} has been deleted`);
@@ -312,6 +317,7 @@ export class MembersPage implements OnInit {
               error: (error) => {
                 this.error = 'Error deleting member';
                 this.loading = false;
+                this.isLoading = false;
                 console.error('Error deleting member:', error);
                 this.showToast('Failed to delete member', 'danger');
               }
@@ -336,6 +342,7 @@ export class MembersPage implements OnInit {
       const data = result.data;
       if (data && data.member) {
         this.loading = true;
+        this.isLoading = true;
         this.memberService.addMember(data.member).subscribe({
           next: () => {
             this.showToast('Member added successfully');
@@ -345,6 +352,7 @@ export class MembersPage implements OnInit {
             console.error('Error adding member:', error);
             this.showToast('Failed to add member', 'danger');
             this.loading = false;
+            this.isLoading = false;
           }
         });
       }

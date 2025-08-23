@@ -2,11 +2,12 @@
   <ion-toolbar class="toolbar-primary">
     <ion-title>Members List</ion-title>
     <ion-buttons slot="end">
+      <ion-spinner *ngIf="isLoading" name="dots"></ion-spinner>
+      <ion-button class="btn-primary" (click)="loadMembers()" [disabled]="isLoading">
+        <ion-icon slot="icon-only" name="refresh-outline"></ion-icon>
+      </ion-button>
       <ion-button class="btn-primary" (click)="toggleSearch()">
         <ion-icon slot="icon-only" [name]="isSearchVisible ? 'close-outline' : 'search-outline'"></ion-icon>
-      </ion-button>
-      <ion-button class="btn-primary" (click)="addMember()">
-        <ion-icon slot="icon-only" name="add-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>

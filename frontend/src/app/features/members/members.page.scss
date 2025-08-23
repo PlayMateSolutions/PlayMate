@@ -2,6 +2,15 @@ ion-content {
   --background: var(--ion-color-light-shade);
 }
 
+ion-toolbar {
+  ion-spinner {
+    margin-right: 16px;
+    width: 20px;
+    height: 20px;
+    color: var(--ion-color-primary-contrast);
+  }
+}
+
 ion-searchbar {
   padding: 16px;
   --background: var(--ion-color-light);
