@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, from } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../core/services/auth.service';
@@ -8,7 +8,10 @@ import { switchMap } from 'rxjs/operators';
 
 interface PaymentResponse {
   status: 'success' | 'error';
-  data?: any;
+  data?: {
+    paymentId: string;
+    expiryDate: string;
+  };
   error?: {
     code: number;
     message: string;
@@ -28,27 +31,30 @@ export class PaymentService {
   ) {}
 
   recordPayment(payment: any): Observable<PaymentResponse> {
-    return from(this.getRequestPayload('recordPayment', payment)).pipe(
-      switchMap(payload => {
-        const params = {
-          sportsClubId: this.clubContext.getSportsClubId() || '',
-          action: 'recordPayment'
+    return from(this.authService.getAuthToken()).pipe(
+      switchMap(token => {
+        if (!token) {
+          throw new Error('No valid auth token');
+        }
+
+        const params = new HttpParams()
+          .set('sportsClubId', this.clubContext.getSportsClubId() || '')
+          .set('action', 'recordPayment')
+          .set('authorization', 'Bearer ' + token);
+
+        const headers = new HttpHeaders({
+          'Content-Type': 'text/plain;charset=utf-8'
+        });
+
+        const options = {
+          headers,
+          params,
+          responseType: 'json' as const,
+          observe: 'body' as const
         };
-        const queryString = new URLSearchParams(params).toString();
-        return this.http.post<PaymentResponse>(`${this.apiUrl}?${queryString}`, payload);
+
+        return this.http.post<PaymentResponse>(this.apiUrl, payment, options);
       })
     );
-  }
-
-  private async getRequestPayload(action: string, data: any = {}): Promise<any> {
-    const token = await this.authService.getAuthToken();
-    if (!token) {
-      throw new Error('Unable to get valid authentication token');
-    }
-    return {
-      action,
-      payload: data,
-      authorization: 'Bearer ' + token
-    };
   }
 }

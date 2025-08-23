@@ -38,8 +38,7 @@
                 "glob": "manifest.json",
                 "input": "src",
                 "output": ""
-              },
-              "src/404.html"
+              }
             ],
             "styles": ["src/global.scss", "src/theme/variables.scss"],
             "scripts": [],
@@ -138,7 +137,10 @@
     }
   },
   "cli": {
-    "schematicCollections": ["@ionic/angular-toolkit"]
+    "schematicCollections": [
+      "@ionic/angular-toolkit"
+    ],
+    "analytics": "242eedc3-72a0-459a-86d8-12cadf3b8ad9"
   },
   "schematics": {
     "@ionic/angular-toolkit:component": {

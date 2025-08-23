@@ -604,8 +604,8 @@ function handleRecordPayment(payload) {
   }
 
   try {
-    const paymentId = recordPayment(payload);
-    return { paymentId: paymentId };
+    const payment = recordPayment(payload);
+    return payment;
   } finally {
     LOCK.releaseLock();
   }

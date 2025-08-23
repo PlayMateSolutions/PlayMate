@@ -10,7 +10,7 @@ function getPaymentsTable(context) {
   return Tamotsu.Table.define(
     {
       sheetName: SHEET_NAMES.PAYMENTS,
-      idColumn: "ID",
+      idColumn: "id",
     },
     {
       validate: function (on) {
@@ -58,6 +58,7 @@ function recordPayment(paymentData) {
   }
 
   // Extend member's expiry date if payment is successful and has an end period
+  let expiryDate = null;
   if (
     paymentData["status"] ===
     (typeof PAYMENT_STATUS !== "undefined" ? PAYMENT_STATUS.PAID : "Paid")
@@ -68,14 +69,18 @@ function recordPayment(paymentData) {
     // print the context
     Logger.log("Payment context: " + JSON.stringify(paymentData.context));
 
-    extendMemberExpiryDate({
-      memberId: paymentData["memberId"],
+    expiryDate = extendMemberExpiryDate({
+      id: paymentData["memberId"],
       periodStart: paymentData["periodStart"],
       periodEnd: paymentData["periodEnd"],
       context: paymentData.context,
     });
   }
-  return newPayment["id"] ? String(newPayment["id"]) : null;
+  
+  return {
+    paymentId: newPayment["id"] ? String(newPayment["id"]) : null,
+    expiryDate: expiryDate
+  };
 }
 
 /**

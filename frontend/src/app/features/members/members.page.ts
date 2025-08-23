@@ -270,24 +270,20 @@ export class MembersPage implements OnInit {
     });
 
     modal.onWillDismiss().then((result) => {
-      if (result.data) {
-        this.loading = true;
-        this.memberService.updateMember({
-          ...member,
-          expiryDate: result.data.periodEnd.split('T')[0],
-          status: 'active'
-        }).subscribe({
-          next: () => {
-            this.showToast(`Payment recorded successfully for ${member.firstName} ${member.lastName}`);
-            this.loadMembers();
-            this.loading = false;
-          },
-          error: (error) => {
-            this.showToast('Error recording payment', 'danger');
-            this.loading = false;
-            console.error('Error recording payment:', error);
-          }
-        });
+      console.log('Payment modal result:', result.data);
+      if (result.data?.success) {
+        // Update member in the local array
+        const index = this.members.findIndex(m => m.id === member.id);
+        if (index !== -1) {
+          this.members[index] = {
+            ...member,
+            expiryDate: result.data.expiryDate,
+            status: 'active'
+          };
+          // Re-apply current filters and sorting
+          this.filterMembers();
+          this.showToast(`Payment recorded successfully for ${member.firstName} ${member.lastName}`);
+        }
       }
     });
 
@@ -308,7 +304,7 @@ export class MembersPage implements OnInit {
           role: 'destructive',
           handler: () => {
             this.loading = true;
-            this.memberService.deleteMember(member.memberId).subscribe({
+            this.memberService.deleteMember(member.id).subscribe({
               next: () => {
                 this.showToast(`${member.firstName} ${member.lastName} has been deleted`);
                 this.loadMembers();

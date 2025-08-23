@@ -116,7 +116,7 @@ export class MemberService {
     );
   }
 
-  addMember(member: Omit<Member, 'memberId'>): Observable<Member> {
+  addMember(member: Omit<Member, 'id'>): Observable<Member> {
     return from(this.getRequestPayload('addMember', member)).pipe(
       switchMap(payload => {
         const params = new HttpParams()

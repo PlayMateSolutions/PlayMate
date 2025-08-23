@@ -15,7 +15,7 @@ import { CommonModule } from '@angular/common';
 })
 export class AddMemberComponent {
   constructor(private modalCtrl: ModalController) {}
-  @Output() memberAdded = new EventEmitter<Omit<Member, 'memberId'>>();
+  @Output() memberAdded = new EventEmitter<Omit<Member, 'id'>>();
   @Output() cancelled = new EventEmitter<void>();
 
 
@@ -38,7 +38,7 @@ export class AddMemberComponent {
       this.error = 'First Name, Phone, and Place are required.';
       return;
     }
-    const newMember: Omit<Member, 'memberId'> = {
+    const newMember: Omit<Member, 'id'> = {
       firstName: this.firstName.trim(),
       phone: this.phone.trim(),
       place: this.place.trim(),

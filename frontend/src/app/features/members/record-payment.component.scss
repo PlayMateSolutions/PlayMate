@@ -1,17 +1,53 @@
-ion-datetime {
-  --background: var(--ion-color-light);
-  padding: 16px;
-  border-radius: 8px;
-}
+:host {
+  ion-content {
+    --background: var(--ion-background-color);
+  }
 
-ion-text {
-  font-weight: 500;
-  margin-inline-start: 8px;
-}
+  ion-item {
+    --background: transparent;
+    --border-color: var(--ion-color-step-150);
+    
+    ion-input, ion-textarea, ion-select {
+      --background: transparent;
+      --padding-start: 12px;
+      --color: var(--ion-text-color);
+      margin-top: 4px;
+      
+      &::part(native) {
+        background: transparent;
+        color: var(--ion-text-color);
+        padding-left: 0;
+      }
+    }
 
-ion-input {
-  --padding-start: 12px;
-  --background: var(--ion-color-light-shade);
-  border-radius: 8px;
-  margin-top: 4px;
+    ion-label {
+      color: var(--ion-text-color);
+      opacity: 0.8;
+    }
+  }
+
+  ion-text {
+    font-weight: 500;
+    margin-inline-start: 8px;
+    color: var(--ion-text-color);
+  }
+
+  ion-datetime {
+    --background: var(--ion-background-color);
+    padding: 16px;
+    border-radius: 8px;
+    color: var(--ion-text-color);
+  }
+
+  ion-list {
+    background: transparent;
+  }
+
+  ion-popover {
+    --background: var(--ion-background-color);
+    
+    ion-datetime {
+      background: var(--ion-background-color);
+    }
+  }
 }

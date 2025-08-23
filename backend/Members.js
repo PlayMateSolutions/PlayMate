@@ -1,23 +1,23 @@
 /**
  * Extends a member's expiry date based on payment
  * @param {Object} params - { memberId, periodStart, periodEnd, context }
- * @return {boolean} True if update was successful, false otherwise
+ * @return {string|null} New expiry date in YYYY-MM-DD format if successful, null otherwise
  */
 function extendMemberExpiryDate(params) {
   Logger.log('[extendMemberExpiryDate] params: ' + JSON.stringify(params));
   var Member = getMemberTable(params.context);
   Logger.log('[extendMemberExpiryDate] Member table initialized');
-  var member = Member.find(1);
+  var member = Member.find(params.id);
   if (!member) {
-    Logger.log('[extendMemberExpiryDate] Member not found: ' + params.memberId);
-    return false;
+    Logger.log('[extendMemberExpiryDate] Member not found: ' + params.id);
+    return null;
   }
   var currentExpiry = member['expiryDate'] ? new Date(member['expiryDate']) : null;
   var periodStart = params.periodStart ? new Date(params.periodStart) : null;
   var periodEnd = params.periodEnd ? new Date(params.periodEnd) : null;
   if (!periodEnd) {
     Logger.log('[extendMemberExpiryDate] No periodEnd provided.');
-    return false;
+    return null;
   }
   var newExpiry;
   if (!currentExpiry || currentExpiry < new Date()) {
@@ -34,9 +34,10 @@ function extendMemberExpiryDate(params) {
     }
   }
   member['expiryDate'] = newExpiry;
+  Logger.log('[extendMemberExpiryDate] Member updated: ' + JSON.stringify(member));
   member.save();
-  Logger.log('[extendMemberExpiryDate] Expiry date set for memberId: ' + params.memberId + ' to ' + newExpiry);
-  return true;
+  Logger.log('[extendMemberExpiryDate] Expiry date set for memberId: ' + params.id + ' to ' + newExpiry);
+  return newExpiry;
 }
 
 // Helper to get Tamotsu Member table
@@ -45,7 +46,7 @@ function getMemberTable(context) {
   return Tamotsu.Table.define(
     {
       sheetName: SHEET_NAMES.MEMBERS,
-      idColumn: "ID",
+      idColumn: "id",
     },
     {
       validate: function (on) {

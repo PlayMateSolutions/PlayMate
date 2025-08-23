@@ -56,7 +56,7 @@ export class RecordPaymentComponent {
   @Input() member!: Member;
 
   payment = {
-    memberId: '',
+    memberId: '', // Keep as memberId since that's what backend expects
     date: new Date().toISOString(),
     amount: 500,
     paymentType: 'Cash' as const,
@@ -73,7 +73,7 @@ export class RecordPaymentComponent {
   ) {}
 
   ngOnInit() {
-    this.payment.memberId = this.member.memberId;
+    this.payment.memberId = this.member.id;
     
     // Set period start to first day of current month
     const startDate = new Date();
@@ -109,8 +109,13 @@ export class RecordPaymentComponent {
 
     try {
       const response = await this.paymentService.recordPayment(this.payment).toPromise();
-      if (response?.status === 'success') {
-        await this.modalCtrl.dismiss(this.payment);
+      if (response?.status === 'success' && response.data) {
+        await this.modalCtrl.dismiss({
+          success: true,
+          payment: this.payment,
+          paymentId: response.data.paymentId,
+          expiryDate: response.data.expiryDate
+        });
       } else {
         throw new Error(response?.error?.message || 'Failed to record payment');
       }
