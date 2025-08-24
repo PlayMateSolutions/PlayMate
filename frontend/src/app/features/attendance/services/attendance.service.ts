@@ -40,14 +40,19 @@ export class AttendanceService {
     private clubContext: ClubContextService,
     private memberService: MemberService
   ) {
-    this.initializeData();
+    // Initialize with empty data immediately to prevent blocking
+    this.attendanceSubject.next([]);
+    this.analyticsSubject.next(null);
+    this.loadingSubject.next(false);
+    this.lastSyncSubject.next(null);
+    
+    // Load data in background after a delay
+    setTimeout(() => this.loadCachedData(), 1000);
   }
 
-  private async initializeData(): Promise<void> {
+  private async loadCachedData(): Promise<void> {
     try {
-      this.loadingSubject.next(true);
-      
-      // Load cached data first
+      console.log('Loading cached attendance data...');
       const cachedAttendance = await AttendanceDB.getAll();
       const lastSync = await AttendanceDB.getLastSyncTime();
       
@@ -59,9 +64,30 @@ export class AttendanceService {
       }
       
       this.lastSyncSubject.next(lastSync);
+    } catch (error) {
+      console.error('Error loading cached data:', error);
+    }
+  }
+
+  private async initializeData(): Promise<void> {
+    try {
+      this.loadingSubject.next(true);
       
-      // Then sync with server
-      await this.syncAttendance();
+      // Load cached data first
+      await this.loadCachedData();
+      
+      // Only sync if we have no cached data or it's been more than 5 minutes
+      const lastSync = await AttendanceDB.getLastSyncTime();
+      const shouldSync = this.attendanceSubject.value.length === 0 || 
+        !lastSync || 
+        (new Date().getTime() - lastSync.getTime()) > 5 * 60 * 1000;
+      
+      if (shouldSync) {
+        // Run sync in background to avoid blocking
+        this.syncAttendance().catch(error => {
+          console.error('Background sync failed:', error);
+        });
+      }
       
     } catch (error) {
       console.error('Error initializing attendance data:', error);
@@ -147,11 +173,24 @@ export class AttendanceService {
     try {
       console.log('Linking attendance records with member data:', attendanceRecords.length);
       
-      // Get all members to link data
-      const members = await new Promise<Member[]>((resolve) => {
-        this.memberService.getMembers().subscribe(result => {
-          console.log('Members fetched for linking:', result.members.length);
-          resolve(result.members);
+      // Get all members to link data with a timeout
+      const members = await new Promise<Member[]>((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          console.warn('Member service timeout, proceeding without member data');
+          resolve([]);
+        }, 5000);
+        
+        this.memberService.getMembers().subscribe({
+          next: (result) => {
+            clearTimeout(timeout);
+            console.log('Members fetched for linking:', result.members.length);
+            resolve(result.members);
+          },
+          error: (error) => {
+            clearTimeout(timeout);
+            console.error('Error fetching members:', error);
+            resolve([]);
+          }
         });
       });
 
@@ -166,7 +205,7 @@ export class AttendanceService {
           membershipStatus: record.membershipStatus || 'unknown'
         };
         
-        if (!member) {
+        if (!member && members.length > 0) {
           console.warn('Member not found for attendance record:', record.memberId);
         }
         
@@ -344,6 +383,10 @@ export class AttendanceService {
 
   async refreshData(): Promise<void> {
     await this.syncAttendance(true);
+  }
+
+  async loadData(): Promise<void> {
+    await this.initializeData();
   }
 
   getAttendanceByMember(memberId: string): Observable<Attendance[]> {

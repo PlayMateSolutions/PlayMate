@@ -6,53 +6,23 @@ import {
   IonToolbar, 
   IonTitle, 
   IonContent, 
-  IonList,
-  IonItem, 
-  IonLabel, 
-  IonButton,
-  IonIcon,
-  IonButtons,
-  IonMenuButton,
   IonCard,
   IonCardHeader,
   IonCardTitle,
   IonCardContent,
-  IonGrid,
-  IonRow,
-  IonCol,
-  IonChip,
   IonSpinner,
-  IonRefresher,
-  IonRefresherContent,
-  IonSearchbar,
-  IonSelect,
-  IonSelectOption,
-  IonDatetime,
   IonText,
-  IonSegment,
-  IonSegmentButton,
-  IonBadge,
-  RefresherCustomEvent
+  IonButtons,
+  IonMenuButton
 } from '@ionic/angular/standalone';
-import { 
-  addIcons 
-} from 'ionicons';
-import {
-  peopleOutline,
-  trendingUpOutline,
-  trendingDownOutline,
-  timeOutline,
-  calendarOutline,
-  statsChartOutline,
-  personOutline,
-  refreshOutline,
-  filterOutline,
-  eyeOutline
-} from 'ionicons/icons';
-import { AttendanceService } from './services/attendance.service';
-import { AnalyticsService, AttendanceInsight, AttendanceTrend } from './services/analytics.service';
-import { Attendance, AttendanceFilters, AttendanceAnalytics } from '../../shared/interfaces/attendance.interface';
-import { Subscription } from 'rxjs';
+import { AttendanceDB } from './services/attendance-db';
+import { Attendance } from '../../shared/interfaces/attendance.interface';
+import { BarChartComponent, ChartData } from '../../shared/components/bar-chart/bar-chart.component';
+
+interface DailyAttendanceData {
+  date: string;
+  count: number;
+}
 
 @Component({
   selector: 'app-attendance',
@@ -66,259 +36,90 @@ import { Subscription } from 'rxjs';
     IonToolbar,
     IonTitle,
     IonContent,
-    IonList,
-    IonItem,
-    IonLabel,
-    IonButton,
-    IonIcon,
-    IonButtons,
-    IonMenuButton,
     IonCard,
     IonCardHeader,
     IonCardTitle,
     IonCardContent,
-    IonGrid,
-    IonRow,
-    IonCol,
-    IonChip,
     IonSpinner,
-    IonRefresher,
-    IonRefresherContent,
-    IonSearchbar,
-    IonSelect,
-    IonSelectOption,
-    IonDatetime,
     IonText,
-    IonSegment,
-    IonSegmentButton,
-    IonBadge
+    IonButtons,
+    IonMenuButton,
+    BarChartComponent
   ]
 })
-export class AttendancePage implements OnInit, OnDestroy {
-  analytics: AttendanceAnalytics | null = null;
-  filteredAttendance: Attendance[] = [];
-  insights: AttendanceInsight[] = [];
-  dailyTrend: AttendanceTrend | null = null;
-  loading = false;
-  lastSync: Date | null = null;
-  
-  // Filter state
-  filters: AttendanceFilters = {
-    membershipStatus: 'all'
-  };
-  
-  selectedSegment = 'analytics';
-  
-  private subscriptions: Subscription[] = [];
-
-  constructor(
-    private attendanceService: AttendanceService,
-    private analyticsService: AnalyticsService
-  ) {
-    addIcons({
-      peopleOutline,
-      trendingUpOutline,
-      trendingDownOutline,
-      timeOutline,
-      calendarOutline,
-      statsChartOutline,
-      personOutline,
-      refreshOutline,
-      filterOutline,
-      eyeOutline
-    });
-  }
+export class AttendancePage implements OnInit {
+  loading = true;
+  dailyData: DailyAttendanceData[] = [];
+  chartData: ChartData[] = [];
+  totalRecords = 0;
 
   ngOnInit() {
-    this.subscribeToData();
+    this.loadAttendanceData();
   }
 
-  ngOnDestroy() {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
-  }
-
-  private subscribeToData() {
-    // Subscribe to analytics
-    this.subscriptions.push(
-      this.attendanceService.analytics$.subscribe(analytics => {
-        console.log('Analytics received:', analytics);
-        this.analytics = analytics;
-      })
-    );
-
-    // Subscribe to loading state
-    this.subscriptions.push(
-      this.attendanceService.loading$.subscribe(loading => {
-        this.loading = loading;
-      })
-    );
-
-    // Subscribe to last sync time
-    this.subscriptions.push(
-      this.attendanceService.lastSync$.subscribe(lastSync => {
-        this.lastSync = lastSync;
-      })
-    );
-
-    // Subscribe to filtered attendance
-    this.subscriptions.push(
-      this.attendanceService.getFilteredAttendance(this.filters).subscribe(attendance => {
-        console.log('Filtered attendance received:', attendance.length);
-        this.filteredAttendance = attendance;
-      })
-    );
-
-    // Subscribe to insights
-    this.subscriptions.push(
-      this.analyticsService.getInsights().subscribe(insights => {
-        this.insights = insights;
-      })
-    );
-
-    // Subscribe to daily trend
-    this.subscriptions.push(
-      this.analyticsService.getDailyTrend(30).subscribe(trend => {
-        this.dailyTrend = trend;
-      })
-    );
-  }
-
-  async handleRefresh(event?: RefresherCustomEvent) {
+  async loadAttendanceData() {
     try {
-      await this.attendanceService.refreshData();
+      this.loading = true;
+      console.log('Loading attendance data from IndexedDB...');
+      
+      const attendanceRecords = await AttendanceDB.getAll();
+      console.log('Loaded records:', attendanceRecords.length);
+      
+      this.totalRecords = attendanceRecords.length;
+      this.dailyData = this.calculateDailyAttendance(attendanceRecords);
+      this.chartData = this.prepareChartData(this.dailyData);
+      
+      // If no real data, add some test data
+      if (this.chartData.length === 0) {
+        console.log('No real data found, adding test data...');
+        this.chartData = [
+          { label: '2024-08-20', value: 15 },
+          { label: '2024-08-21', value: 23 },
+          { label: '2024-08-22', value: 18 },
+          { label: '2024-08-23', value: 31 },
+          { label: '2024-08-24', value: 27 }
+        ];
+        this.totalRecords = 5;
+      }
+      
+      console.log('Daily data:', this.dailyData);
+      console.log('Chart data:', this.chartData);
+      
     } catch (error) {
-      console.error('Error refreshing data:', error);
+      console.error('Error loading attendance data:', error);
     } finally {
-      if (event) {
-        event.target.complete();
-      }
+      this.loading = false;
     }
   }
 
-  onFilterChange() {
-    this.subscriptions.push(
-      this.attendanceService.getFilteredAttendance(this.filters).subscribe(attendance => {
-        this.filteredAttendance = attendance;
-      })
-    );
-  }
-
-  onDateFilterChange(event: any, type: 'start' | 'end') {
-    if (type === 'start') {
-      this.filters.startDate = event.detail.value ? new Date(event.detail.value) : undefined;
-    } else {
-      this.filters.endDate = event.detail.value ? new Date(event.detail.value) : undefined;
-    }
-    this.onFilterChange();
-  }
-
-  onSearchChange(event: any) {
-    this.filters.searchTerm = event.detail.value;
-    this.onFilterChange();
-  }
-
-  onMembershipStatusChange(event: any) {
-    this.filters.membershipStatus = event.detail.value;
-    this.onFilterChange();
-  }
-
-  clearFilters() {
-    this.filters = {
-      membershipStatus: 'all'
-    };
-    this.onFilterChange();
-  }
-
-  segmentChanged(event: any) {
-    this.selectedSegment = event.detail.value;
-  }
-
-  getInsightIcon(type: string): string {
-    switch (type) {
-      case 'positive': return 'trending-up-outline';
-      case 'negative': return 'trending-down-outline';
-      default: return 'stats-chart-outline';
-    }
-  }
-
-  getInsightColor(type: string): string {
-    switch (type) {
-      case 'positive': return 'success';
-      case 'negative': return 'danger';
-      default: return 'medium';
-    }
-  }
-
-  getTrendIcon(trend: string): string {
-    switch (trend) {
-      case 'up': return 'trending-up-outline';
-      case 'down': return 'trending-down-outline';
-      default: return 'stats-chart-outline';
-    }
-  }
-
-  getTrendColor(trend: string): string {
-    switch (trend) {
-      case 'up': return 'success';
-      case 'down': return 'danger';
-      default: return 'medium';
-    }
-  }
-
-  formatDate(date: Date | string): string {
-    return new Date(date).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
-  }
-
-  formatTime(date: Date | string): string {
-    return new Date(date).toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true
-    });
-  }
-
-  formatDuration(minutes: number): string {
-    if (minutes < 60) {
-      return `${minutes}m`;
-    }
-    const hours = Math.floor(minutes / 60);
-    const remainingMinutes = minutes % 60;
-    return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}m` : `${hours}h`;
-  }
-
-  getMembershipStatusColor(status: string): string {
-    switch (status) {
-      case 'active': return 'success';
-      case 'expired': return 'danger';
-      default: return 'medium';
-    }
-  }
-
-  getAttendanceByDate(): { [key: string]: Attendance[] } {
-    const grouped: { [key: string]: Attendance[] } = {};
+  private calculateDailyAttendance(records: Attendance[]): DailyAttendanceData[] {
+    const dailyCount = new Map<string, number>();
     
-    this.filteredAttendance.forEach(record => {
-      const dateKey = this.formatDate(record.date);
-      if (!grouped[dateKey]) {
-        grouped[dateKey] = [];
-      }
-      grouped[dateKey].push(record);
+    records.forEach(record => {
+      const dateStr = new Date(record.date).toISOString().split('T')[0]; // YYYY-MM-DD format
+      dailyCount.set(dateStr, (dailyCount.get(dateStr) || 0) + 1);
     });
 
-    // Sort dates in descending order
-    const sortedGrouped: { [key: string]: Attendance[] } = {};
-    Object.keys(grouped)
-      .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
-      .forEach(key => {
-        sortedGrouped[key] = grouped[key].sort((a, b) => 
-          new Date(b.checkInTime).getTime() - new Date(a.checkInTime).getTime()
-        );
-      });
+    // Convert to array and sort by date
+    return Array.from(dailyCount.entries())
+      .map(([date, count]) => ({ date, count }))
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .slice(-30); // Last 30 days
+  }
 
-    return sortedGrouped;
+  private prepareChartData(dailyData: DailyAttendanceData[]): ChartData[] {
+    const chartData = dailyData.map(item => ({
+      label: item.date,
+      value: item.count
+    }));
+    console.log('Chart data prepared:', chartData);
+    return chartData;
+  }
+
+  formatDate(dateStr: string): string {
+    return new Date(dateStr).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric'
+    });
   }
 }

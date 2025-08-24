@@ -1,0 +1,30 @@
+<div class="bar-chart" [style.height.px]="height">
+  <div class="chart-title" *ngIf="title">{{ title }}</div>
+  
+  <div class="chart-container">
+    <div class="chart-bars">
+      <div *ngFor="let item of data; trackBy: trackByLabel" class="bar-container">
+        <div class="bar-value" *ngIf="showValues">
+          {{ item.value }}
+        </div>
+        
+        <div class="bar-wrapper" [style.height.px]="height - 80">
+          <div 
+            class="bar" 
+            [style.height.%]="getBarHeight(item.value)"
+            [style.background]="getBarColor(item)"
+            [title]="formatLabel(item.label) + ': ' + item.value"
+          ></div>
+        </div>
+        
+        <div class="bar-label" *ngIf="showLabels">
+          {{ formatLabel(item.label) }}
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="no-data" *ngIf="data.length === 0">
+    <p>No data to display</p>
+  </div>
+</div>
