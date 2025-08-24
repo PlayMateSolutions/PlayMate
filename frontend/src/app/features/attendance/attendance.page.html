@@ -3,11 +3,47 @@
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title>Daily Attendance</ion-title>
+    <ion-title>Attendance Analytics</ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="refreshAttendance()" [disabled]="loading || refreshing">
         <ion-spinner *ngIf="refreshing" name="crescent"></ion-spinner>
         <ion-icon *ngIf="!refreshing" name="refresh" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <!-- Period Selector -->
+  <ion-toolbar>
+    <ion-segment [(ngModel)]="viewPeriod" (ionChange)="onPeriodChange($event)" mode="ios">
+      <ion-segment-button value="weekly">
+        <ion-label>Weekly</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="monthly">
+        <ion-label>Monthly</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+
+  <!-- Navigation Bar (only show for weekly/monthly) -->
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button 
+        fill="clear" 
+        (click)="viewPeriod === 'weekly' ? goToPreviousWeek() : goToPreviousMonth()">
+        <ion-icon name="chevron-back-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    
+    <ion-title size="small" class="period-title">
+      {{ getCurrentPeriodText() }}
+    </ion-title>
+    
+    <ion-buttons slot="end">
+      <ion-button 
+        fill="clear" 
+        [disabled]="viewPeriod === 'weekly' ? !canGoToNextWeek() : !canGoToNextMonth()"
+        (click)="viewPeriod === 'weekly' ? goToNextWeek() : goToNextMonth()">
+        <ion-icon name="chevron-forward-outline" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -23,9 +59,10 @@
   <!-- Summary Card -->
   <ion-card *ngIf="!loading">
     <ion-card-header>
-      <ion-card-title>Attendance Summary</ion-card-title>
+      <ion-card-title>{{ viewPeriod | titlecase }} Attendance Summary</ion-card-title>
     </ion-card-header>
     <ion-card-content>
+      <p><strong>Period:</strong> {{ getCurrentPeriodText() }}</p>
       <p><strong>Total Records:</strong> {{ totalRecords }}</p>
       <p><strong>Days with Data:</strong> {{ chartData.length }}</p>
     </ion-card-content>
@@ -34,7 +71,7 @@
   <!-- Daily Attendance Chart -->
   <ion-card *ngIf="!loading && chartData.length > 0">
     <ion-card-header>
-      <ion-card-title>Daily Attendance (Last 30 Days)</ion-card-title>
+      <ion-card-title>{{ getChartTitle() }}</ion-card-title>
     </ion-card-header>
     <ion-card-content>
       <div style="display: flex; justify-content: center; align-items: center;">
