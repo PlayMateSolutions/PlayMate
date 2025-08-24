@@ -56,20 +56,29 @@
     <ion-text color="medium">Loading attendance data...</ion-text>
   </div>
 
-  <!-- Summary Card -->
-  <ion-card *ngIf="!loading">
-    <ion-card-header>
-      <ion-card-title>{{ viewPeriod | titlecase }} Attendance Summary</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <p><strong>Period:</strong> {{ getCurrentPeriodText() }}</p>
-      <p><strong>Total Records:</strong> {{ totalRecords }}</p>
-      <p><strong>Days with Data:</strong> {{ chartData.length }}</p>
-    </ion-card-content>
-  </ion-card>
+  <!-- Stats Cards - Only Average and Active Users -->
+  <div class="stats-grid" *ngIf="!loading && hasDataForCurrentPeriod">
+    <!-- Active Users Card -->
+    <div class="stat-card">
+      <div class="stat-icon active-users">
+        <ion-icon name="people"></ion-icon>
+      </div>
+      <div class="stat-label">Active Users</div>
+      <div class="stat-value">{{ uniqueMembersCount }}</div>
+    </div>
+    
+    <!-- Average Daily Card -->
+    <div class="stat-card">
+      <div class="stat-icon avg-daily">
+        <ion-icon name="calendar"></ion-icon>
+      </div>
+      <div class="stat-label">Avg Daily</div>
+      <div class="stat-value">{{ averageAttendance | number:'1.0-1' }}</div>
+    </div>
+  </div>
 
   <!-- Daily Attendance Chart -->
-  <ion-card *ngIf="!loading && chartData.length > 0">
+  <ion-card *ngIf="!loading && hasDataForCurrentPeriod">
     <ion-card-header>
       <ion-card-title>{{ getChartTitle() }}</ion-card-title>
     </ion-card-header>
@@ -87,11 +96,13 @@
   </ion-card>
 
   <!-- No Data Message -->
-  <ion-card *ngIf="!loading && chartData.length === 0">
+  <ion-card *ngIf="!loading && !hasDataForCurrentPeriod">
     <ion-card-content class="no-data">
+      <ion-icon name="analytics-outline" size="large" color="medium"></ion-icon>
       <ion-text color="medium">
-        <h3>No attendance data found</h3>
-        <p>There are no attendance records to display.</p>
+        <h3>No Data for {{ getCurrentPeriodText() }}</h3>
+        <p>There are no attendance records for this period.</p>
+        <p>Try changing the date range or refresh the data.</p>
       </ion-text>
     </ion-card-content>
   </ion-card>

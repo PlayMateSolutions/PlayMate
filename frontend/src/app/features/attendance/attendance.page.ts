@@ -26,7 +26,27 @@ import { Attendance } from '../../shared/interfaces/attendance.interface';
 import { GoogleChart, ChartType } from 'angular-google-charts';
 import { AttendanceService } from './services/attendance.service';
 import { addIcons } from 'ionicons';
-import { refresh, chevronBackOutline, chevronForwardOutline } from 'ionicons/icons';
+import { 
+  refresh, 
+  chevronBackOutline, 
+  chevronForwardOutline,
+  peopleOutline,
+  calendarOutline,
+  trendingUpOutline,
+  trendingDownOutline,
+  statsChartOutline,
+  eyeOutline,
+  analyticsOutline,
+  timeOutline,
+  people,
+  calendar,
+  statsChart,
+  trendingUp,
+  trendingDown,
+  eye,
+  card,
+  analytics
+} from 'ionicons/icons';
 
 interface DailyAttendanceData {
   date: string;
@@ -73,22 +93,48 @@ export class AttendancePage implements OnInit {
   
   dailyData: DailyAttendanceData[] = [];
   chartData: any[][] = [];
-  chartColumns = ['Date', 'Attendance'];
+  chartColumns = ['Date', 'Attendance', {'type': 'string', 'role': 'tooltip'}, {'type': 'string', 'role': 'annotation'}];
   chartType: ChartType = ChartType.ColumnChart;
-  totalRecords = 0;
+  uniqueMembersCount = 0;
+  averageAttendance = 0;
+  highestAttendance = { day: '', count: 0 };
+  lowestAttendance = { day: '', count: 0 };
+  daysWithNoAttendance = 0;
+  totalAttendanceCount = 0;
+  expiredMembershipsCount = 0;
+  hasDataForCurrentPeriod = false;
 
   constructor(
     private attendanceService: AttendanceService,
     private toastController: ToastController
   ) {
-    addIcons({ refresh, chevronBackOutline, chevronForwardOutline });
+    addIcons({ 
+      refresh, 
+      chevronBackOutline, 
+      chevronForwardOutline,
+      peopleOutline, 
+      calendarOutline,
+      trendingUpOutline,
+      trendingDownOutline,
+      statsChartOutline,
+      eyeOutline,
+      analyticsOutline,
+      timeOutline,
+      people,
+      calendar,
+      statsChart,
+      trendingUp,
+      trendingDown,
+      eye,
+      analytics
+    });
     
     // Initialize current week start (Monday)
     this.setCurrentWeekStart();
     // Initialize current month
     this.currentMonth = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), 1);
   }
-  chartOptions = {
+  chartOptions: any = {
     backgroundColor: 'transparent',
     colors: ['#4CAF50'],
     chartArea: {
@@ -126,25 +172,32 @@ export class AttendancePage implements OnInit {
       const attendanceRecords = await AttendanceDB.getAll();
       console.log('Loaded records:', attendanceRecords.length);
       
-      this.totalRecords = attendanceRecords.length;
+      // Get date range for current period
+      const dateRange = this.getDateRangeForCurrentView();
+      const startDate = new Date(dateRange[0]);
+      const endDate = new Date(dateRange[dateRange.length - 1]);
+      endDate.setHours(23, 59, 59, 999); // End of the day
+      
+      // Check if there are any records for the current period
+      const recordsForCurrentPeriod = attendanceRecords.filter(record => {
+        const recordDate = new Date(record.date);
+        return recordDate >= startDate && recordDate <= endDate;
+      });
+      
+      this.hasDataForCurrentPeriod = recordsForCurrentPeriod.length > 0;
+      
       this.dailyData = this.calculateDailyAttendance(attendanceRecords);
       this.chartData = this.prepareChartData(this.dailyData);
       
-      // If no real data, add some test data
-      if (this.chartData.length === 0) {
-        console.log('No real data found, adding test data...');
-        this.chartData = [
-          ['Aug 20', 15],
-          ['Aug 21', 23],
-          ['Aug 22', 18],
-          ['Aug 23', 31],
-          ['Aug 24', 27]
-        ];
-        this.totalRecords = 5;
-      }
+      // Calculate statistics
+      this.calculateStatistics(this.dailyData, attendanceRecords);
+      
+      // Update chart options to include annotations
+      this.updateChartOptions();
       
       console.log('Daily data:', this.dailyData);
       console.log('Chart data:', this.chartData);
+      console.log('Has data for current period:', this.hasDataForCurrentPeriod);
       
     } catch (error) {
       console.error('Error loading attendance data:', error);
@@ -224,16 +277,90 @@ export class AttendancePage implements OnInit {
   }
 
   private prepareChartData(dailyData: DailyAttendanceData[]): any[][] {
-    return dailyData.map(item => [
-      this.formatDate(item.date),
-      item.count
-    ]);
+    if (!dailyData || dailyData.length === 0) {
+      return [];
+    }
+
+    // Sort days chronologically
+    dailyData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    
+    return dailyData.map(day => {
+      const count = day.count || 0;
+      // Create array with [date string, count, tooltip, formatted count for annotation]
+      return [
+        this.formatDate(day.date), 
+        count, 
+        `${day.date}: ${count} ${count === 1 ? 'person' : 'people'}`, 
+        count.toString()
+      ];
+    });
+  }
+  
+  private calculateStatistics(dailyData: DailyAttendanceData[], attendanceRecords: Attendance[]) {
+    if (!dailyData || dailyData.length === 0) {
+      this.uniqueMembersCount = 0;
+      this.averageAttendance = 0;
+      this.highestAttendance = { day: '', count: 0 };
+      this.lowestAttendance = { day: '', count: 0 };
+      this.daysWithNoAttendance = 0;
+      this.totalAttendanceCount = 0;
+      this.expiredMembershipsCount = 0;
+      return;
+    }
+    
+    // Get date range for current period
+    const dateRange = this.getDateRangeForCurrentView();
+    const startDate = new Date(dateRange[0]);
+    const endDate = new Date(dateRange[dateRange.length - 1]);
+    endDate.setHours(23, 59, 59, 999); // End of the day
+    
+    // Filter attendance records for the current period
+    const periodAttendanceRecords = attendanceRecords.filter(record => {
+      const recordDate = new Date(record.date);
+      return recordDate >= startDate && recordDate <= endDate;
+    });
+    
+    // Calculate total attendance count (sum of all counts)
+    this.totalAttendanceCount = dailyData.reduce((sum, day) => sum + (day.count || 0), 0);
+    
+    // Calculate average attendance
+    this.averageAttendance = this.totalAttendanceCount / dailyData.length;
+    
+    // Find highest and lowest attendance
+    let highest = { day: '', count: 0 };
+    let lowest = { day: '', count: Number.MAX_SAFE_INTEGER };
+    
+    dailyData.forEach(day => {
+      const count = day.count || 0;
+      if (count > highest.count) {
+        highest = { day: day.date, count };
+      }
+      if (count < lowest.count) {
+        lowest = { day: day.date, count };
+      }
+    });
+    
+    this.highestAttendance = highest;
+    this.lowestAttendance = lowest.count === Number.MAX_SAFE_INTEGER ? { day: '', count: 0 } : lowest;
+    
+    // Count days with no attendance
+    this.daysWithNoAttendance = dailyData.filter(day => !day.count || day.count === 0).length;
+    
+    // Count attendance with expired memberships
+    this.expiredMembershipsCount = periodAttendanceRecords.filter(record => {
+      // Check if the member has an expired membership at the time of attendance
+      return record.membershipStatus === 'expired';
+    }).length;
+    
+    // Calculate unique members count (using Set to find unique memberIds)
+    const uniqueMemberIds = new Set(periodAttendanceRecords.map(record => record.memberId));
+    this.uniqueMembersCount = uniqueMemberIds.size;
   }
 
-  formatDate(dateStr: string): string {
+  private formatDateForDisplay(dateStr: string, period: string = this.viewPeriod): string {
     const date = new Date(dateStr);
     
-    switch(this.viewPeriod) {
+    switch(period) {
       case 'weekly':
         return date.toLocaleDateString('en-US', { 
           weekday: 'short'
@@ -249,6 +376,10 @@ export class AttendancePage implements OnInit {
           weekday: 'short'
         });
     }
+  }
+  
+  formatDate(dateStr: string): string {
+    return this.formatDateForDisplay(dateStr);
   }
 
   async refreshAttendance() {
@@ -362,5 +493,55 @@ export class AttendancePage implements OnInit {
     nextMonth.setMonth(this.currentMonth.getMonth() + 1);
     const now = new Date();
     return nextMonth <= new Date(now.getFullYear(), now.getMonth(), 1);
+  }
+  
+  private updateChartOptions() {
+    // Calculate max value for chart
+    const maxValue = this.chartData.length > 0 
+      ? Math.max(...this.chartData.map(item => item[1]), 10) * 1.1 
+      : 10;
+      
+    // Update chart options based on the data and view period
+    this.chartOptions = {
+      backgroundColor: 'transparent',
+      colors: ['#4CAF50'],
+      chartArea: {
+        left: 60,
+        top: 20,
+        width: this.viewPeriod === 'monthly' && this.chartData.length > 20 ? '80%' : '85%',
+        height: '75%'
+      },
+      hAxis: {
+        textStyle: { fontSize: 12, color: '#666' },
+        gridlines: { color: 'transparent' }
+      },
+      vAxis: {
+        textStyle: { fontSize: 12, color: '#666' },
+        gridlines: { color: '#e0e0e0', count: 5 },
+        minValue: 0,
+        viewWindow: {
+          min: 0,
+          max: maxValue
+        }
+      },
+      legend: { position: 'none' },
+      animation: {
+        startup: true,
+        duration: 1000,
+        easing: 'out'
+      },
+      annotations: {
+        textStyle: {
+          fontSize: 12,
+          color: '#fff',
+          bold: true
+        },
+        alwaysOutside: false,
+        stem: {
+          color: 'transparent',
+          length: 0
+        }
+      }
+    };
   }
 }
