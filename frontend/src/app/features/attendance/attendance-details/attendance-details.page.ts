@@ -23,15 +23,15 @@ import {
   IonInfiniteScrollContent,
   IonSearchbar,
   IonIcon,
-  IonBadge,
   IonNote,
+  IonBadge,
   InfiniteScrollCustomEvent
 } from '@ionic/angular/standalone';
 import { AttendanceDB } from '../services/attendance-db';
 import { Attendance } from '../../../shared/interfaces/attendance.interface';
 import { FormsModule } from '@angular/forms';
 import { addIcons } from 'ionicons';
-import { listOutline } from 'ionicons/icons';
+import { listOutline, alertCircle } from 'ionicons/icons';
 
 @Component({
   selector: 'app-attendance-details',
@@ -62,8 +62,8 @@ import { listOutline } from 'ionicons/icons';
     IonInfiniteScrollContent,
     IonSearchbar,
     IonIcon,
-    IonBadge,
-    IonNote
+    IonNote,
+    IonBadge
   ]
 })
 export class AttendanceDetailsPage implements OnInit {
@@ -84,7 +84,8 @@ export class AttendanceDetailsPage implements OnInit {
   constructor(private route: ActivatedRoute) {
     // Add required icons
     addIcons({
-      listOutline
+      listOutline,
+      alertCircle
     });
   }
 

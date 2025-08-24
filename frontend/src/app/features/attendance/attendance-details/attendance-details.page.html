@@ -43,15 +43,11 @@
       <ion-list lines="full">
         <ion-item *ngFor="let record of group.records" class="attendance-item">
           <ion-label>
-            <h3>{{ record.memberName || 'Unknown Member' }}</h3>
-            <ion-note color="medium">{{ record.time }}</ion-note>
+            {{ record.memberName || 'Unknown Member' }}
+            <ion-note color="medium" class="id-note">#{{ record.memberId || 'N/A' }}</ion-note>
           </ion-label>
-          <div class="status-wrapper" slot="end">
-            <div class="status-indicator" [class.active]="record.membershipStatus === 'active'" [class.expired]="record.membershipStatus !== 'active'"></div>
-            <ion-text [color]="record.membershipStatus === 'active' ? 'success' : 'danger'" class="status-text">
-              {{ record.membershipStatus === 'active' ? 'Active' : 'Expired' }}
-            </ion-text>
-          </div>
+          <ion-badge *ngIf="record.membershipStatus !== 'active'" color="danger" slot="end" class="expired-badge">Expired</ion-badge>
+          <ion-note color="medium" slot="end" class="time-note">{{ record.time }}</ion-note>
         </ion-item>
       </ion-list>
     </div>
