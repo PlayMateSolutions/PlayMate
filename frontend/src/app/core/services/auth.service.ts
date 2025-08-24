@@ -78,7 +78,7 @@ export class AuthService {
       const response = await SocialLogin.login({
         provider: 'google',
         options: {
-          scopes: ['email', 'profile'],
+          scopes: ['email', 'profile', 'https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/script.external_request'],
         },
       });
 
@@ -176,7 +176,7 @@ export class AuthService {
         await SocialLogin.refresh({
           provider: 'google',
           options: {
-            scopes: ['email', 'profile'],
+            scopes: ['email', 'profile', "https://www.googleapis.com/auth/spreadsheets", 'https://www.googleapis.com/auth/script.external_request'],
             forceRefreshToken: true,
           },
         });

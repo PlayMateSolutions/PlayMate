@@ -136,7 +136,7 @@ export class SettingsPage implements OnInit {
       await this.authService.logout();
 
       // Clear local storage
-      localStorage.clear();
+      // localStorage.clear();
 
       // Clear IndexedDB members database
       const request = window.indexedDB.deleteDatabase('members');
@@ -148,7 +148,7 @@ export class SettingsPage implements OnInit {
       };
 
       // Clear club context
-      this.clubContext.clear();
+      // this.clubContext.clear();
 
       // Navigate to login page
       await this.router.navigate(['/login'], { replaceUrl: true });

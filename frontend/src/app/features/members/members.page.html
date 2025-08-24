@@ -5,10 +5,14 @@
     </ion-buttons>
     <ion-title>Members List</ion-title>
     <ion-buttons slot="end">
-      <ion-spinner *ngIf="isLoading" name="dots"></ion-spinner>
-      <ion-button class="btn-primary" (click)="loadMembers()" [disabled]="isLoading">
-        <ion-icon slot="icon-only" name="refresh-outline"></ion-icon>
-      </ion-button>
+      <ng-container *ngIf="loading; else refreshButton">
+        <ion-spinner name="circular"></ion-spinner>
+      </ng-container>
+      <ng-template #refreshButton>
+        <ion-button class="btn-primary" (click)="loadMembers()">
+          <ion-icon slot="icon-only" name="refresh-outline"></ion-icon>
+        </ion-button>
+      </ng-template>
       <ion-button class="btn-primary" (click)="toggleSearch()">
         <ion-icon slot="icon-only" [name]="isSearchVisible ? 'close-outline' : 'search-outline'"></ion-icon>
       </ion-button>

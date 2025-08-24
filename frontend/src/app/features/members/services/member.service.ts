@@ -39,10 +39,11 @@ export class MemberService {
     };
   }
 
-  getMembers(): Observable<Member[]> {
+  getMembers(): Observable<{members: Member[], isFresh: boolean}> {
     // 1. Emit cached members from IndexedDB immediately (if any)
     const cached$ = from(MembersDB.getAll()).pipe(
-      catchError(() => of([]))
+      map(members => ({ members, isFresh: false })),
+      catchError(() => of({ members: [], isFresh: false }))
     );
 
     // 2. Fetch from backend, update cache, emit fresh data
@@ -71,6 +72,7 @@ export class MemberService {
             return response.data || [];
           }),
           switchMap(members => from(MembersDB.setAll(members)).pipe(map(() => members))),
+          map(members => ({ members, isFresh: true })),
           catchError(error => {
             console.error('Error fetching members:', error);
             throw error;
