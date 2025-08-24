@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { 
   IonHeader, 
   IonToolbar, 
@@ -106,7 +107,8 @@ export class AttendancePage implements OnInit {
 
   constructor(
     private attendanceService: AttendanceService,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private router: Router
   ) {
     addIcons({ 
       refresh, 
@@ -454,6 +456,26 @@ export class AttendancePage implements OnInit {
   goToNextMonth() {
     this.currentMonth.setMonth(this.currentMonth.getMonth() + 1);
     this.loadAttendanceData();
+  }
+  
+  // Navigate to attendance details page
+  navigateToAttendanceDetails() {
+    // Get date range for current period to pass to the details page
+    const dateRange = this.getDateRangeForCurrentView();
+    const startDate = dateRange[0];
+    const endDate = dateRange[dateRange.length - 1];
+    
+    // Navigate to attendance details with query parameters
+    this.router.navigate(['/tabs/attendance-details'], { 
+      queryParams: { 
+        startDate: startDate,
+        endDate: endDate,
+        period: this.viewPeriod,
+        periodLabel: this.getCurrentPeriodText(),
+        scrollToDate: startDate // Pass scrollToDate for auto-scroll
+      },
+      skipLocationChange: false  // Make sure the URL is updated
+    });
   }
 
   // Get display text for current period

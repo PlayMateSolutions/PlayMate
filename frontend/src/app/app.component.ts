@@ -81,7 +81,7 @@ export class AppComponent implements OnInit {
           const existingClubId = this.clubContext.getSportsClubId();
           
           if (!existingClubId && !currentUrl.includes('/settings')) {
-            // No club ID set and not on settings page, go to settings
+            // No club ID set and not on asettings page, go to settings
             await this.router.navigate(['/settings']);
           }
         });

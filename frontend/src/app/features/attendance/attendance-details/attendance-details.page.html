@@ -1,0 +1,80 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/attendance"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Attendance Details</ion-title>
+  </ion-toolbar>
+  
+  <ion-toolbar>
+    <ion-searchbar
+      placeholder="Search by name"
+      (ionInput)="onSearchChange($event)"
+      [debounce]="500">
+    </ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <!-- Loading Indicator -->
+  <div *ngIf="loading" class="loading-container">
+    <ion-spinner name="crescent"></ion-spinner>
+    <ion-text color="medium">Loading attendance data...</ion-text>
+  </div>
+  
+  <!-- Period Info Card -->
+  <ion-card *ngIf="!loading">
+    <ion-card-header>
+      <ion-card-title>{{ periodLabel }}</ion-card-title>
+      <ion-card-subtitle>{{ filteredRecords.length }} records</ion-card-subtitle>
+    </ion-card-header>
+  </ion-card>
+  
+  <!-- Simplified Attendance List Grouped by Date -->
+  <div class="attendance-list" *ngIf="!loading && displayedGroups.length > 0">
+    <!-- Each date group -->
+    <div *ngFor="let group of displayedGroups" class="date-group">
+      <ion-item-divider sticky="true" color="light" [id]="group.date">
+        <ion-label>{{ group.records[0]?.formattedDate }}</ion-label>
+        <ion-note slot="end">{{ group.records.length }} records</ion-note>
+      </ion-item-divider>
+      
+      <!-- Simplified attendance items -->
+      <ion-list lines="full">
+        <ion-item *ngFor="let record of group.records" class="attendance-item">
+          <ion-label>
+            <h3>{{ record.memberName || 'Unknown Member' }}</h3>
+            <ion-note color="medium">{{ record.time }}</ion-note>
+          </ion-label>
+          <div class="status-wrapper" slot="end">
+            <div class="status-indicator" [class.active]="record.membershipStatus === 'active'" [class.expired]="record.membershipStatus !== 'active'"></div>
+            <ion-text [color]="record.membershipStatus === 'active' ? 'success' : 'danger'" class="status-text">
+              {{ record.membershipStatus === 'active' ? 'Active' : 'Expired' }}
+            </ion-text>
+          </div>
+        </ion-item>
+      </ion-list>
+    </div>
+    
+    <!-- Infinite Scroll -->
+    <ion-infinite-scroll (ionInfinite)="loadMoreRecords($event)">
+      <ion-infinite-scroll-content
+        loadingSpinner="bubbles"
+        loadingText="Loading more records...">
+      </ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+  </div>
+  
+  <!-- No Records Message -->
+  <ion-card *ngIf="!loading && displayedGroups.length === 0" class="no-data-card">
+    <ion-card-content class="no-data">
+      <ion-icon name="list-outline" size="large" color="medium"></ion-icon>
+      <ion-text color="medium">
+        <h3>No Attendance Records</h3>
+        <p *ngIf="!searchQuery">There are no attendance records for this period.</p>
+        <p *ngIf="searchQuery">No records match your search criteria.</p>
+        <p *ngIf="searchQuery">Try a different search term.</p>
+      </ion-text>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

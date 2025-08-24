@@ -59,12 +59,16 @@
   <!-- Stats Cards - Only Average and Active Users -->
   <div class="stats-grid" *ngIf="!loading && hasDataForCurrentPeriod">
     <!-- Active Users Card -->
-    <div class="stat-card">
+    <div class="stat-card" (click)="navigateToAttendanceDetails()">
       <div class="stat-icon active-users">
         <ion-icon name="people"></ion-icon>
       </div>
       <div class="stat-label">Active Users</div>
       <div class="stat-value">{{ uniqueMembersCount }}</div>
+      <div class="view-details">
+        <ion-icon name="chevron-forward-outline" size="small"></ion-icon>
+        <small>View Details</small>
+      </div>
     </div>
     
     <!-- Average Daily Card -->
