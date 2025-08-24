@@ -1,8 +1,9 @@
 export interface Attendance {
-  attendanceId: string;
+  id: string;
   memberId: string;
   memberName?: string;
-  sport: string;
+  membershipStatus?: 'active' | 'expired' | 'unknown';
+  daysToExpiry?: number;
   date: Date;
   checkInTime: Date;
   checkOutTime?: Date;
@@ -13,34 +14,40 @@ export interface Attendance {
 export interface AttendanceFilters {
   startDate?: Date;
   endDate?: Date;
-  sport?: string;
   memberId?: string;
+  membershipStatus?: 'active' | 'expired' | 'unknown' | 'all';
   searchTerm?: string;
 }
 
-export interface AttendanceSummary {
-  totalSessions: number;
-  averageSessionDuration: number;
-  sportBreakdown: {
-    [key: string]: {
-      sessions: number;
-      totalDuration: number;
-      averageDuration: number;
-    }
+export interface DailyAttendanceStats {
+  date: string;
+  totalCheckins: number;
+  activeMembers: number;
+  expiredMembers: number;
+  averageDuration: number;
+  uniqueMembers: number;
+}
+
+export interface AttendanceAnalytics {
+  dailyStats: DailyAttendanceStats[];
+  summary: {
+    totalActiveUsers: number;
+    averageDaily: number;
+    minDaily: number;
+    maxDaily: number;
+    activeVsExpiredRatio: number;
+    totalAttendanceRecords: number;
   };
-  timeOfDayBreakdown: {
-    morning: number;
-    afternoon: number;
-    evening: number;
-  };
-  dayOfWeekBreakdown: {
-    [key: string]: number;
+  trends: {
+    weeklyGrowth: number;
+    mostActiveDay: string;
+    peakHours: { hour: number; count: number }[];
   };
 }
 
 export interface AttendanceResponse {
   status: 'success' | 'error';
-  data?: Attendance | Attendance[] | AttendanceSummary;
+  data?: Attendance | Attendance[] | AttendanceAnalytics;
   message?: string;
   totalCount?: number;
   page?: number;

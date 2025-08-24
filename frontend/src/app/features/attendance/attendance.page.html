@@ -1,0 +1,297 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Attendance Analytics</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="handleRefresh()">
+        <ion-icon slot="icon-only" name="refresh-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Segment Control -->
+  <ion-segment [(ngModel)]="selectedSegment" (ionChange)="segmentChanged($event)" mode="md">
+    <ion-segment-button value="analytics">
+      <ion-label>Analytics</ion-label>
+      <ion-icon name="stats-chart-outline"></ion-icon>
+    </ion-segment-button>
+    <ion-segment-button value="details">
+      <ion-label>Details</ion-label>
+      <ion-icon name="eye-outline"></ion-icon>
+    </ion-segment-button>
+  </ion-segment>
+
+  <!-- Loading Indicator -->
+  <div *ngIf="loading" class="loading-container">
+    <ion-spinner name="crescent"></ion-spinner>
+    <ion-text color="medium">Loading attendance data...</ion-text>
+  </div>
+
+  <!-- Analytics View -->
+  <div *ngIf="selectedSegment === 'analytics'" class="analytics-container">
+    
+    <!-- Summary Cards -->
+    <ion-grid *ngIf="analytics">
+      <ion-row>
+        <ion-col size="6">
+          <ion-card class="metric-card">
+            <ion-card-content>
+              <div class="metric-header">
+                <ion-icon name="people-outline" color="primary"></ion-icon>
+                <span class="metric-label">Active Users</span>
+              </div>
+              <div class="metric-value">{{ analytics.summary.totalActiveUsers }}</div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+        <ion-col size="6">
+          <ion-card class="metric-card">
+            <ion-card-content>
+              <div class="metric-header">
+                <ion-icon name="calendar-outline" color="secondary"></ion-icon>
+                <span class="metric-label">Avg Daily</span>
+              </div>
+              <div class="metric-value">{{ analytics.summary.averageDaily }}</div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="6">
+          <ion-card class="metric-card">
+            <ion-card-content>
+              <div class="metric-header">
+                <ion-icon name="trending-up-outline" color="success"></ion-icon>
+                <span class="metric-label">Max Daily</span>
+              </div>
+              <div class="metric-value">{{ analytics.summary.maxDaily }}</div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+        <ion-col size="6">
+          <ion-card class="metric-card">
+            <ion-card-content>
+              <div class="metric-header">
+                <ion-icon name="trending-down-outline" color="warning"></ion-icon>
+                <span class="metric-label">Min Daily</span>
+              </div>
+              <div class="metric-value">{{ analytics.summary.minDaily }}</div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <!-- Insights -->
+    <ion-card *ngIf="insights.length > 0" class="insights-card">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="stats-chart-outline"></ion-icon>
+          Insights
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div *ngFor="let insight of insights" class="insight-item">
+          <div class="insight-header">
+            <ion-icon [name]="getInsightIcon(insight.type)" [color]="getInsightColor(insight.type)"></ion-icon>
+            <span class="insight-title">{{ insight.title }}</span>
+            <ion-chip *ngIf="insight.value" [color]="getInsightColor(insight.type)" size="small">
+              {{ insight.value }}
+            </ion-chip>
+          </div>
+          <p class="insight-description">{{ insight.description }}</p>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Daily Trend -->
+    <ion-card *ngIf="dailyTrend" class="trend-card">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="time-outline"></ion-icon>
+          30-Day Trend
+          <ion-chip [color]="getTrendColor(dailyTrend.trend)" size="small">
+            <ion-icon [name]="getTrendIcon(dailyTrend.trend)"></ion-icon>
+            {{ dailyTrend.percentage }}%
+          </ion-chip>
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="trend-chart">
+          <div *ngFor="let point of dailyTrend.data" class="trend-point">
+            <div class="trend-bar" [style.height.px]="point.value * 3"></div>
+            <span class="trend-label">{{ point.label }}</span>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Additional Analytics -->
+    <ion-grid *ngIf="analytics">
+      <ion-row>
+        <ion-col size="12">
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>Quick Stats</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <div class="stat-row">
+                <span class="stat-label">Total Records:</span>
+                <span class="stat-value">{{ analytics.summary.totalAttendanceRecords }}</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">Active vs Expired Ratio:</span>
+                <span class="stat-value">{{ analytics.summary.activeVsExpiredRatio }}:1</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">Most Active Day:</span>
+                <span class="stat-value">{{ analytics.trends.mostActiveDay }}</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">Weekly Growth:</span>
+                <span class="stat-value" [class.positive]="analytics.trends.weeklyGrowth > 0" [class.negative]="analytics.trends.weeklyGrowth < 0">
+                  {{ analytics.trends.weeklyGrowth }}%
+                </span>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+
+  <!-- Details View -->
+  <div *ngIf="selectedSegment === 'details'" class="details-container">
+    
+    <!-- Filters -->
+    <ion-card class="filters-card">
+      <ion-card-content>
+        <ion-grid>
+          <ion-row>
+            <ion-col size="12">
+              <ion-searchbar 
+                [value]="filters.searchTerm" 
+                (ionInput)="onSearchChange($event)"
+                placeholder="Search by member name or notes"
+                debounce="300">
+              </ion-searchbar>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col size="6">
+              <ion-select 
+                [value]="filters.membershipStatus" 
+                (ionChange)="onMembershipStatusChange($event)"
+                placeholder="Membership Status"
+                interface="popover">
+                <ion-select-option value="all">All Status</ion-select-option>
+                <ion-select-option value="active">Active</ion-select-option>
+                <ion-select-option value="expired">Expired</ion-select-option>
+                <ion-select-option value="unknown">Unknown</ion-select-option>
+              </ion-select>
+            </ion-col>
+            <ion-col size="6">
+              <ion-button fill="outline" size="small" (click)="clearFilters()">
+                <ion-icon name="filter-outline" slot="start"></ion-icon>
+                Clear
+              </ion-button>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col size="6">
+              <ion-item>
+                <ion-label position="stacked">Start Date</ion-label>
+                <ion-datetime 
+                  [value]="filters.startDate?.toISOString()"
+                  (ionChange)="onDateFilterChange($event, 'start')"
+                  presentation="date"
+                  max="2030-12-31"
+                  min="2020-01-01">
+                </ion-datetime>
+              </ion-item>
+            </ion-col>
+            <ion-col size="6">
+              <ion-item>
+                <ion-label position="stacked">End Date</ion-label>
+                <ion-datetime 
+                  [value]="filters.endDate?.toISOString()"
+                  (ionChange)="onDateFilterChange($event, 'end')"
+                  presentation="date"
+                  max="2030-12-31"
+                  min="2020-01-01">
+                </ion-datetime>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Attendance Records by Date -->
+    <div *ngIf="filteredAttendance.length > 0; else noRecords">
+      <div *ngFor="let dateGroup of getAttendanceByDate() | keyvalue" class="date-group">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title class="date-header">
+              <ion-icon name="calendar-outline"></ion-icon>
+              {{ dateGroup.key }}
+              <ion-badge color="primary">{{ dateGroup.value.length }}</ion-badge>
+            </ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-list>
+              <ion-item *ngFor="let record of dateGroup.value" class="attendance-item">
+                <ion-label>
+                  <h3>{{ record.memberName || 'Unknown Member' }}</h3>
+                  <p>
+                    <ion-icon name="time-outline"></ion-icon>
+                    {{ formatTime(record.checkInTime) }}
+                    <span *ngIf="record.checkOutTime">
+                      - {{ formatTime(record.checkOutTime) }}
+                    </span>
+                    <span *ngIf="record.duration" class="duration">
+                      ({{ formatDuration(record.duration) }})
+                    </span>
+                  </p>
+                  <p *ngIf="record.notes" class="notes">{{ record.notes }}</p>
+                </ion-label>
+                <ion-chip 
+                  slot="end" 
+                  [color]="getMembershipStatusColor(record.membershipStatus || 'unknown')"
+                  size="small">
+                  {{ (record.membershipStatus || 'unknown') | titlecase }}
+                </ion-chip>
+              </ion-item>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
+
+    <ng-template #noRecords>
+      <ion-card>
+        <ion-card-content class="no-records">
+          <ion-icon name="calendar-outline" size="large" color="medium"></ion-icon>
+          <h3>No attendance records found</h3>
+          <p>Try adjusting your filters or check back later for new data.</p>
+        </ion-card-content>
+      </ion-card>
+    </ng-template>
+  </div>
+
+  <!-- Last Sync Info -->
+  <div *ngIf="lastSync" class="sync-info">
+    <ion-text color="medium">
+      <small>Last synced: {{ formatDate(lastSync) }} at {{ formatTime(lastSync) }}</small>
+    </ion-text>
+  </div>
+
+</ion-content>

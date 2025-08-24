@@ -1,0 +1,343 @@
+// Attendance Page Styles
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  gap: 1rem;
+}
+
+// Analytics Container
+.analytics-container {
+  padding: 1rem;
+}
+
+// Metric Cards
+.metric-card {
+  margin: 0;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  ion-card-content {
+    padding: 1rem;
+  }
+
+  .metric-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+
+    ion-icon {
+      font-size: 1.2rem;
+    }
+
+    .metric-label {
+      font-size: 0.8rem;
+      color: var(--ion-color-medium);
+      font-weight: 500;
+    }
+  }
+
+  .metric-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--ion-color-dark);
+  }
+}
+
+// Insights Card
+.insights-card {
+  margin: 1rem 0;
+  border-radius: 12px;
+
+  ion-card-header {
+    padding-bottom: 0.5rem;
+
+    ion-card-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.1rem;
+    }
+  }
+
+  .insight-item {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--ion-color-light);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .insight-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.25rem;
+
+      .insight-title {
+        font-weight: 600;
+        flex: 1;
+      }
+
+      ion-chip {
+        margin: 0;
+      }
+    }
+
+    .insight-description {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--ion-color-medium);
+      line-height: 1.4;
+    }
+  }
+}
+
+// Trend Card
+.trend-card {
+  margin: 1rem 0;
+  border-radius: 12px;
+
+  ion-card-header {
+    ion-card-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.1rem;
+    }
+  }
+
+  .trend-chart {
+    display: flex;
+    align-items: end;
+    gap: 4px;
+    height: 120px;
+    overflow-x: auto;
+    padding: 0.5rem 0;
+
+    .trend-point {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 30px;
+
+      .trend-bar {
+        width: 20px;
+        background: linear-gradient(to top, var(--ion-color-primary), var(--ion-color-primary-tint));
+        border-radius: 2px 2px 0 0;
+        min-height: 10px;
+        margin-bottom: 0.25rem;
+      }
+
+      .trend-label {
+        font-size: 0.7rem;
+        color: var(--ion-color-medium);
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+        max-width: 20px;
+        text-align: center;
+      }
+    }
+  }
+}
+
+// Quick Stats
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--ion-color-light-shade);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .stat-label {
+    font-weight: 500;
+    color: var(--ion-color-medium);
+  }
+
+  .stat-value {
+    font-weight: 600;
+    color: var(--ion-color-dark);
+
+    &.positive {
+      color: var(--ion-color-success);
+    }
+
+    &.negative {
+      color: var(--ion-color-danger);
+    }
+  }
+}
+
+// Details Container
+.details-container {
+  padding: 1rem;
+}
+
+// Filters Card
+.filters-card {
+  margin-bottom: 1rem;
+  border-radius: 12px;
+
+  ion-item {
+    --padding-start: 0;
+    --inner-padding-end: 0;
+  }
+
+  ion-select,
+  ion-datetime {
+    width: 100%;
+  }
+}
+
+// Date Groups
+.date-group {
+  margin-bottom: 1rem;
+
+  .date-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+
+    ion-badge {
+      margin-left: auto;
+    }
+  }
+}
+
+// Attendance Items
+.attendance-item {
+  --padding-start: 0;
+  --inner-padding-end: 0;
+
+  ion-label {
+    margin: 0.5rem 0;
+
+    h3 {
+      margin: 0 0 0.25rem 0;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 0.25rem 0;
+      font-size: 0.9rem;
+      color: var(--ion-color-medium);
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+
+      ion-icon {
+        font-size: 0.9rem;
+      }
+
+      .duration {
+        font-weight: 500;
+        color: var(--ion-color-primary);
+      }
+    }
+
+    .notes {
+      font-style: italic;
+      font-size: 0.85rem;
+    }
+  }
+
+  ion-chip {
+    margin: 0;
+  }
+}
+
+// No Records
+.no-records {
+  text-align: center;
+  padding: 2rem;
+
+  ion-icon {
+    margin-bottom: 1rem;
+  }
+
+  h3 {
+    margin: 0 0 0.5rem 0;
+    color: var(--ion-color-medium);
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--ion-color-medium);
+  }
+}
+
+// Sync Info
+.sync-info {
+  text-align: center;
+  padding: 1rem;
+  border-top: 1px solid var(--ion-color-light);
+  margin-top: 1rem;
+}
+
+// Segment Styling
+ion-segment {
+  margin: 1rem;
+  border-radius: 8px;
+
+  ion-segment-button {
+    --indicator-color: var(--ion-color-primary);
+    --color-checked: var(--ion-color-primary-contrast);
+    --background-checked: var(--ion-color-primary);
+
+    ion-label {
+      font-weight: 500;
+    }
+
+    ion-icon {
+      font-size: 1rem;
+      margin-top: 0.25rem;
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .analytics-container,
+  .details-container {
+    padding: 0.5rem;
+  }
+
+  .metric-card {
+    .metric-value {
+      font-size: 1.5rem;
+    }
+  }
+
+  .trend-chart {
+    .trend-point {
+      min-width: 25px;
+
+      .trend-bar {
+        width: 15px;
+      }
+    }
+  }
+}
+
+// Dark mode adjustments
+@media (prefers-color-scheme: dark) {
+  .metric-card,
+  .insights-card,
+  .trend-card {
+    box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
+  }
+
+  .trend-chart .trend-point .trend-bar {
+    background: linear-gradient(to top, var(--ion-color-primary), var(--ion-color-primary-shade));
+  }
+}
