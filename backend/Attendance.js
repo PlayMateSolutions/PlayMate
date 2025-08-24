@@ -4,17 +4,13 @@ function getAttendanceTable(context) {
   return Tamotsu.Table.define(
     {
       sheetName: SHEET_NAMES.ATTENDANCE,
-      idColumn: "ID",
+      idColumn: "id",
     },
     {
       validate: function (on) {
         this.errors = {};
         if (!this["memberId"]) this.errors["memberId"] = "can't be blank";
         if (!this["date"]) this.errors["date"] = "can't be blank";
-
-        if (Object.keys(this.errors).length > 0) {
-          Logger.log("Validation errors: " + JSON.stringify(this.errors));
-        }
 
         return Object.keys(this.errors).length === 0;
       },
@@ -69,6 +65,25 @@ function recordAttendance(attendanceData) {
     var checkOut = new Date(attrs["checkOutTime"]);
     attrs["duration"] = Math.round((checkOut - checkIn) / (1000 * 60));
   }
+  
+  // Check membership status at the time of attendance
+  var Members = getMemberTable(attendanceData.context);
+  var member = Members.find(attrs["memberId"]);
+  if (member) {
+    var attendanceDate = new Date(attrs["date"]);
+    var expiryDate = member["expiryDate"] ? new Date(member["expiryDate"]) : null;
+    
+    // Check if expiry date is valid
+    if (expiryDate && !isNaN(expiryDate.getTime())) {
+      attrs["daysToExpiry"] = Math.ceil((expiryDate - attendanceDate) / (1000 * 60 * 60 * 24));
+    } else {
+      attrs["daysToExpiry"] = -1;  // Invalid or empty expiry date
+    }
+    attrs["membershipStatus"] = attrs["daysToExpiry"] > 0 ? "active" : "expired";
+  } else {
+    attrs["membershipStatus"] = "unknown";
+  }
+  
   delete attrs.context;
   var newAttendance = Attendance.create(attrs);
   if (newAttendance === false) {
@@ -86,184 +101,33 @@ function recordAttendance(attendanceData) {
 }
 
 /**
- * Updates an existing attendance record using Tamotsu
- * @param {string} attendanceId - ID of the attendance record to update
- * @param {Object} updatedData - Object containing updated attendance details
- * @return {boolean} True if update was successful, false otherwise
- */
-function updateAttendance(attendanceId, updatedData) {
-  var Attendance = getAttendanceTable(updatedData.context);
-  var attendance = Attendance.find(attendanceId);
-  if (!attendance) {
-    return false;
-  }
-  Object.keys(updatedData).forEach(function (key) {
-    if (key !== "context" && key !== "id") {
-      attendance[key] = updatedData[key];
-    }
-  });
-  attendance.save();
-  return true;
-}
-
-/**
- * Gets attendance by ID using Tamotsu
- * @param {string} attendanceId - ID of the attendance record to retrieve
- * @return {Object|null} Attendance object or null if not found
- */
-function getAttendanceById(payload) {
-  var Attendance = getAttendanceTable(payload.context);
-  var attendance = Attendance.find(payload.attendanceId);
-  return attendance || null;
-}
-
-/**
- * Gets all attendance records, optionally filtered by member, date range, or sport using Tamotsu
- * @param {Object} payload - { context, memberId, startDate, endDate, sport }
+ * Gets all attendance records, optionally filtered by member or ID range using Tamotsu
+ * @param {Object} payload - { context, memberId, id }
  * @return {Array} Array of attendance objects
  */
 function getAttendanceRecords(payload = {}) {
-  var Attendance = getAttendanceTable(payload.context);
-  var records = Attendance.all();
-  // Apply filters
-  if (payload.memberId) {
-    records = records.filter(function (r) {
-      return r["memberId"] === payload.memberId;
-    });
-  }
-  if (payload.sport) {
-    records = records.filter(function (r) {
-      return r["sport"] === payload.sport;
-    });
-  }
-  if (payload.startDate) {
-    var startDate = new Date(payload.startDate);
-    records = records.filter(function (r) {
-      return new Date(r["date"]) >= startDate;
-    });
-  }
-  if (payload.endDate) {
-    var endDate = new Date(payload.endDate);
-    records = records.filter(function (r) {
-      return new Date(r["date"]) <= endDate;
-    });
-  }
-  return records;
-}
+  try {
+    var Attendance = getAttendanceTable(payload.context);
+    var records = Attendance.all();
+    
+    // Apply filters
+    if (payload.memberId) {
+      var filterMemberId = parseInt(payload.memberId);
+      records = records.filter(function (r) {
+        return r["memberId"] === filterMemberId;
+      });
+    }
 
-/**
- * Deletes an attendance record by ID using Tamotsu
- * @param {Object} payload - { context, attendanceId }
- * @return {boolean} True if deletion was successful, false otherwise
- */
-function deleteAttendance(payload) {
-  var Attendance = getAttendanceTable(payload.context);
-  var attendance = Attendance.find(payload.attendanceId);
-  if (!attendance) {
-    return false;
+    if (payload.lastAttendanceId) {
+      var filterId = parseInt(payload.lastAttendanceId);
+      records = records.filter(function (r) {
+        return r["id"] > filterId;
+      });
+    }
+    
+    return records;
+  } catch (error) {
+    Logger.log("Error in getAttendanceRecords: " + error.message);
+    throw error;
   }
-  attendance.destroy();
-  return true;
-}
-
-/**
- * Gets attendance summary for a member using Tamotsu
- * @param {Object} payload - { context, memberId, startDate, endDate, sport }
- * @return {Object} Summary of attendance
- */
-function getMemberAttendanceSummary(payload) {
-  var attendanceRecords = getAttendanceRecords(payload);
-  var summary = {
-    totalSessions: attendanceRecords.length,
-    totalDuration: 0,
-    sportBreakdown: {},
-    lastAttendance: null,
-  };
-  if (attendanceRecords.length === 0) {
-    return summary;
-  }
-  for (var i = 0; i < attendanceRecords.length; i++) {
-    var record = attendanceRecords[i];
-    if (record["duration"]) {
-      summary.totalDuration += parseInt(record["duration"]);
-    }
-    var sport = record["sport"];
-    if (!summary.sportBreakdown[sport]) {
-      summary.sportBreakdown[sport] = { sessions: 0, duration: 0 };
-    }
-    summary.sportBreakdown[sport].sessions += 1;
-    if (record["duration"]) {
-      summary.sportBreakdown[sport].duration += parseInt(record["duration"]);
-    }
-  }
-  summary.lastAttendance = attendanceRecords.reduce(function (latest, record) {
-    if (!latest || new Date(record["date"]) > new Date(latest["date"])) {
-      return record;
-    }
-    return latest;
-  }, null);
-  return summary;
-}
-
-/**
- * Gets attendance summary for all members or a specific sport using Tamotsu
- * @param {Object} payload - { context, startDate, endDate, sport }
- * @return {Object} Summary of attendance across all members
- */
-function getOverallAttendanceSummary(payload = {}) {
-  var attendanceRecords = getAttendanceRecords(payload);
-  var summary = {
-    totalSessions: attendanceRecords.length,
-    totalDuration: 0,
-    uniqueMembers: new Set(),
-    sportBreakdown: {},
-    dateBreakdown: {},
-  };
-  if (attendanceRecords.length === 0) {
-    summary.uniqueMembers = 0;
-    return summary;
-  }
-  for (var i = 0; i < attendanceRecords.length; i++) {
-    var record = attendanceRecords[i];
-    summary.uniqueMembers.add(record["memberId"]);
-    if (record["duration"]) {
-      summary.totalDuration += parseInt(record["duration"]);
-    }
-    var sport = record["sport"];
-    if (!summary.sportBreakdown[sport]) {
-      summary.sportBreakdown[sport] = {
-        sessions: 0,
-        duration: 0,
-        uniqueMembers: new Set(),
-      };
-    }
-    summary.sportBreakdown[sport].sessions += 1;
-    summary.sportBreakdown[sport].uniqueMembers.add(record["memberId"]);
-    if (record["duration"]) {
-      summary.sportBreakdown[sport].duration += parseInt(record["duration"]);
-    }
-    var dateStr = Utilities.formatDate(
-      new Date(record["date"]),
-      Session.getScriptTimeZone(),
-      "yyyy-MM-dd"
-    );
-    if (!summary.dateBreakdown[dateStr]) {
-      summary.dateBreakdown[dateStr] = {
-        sessions: 0,
-        uniqueMembers: new Set(),
-      };
-    }
-    summary.dateBreakdown[dateStr].sessions += 1;
-    summary.dateBreakdown[dateStr].uniqueMembers.add(record["memberId"]);
-  }
-  summary.uniqueMembers = summary.uniqueMembers.size;
-  for (var sport in summary.sportBreakdown) {
-    summary.sportBreakdown[sport].uniqueMembers =
-      summary.sportBreakdown[sport].uniqueMembers.size;
-  }
-  for (var date in summary.dateBreakdown) {
-    summary.dateBreakdown[date].uniqueMembers =
-      summary.dateBreakdown[date].uniqueMembers.size;
-  }
-  return summary;
 }

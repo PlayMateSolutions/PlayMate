@@ -101,23 +101,11 @@ function handleRequest(e, method) {
         break;
 
       // Attendance endpoints
-      case "recordAttendance":
-        result = handleRecordAttendance(payload);
-        break;
       case "recordBulkAttendance":
         result = handleRecordBulkAttendance(payload);
         break;
       case "getAttendance":
         result = handleGetAttendance(payload);
-        break;
-      case "getMemberAttendance":
-        result = handleGetMemberAttendance(payload);
-        break;
-      case "getAttendanceSummary":
-        result = handleGetAttendanceSummary(payload);
-        break;
-      case "updateAttendance":
-        result = handleUpdateAttendance(payload);
         break;
 
       // Payment endpoints
@@ -460,129 +448,19 @@ function handleUpdateMember(payload) {
 // ----------------------
 
 /**
- * Handle record attendance request
- *
- * @param {Object} payload - Attendance data
- * @return {Object} Result with new attendance ID
- */
-function handleRecordAttendance(payload) { 
-  // Try to acquire lock to prevent concurrent writes
-  if (!LOCK.tryLock(10000)) {
-    throw new Error(
-      "Failed to acquire lock. The system is busy. Please try again."
-    );
-  }
-
-  try {
-    const attendanceId = recordAttendance(payload);
-    return { attendanceId: attendanceId };
-  } finally {
-    LOCK.releaseLock();
-  }
-}
-
-/**
  * Handle get attendance records request
  *
  * @param {Object} payload - Request with optional filters
  * @return {Object} List of attendance records
  */
 function handleGetAttendance(payload) {
+  Logger.log("handleGetAttendance - Payload: " + JSON.stringify(payload));
   const filters = payload.filters || {};
-
-  // Convert date strings to Date objects if present
-  if (filters.startDate) {
-    filters.startDate = new Date(filters.startDate);
-  }
-  if (filters.endDate) {
-    filters.endDate = new Date(filters.endDate);
-  }
-
-  return getAttendanceRecords(filters);
-}
-
-/**
- * Handle get member attendance request
- *
- * @param {Object} payload - Request with memberId and optional date range
- * @return {Object} Member's attendance records
- */
-function handleGetMemberAttendance(payload) {
-  if (!payload.memberId) {
-    throw new Error("Member ID is required");
-  }
-
-  const options = payload.options || {};
-
-  // Convert date strings to Date objects if present
-  if (options.startDate) {
-    options.startDate = new Date(options.startDate);
-  }
-  if (options.endDate) {
-    options.endDate = new Date(options.endDate);
-  }
-
-  return getMemberAttendanceSummary(payload.memberId, options);
-}
-
-/**
- * Handle get attendance summary request
- *
- * @param {Object} payload - Request with optional filters
- * @return {Object} Attendance summary statistics
- */
-function handleGetAttendanceSummary(payload) {
-  const options = payload.options || {};
-
-  // Convert date strings to Date objects if present
-  if (options.startDate) {
-    options.startDate = new Date(options.startDate);
-  }
-  if (options.endDate) {
-    options.endDate = new Date(options.endDate);
-  }
-
-  return getOverallAttendanceSummary(options);
-}
-
-/**
- * Handle update attendance request
- *
- * @param {Object} payload - Updated attendance data with attendanceId
- * @return {Object} Result indicating success
- */
-function handleUpdateAttendance(payload) {
-  if (!payload.attendanceId) {
-    throw new Error("Attendance ID is required");
-  }
-
-  // Convert date strings to Date objects if present
-  if (payload.date) {
-    payload.date = new Date(payload.date);
-  }
-  if (payload.checkInTime) {
-    payload.checkInTime = new Date(payload.checkInTime);
-  }
-  if (payload.checkOutTime) {
-    payload.checkOutTime = new Date(payload.checkOutTime);
-  }
-
-  // Try to acquire lock to prevent concurrent writes
-  if (!LOCK.tryLock(10000)) {
-    throw new Error(
-      "Failed to acquire lock. The system is busy. Please try again."
-    );
-  }
-
-  try {
-    const success = updateAttendance(payload.attendanceId, payload);
-    if (!success) {
-      throw new Error("Attendance record not found or update failed");
-    }
-    return { success: true };
-  } finally {
-    LOCK.releaseLock();
-  }
+  // Merge filters with the context to ensure spreadsheet is available
+  return getAttendanceRecords({
+    ...payload,
+    context: payload.context
+  });
 }
 
 // ----------------------
