@@ -5,6 +5,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { HttpClient } from '@angular/common/http';
+import { provideGoogleCharts } from 'angular-google-charts';
 
 import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
@@ -22,6 +23,7 @@ bootstrapApplication(AppComponent, {
     provideIonicAngular(),
     provideRouter(routes, withPreloading(PreloadAllModules)),
     provideHttpClient(),
+    provideGoogleCharts(),
     importProvidersFrom(
       StorageModule,
       TranslateModule.forRoot({

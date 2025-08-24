@@ -3,7 +3,6 @@ import { Attendance } from '../../../shared/interfaces/attendance.interface';
 export class AttendanceDB {
   private static dbName = 'PlayMateDB';
   private static storeName = 'attendance';
-  private static settingsStoreName = 'attendanceSettings';
   private static version = 2;
 
   static openDB(): Promise<IDBDatabase> {
@@ -21,11 +20,6 @@ export class AttendanceDB {
           store.createIndex('date', 'date', { unique: false });
           store.createIndex('membershipStatus', 'membershipStatus', { unique: false });
           store.createIndex('dateRange', ['date', 'memberId'], { unique: false });
-        }
-        
-        // Create settings store for sync tracking
-        if (!db.objectStoreNames.contains(AttendanceDB.settingsStoreName)) {
-          db.createObjectStore(AttendanceDB.settingsStoreName, { keyPath: 'key' });
         }
       };
       
@@ -147,55 +141,51 @@ export class AttendanceDB {
   }
 
   static async getLastAttendanceId(): Promise<string | null> {
-    const db = await AttendanceDB.openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(AttendanceDB.settingsStoreName, 'readonly');
-      const store = tx.objectStore(AttendanceDB.settingsStoreName);
-      const request = store.get('lastAttendanceId');
-      
-      request.onsuccess = () => {
-        resolve(request.result?.value || null);
-      };
-      request.onerror = () => reject(request.error);
-    });
+    try {
+      return localStorage.getItem('playmate_lastAttendanceId');
+    } catch (error) {
+      console.error('Error getting last attendance ID from localStorage:', error);
+      return null;
+    }
   }
 
   static async setLastAttendanceId(id: string): Promise<void> {
-    const db = await AttendanceDB.openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(AttendanceDB.settingsStoreName, 'readwrite');
-      const store = tx.objectStore(AttendanceDB.settingsStoreName);
-      const request = store.put({ key: 'lastAttendanceId', value: id });
-      
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
-    });
+    try {
+      localStorage.setItem('playmate_lastAttendanceId', id);
+    } catch (error) {
+      console.error('Error setting last attendance ID to localStorage:', error);
+      throw error;
+    }
   }
 
   static async getLastSyncTime(): Promise<Date | null> {
-    const db = await AttendanceDB.openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(AttendanceDB.settingsStoreName, 'readonly');
-      const store = tx.objectStore(AttendanceDB.settingsStoreName);
-      const request = store.get('lastSyncTime');
-      
-      request.onsuccess = () => {
-        const result = request.result?.value;
-        resolve(result ? new Date(result) : null);
-      };
-      request.onerror = () => reject(request.error);
-    });
+    try {
+      const timeStr = localStorage.getItem('playmate_lastSyncTime');
+      return timeStr ? new Date(timeStr) : null;
+    } catch (error) {
+      console.error('Error getting last sync time from localStorage:', error);
+      return null;
+    }
   }
 
   static async setLastSyncTime(time: Date): Promise<void> {
-    const db = await AttendanceDB.openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(AttendanceDB.settingsStoreName, 'readwrite');
-      const store = tx.objectStore(AttendanceDB.settingsStoreName);
-      const request = store.put({ key: 'lastSyncTime', value: time.toISOString() });
-      
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
-    });
+    try {
+      localStorage.setItem('playmate_lastSyncTime', time.toISOString());
+    } catch (error) {
+      console.error('Error setting last sync time to localStorage:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Clear all attendance-related settings from localStorage
+   */
+  static clearSettings(): void {
+    try {
+      localStorage.removeItem('playmate_lastAttendanceId');
+      localStorage.removeItem('playmate_lastSyncTime');
+    } catch (error) {
+      console.error('Error clearing attendance settings from localStorage:', error);
+    }
   }
 }

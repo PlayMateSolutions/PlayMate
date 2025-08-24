@@ -40,14 +40,16 @@ export class MemberService {
   }
 
   getMembers(): Observable<{members: Member[], isFresh: boolean}> {
-    // 1. Emit cached members from IndexedDB immediately (if any)
-    const cached$ = from(MembersDB.getAll()).pipe(
+    // Only return cached members from IndexedDB
+    return from(MembersDB.getAll()).pipe(
       map(members => ({ members, isFresh: false })),
       catchError(() => of({ members: [], isFresh: false }))
     );
+  }
 
-    // 2. Fetch from backend, update cache, emit fresh data
-    const fresh$ = from(this.authService.getAuthToken()).pipe(
+  refreshMembers(): Observable<{members: Member[], isFresh: boolean}> {
+    // Fetch fresh data from backend and update cache
+    return from(this.authService.getAuthToken()).pipe(
       switchMap(token => {
         const clubId = this.clubContext.getSportsClubId() || '';
         const params = new HttpParams()
@@ -80,9 +82,6 @@ export class MemberService {
         );
       })
     );
-
-    // 3. Emit cached first, then fresh
-    return concat(cached$, fresh$);
   }
 
   searchMembers(searchTerm: string): Observable<Member[]> {

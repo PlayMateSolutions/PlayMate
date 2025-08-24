@@ -13,11 +13,17 @@ import {
   IonSpinner,
   IonText,
   IonButtons,
-  IonMenuButton
+  IonMenuButton,
+  IonButton,
+  IonIcon,
+  ToastController
 } from '@ionic/angular/standalone';
 import { AttendanceDB } from './services/attendance-db';
 import { Attendance } from '../../shared/interfaces/attendance.interface';
-import { BarChartComponent, ChartData } from '../../shared/components/bar-chart/bar-chart.component';
+import { GoogleChart, ChartType } from 'angular-google-charts';
+import { AttendanceService } from './services/attendance.service';
+import { addIcons } from 'ionicons';
+import { refresh } from 'ionicons/icons';
 
 interface DailyAttendanceData {
   date: string;
@@ -44,13 +50,50 @@ interface DailyAttendanceData {
     IonText,
     IonButtons,
     IonMenuButton,
-    BarChartComponent
+    IonButton,
+    IonIcon,
+    GoogleChart
   ]
 })
 export class AttendancePage implements OnInit {
   loading = true;
+  refreshing = false;
   dailyData: DailyAttendanceData[] = [];
-  chartData: ChartData[] = [];
+  chartData: any[][] = [];
+  chartColumns = ['Date', 'Attendance'];
+  chartType: ChartType = ChartType.ColumnChart;
+
+  constructor(
+    private attendanceService: AttendanceService,
+    private toastController: ToastController
+  ) {
+    addIcons({ refresh });
+  }
+  chartOptions = {
+    backgroundColor: 'transparent',
+    colors: ['#4CAF50'],
+    chartArea: {
+      left: 60,
+      top: 20,
+      width: '85%',
+      height: '75%'
+    },
+    hAxis: {
+      textStyle: { fontSize: 12, color: '#666' },
+      gridlines: { color: 'transparent' }
+    },
+    vAxis: {
+      textStyle: { fontSize: 12, color: '#666' },
+      gridlines: { color: '#e0e0e0', count: 5 },
+      minValue: 0
+    },
+    legend: { position: 'none' },
+    animation: {
+      startup: true,
+      duration: 1000,
+      easing: 'out'
+    }
+  };
   totalRecords = 0;
 
   ngOnInit() {
@@ -73,11 +116,11 @@ export class AttendancePage implements OnInit {
       if (this.chartData.length === 0) {
         console.log('No real data found, adding test data...');
         this.chartData = [
-          { label: '2024-08-20', value: 15 },
-          { label: '2024-08-21', value: 23 },
-          { label: '2024-08-22', value: 18 },
-          { label: '2024-08-23', value: 31 },
-          { label: '2024-08-24', value: 27 }
+          ['Aug 20', 15],
+          ['Aug 21', 23],
+          ['Aug 22', 18],
+          ['Aug 23', 31],
+          ['Aug 24', 27]
         ];
         this.totalRecords = 5;
       }
@@ -107,13 +150,11 @@ export class AttendancePage implements OnInit {
       .slice(-30); // Last 30 days
   }
 
-  private prepareChartData(dailyData: DailyAttendanceData[]): ChartData[] {
-    const chartData = dailyData.map(item => ({
-      label: item.date,
-      value: item.count
-    }));
-    console.log('Chart data prepared:', chartData);
-    return chartData;
+  private prepareChartData(dailyData: DailyAttendanceData[]): any[][] {
+    return dailyData.map(item => [
+      this.formatDate(item.date),
+      item.count
+    ]);
   }
 
   formatDate(dateStr: string): string {
@@ -121,5 +162,43 @@ export class AttendancePage implements OnInit {
       month: 'short',
       day: 'numeric'
     });
+  }
+
+  async refreshAttendance() {
+    try {
+      this.refreshing = true;
+      console.log('Refreshing attendance data...');
+      
+      // Use the AttendanceService to sync data
+      await this.attendanceService.syncAttendance(false); // false = incremental sync
+      
+      // Reload the chart data
+      await this.loadAttendanceData();
+      
+      console.log('Attendance data refreshed successfully');
+      
+      // Show success toast
+      const toast = await this.toastController.create({
+        message: 'Attendance data refreshed successfully',
+        duration: 3000,
+        color: 'success',
+        position: 'top'
+      });
+      await toast.present();
+      
+    } catch (error) {
+      console.error('Error refreshing attendance data:', error);
+      
+      // Show error toast
+      const toast = await this.toastController.create({
+        message: 'Failed to refresh attendance data',
+        duration: 3000,
+        color: 'danger',
+        position: 'top'
+      });
+      await toast.present();
+    } finally {
+      this.refreshing = false;
+    }
   }
 }

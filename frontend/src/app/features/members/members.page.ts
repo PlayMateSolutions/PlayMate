@@ -132,15 +132,34 @@ export class MembersPage implements OnInit {
         this.members = result.members;
         this.filteredMembers = [...result.members];
         this.sortMembers();
-        // Only set loading to false when we get the fresh data
-        if (result.isFresh) {
-          this.loading = false;
-        }
+        this.loading = false;
       },
       error: (error) => {
         this.error = 'Error loading members';
         this.loading = false;
         console.error('Error loading members:', error);
+      }
+    });
+  }
+
+  refreshMembers() {
+    this.loading = true;
+    this.error = null;
+    this.memberService.refreshMembers().subscribe({
+      next: (result) => {
+        this.members = result.members;
+        this.filteredMembers = [...result.members];
+        this.sortMembers();
+        this.loading = false;
+        
+        // Show success toast
+        this.showToast('Members refreshed successfully', 'success');
+      },
+      error: (error) => {
+        this.error = 'Error refreshing members';
+        this.loading = false;
+        console.error('Error refreshing members:', error);
+        this.showToast('Failed to refresh members', 'danger');
       }
     });
   }

@@ -4,6 +4,12 @@
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
     <ion-title>Daily Attendance</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="refreshAttendance()" [disabled]="loading || refreshing">
+        <ion-spinner *ngIf="refreshing" name="crescent"></ion-spinner>
+        <ion-icon *ngIf="!refreshing" name="refresh" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -21,7 +27,7 @@
     </ion-card-header>
     <ion-card-content>
       <p><strong>Total Records:</strong> {{ totalRecords }}</p>
-      <p><strong>Days with Data:</strong> {{ dailyData.length }}</p>
+      <p><strong>Days with Data:</strong> {{ chartData.length }}</p>
     </ion-card-content>
   </ion-card>
 
@@ -31,12 +37,15 @@
       <ion-card-title>Daily Attendance (Last 30 Days)</ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      <app-bar-chart 
-        [data]="chartData"
-        [height]="250"
-        [showValues]="true"
-        [showLabels]="true">
-      </app-bar-chart>
+      <div style="display: flex; justify-content: center; align-items: center;">
+        <google-chart
+          [type]="chartType"
+          [data]="chartData"
+          [columns]="chartColumns"
+          [options]="chartOptions"
+          [height]="300">
+        </google-chart>
+      </div>
     </ion-card-content>
   </ion-card>
 

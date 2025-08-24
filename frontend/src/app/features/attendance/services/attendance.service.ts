@@ -103,34 +103,49 @@ export class AttendanceService {
       const token = await this.authService.getAuthToken();
       const clubId = this.clubContext.getSportsClubId() || '';
       
-      let payload: any = {
-        context: {
-          sportsClubId: clubId
-        }
-      };
-
+      console.log('Attendance sync - Token:', token ? 'Present' : 'Missing');
+      console.log('Attendance sync - Club ID:', clubId);
+      
+      // Prepare payload data like member service
+      let payloadData: any = {};
+      
       // Use incremental sync unless forced full sync
       if (!forceFullSync) {
         const lastAttendanceId = await AttendanceDB.getLastAttendanceId();
         if (lastAttendanceId) {
-          payload.lastAttendanceId = lastAttendanceId;
+          payloadData.lastAttendanceId = lastAttendanceId;
         }
       }
 
-      const params = new HttpParams()
+      let params = new HttpParams()
         .set('action', 'getAttendance')
-        .set('payload', JSON.stringify(payload))
         .set('sportsClubId', clubId)
         .set('authorization', token ? 'Bearer ' + token : '');
+
+      // Add payload if we have data
+      if (Object.keys(payloadData).length > 0) {
+        params = params.set('payload', JSON.stringify(payloadData));
+      }
 
       const headers = new HttpHeaders({
         'Content-Type': 'text/plain;charset=utf-8'
       });
 
+      const options = {
+        headers,
+        params,
+        responseType: 'json' as const,
+        observe: 'body' as const
+      };
+
       const response = await this.http.get<ApiResponse<Attendance[]>>(
         this.apiUrl,
-        { headers, params }
+        options
       ).toPromise();
+
+      if (response?.status === 'error') {
+        throw new Error(response.error?.message || 'API returned error status');
+      }
 
       if (response?.status === 'success' && response.data) {
         let attendanceRecords = Array.isArray(response.data) ? response.data : [response.data];
