@@ -83,9 +83,6 @@ export class AppComponent implements OnInit {
           if (!existingClubId && !currentUrl.includes('/settings')) {
             // No club ID set and not on settings page, go to settings
             await this.router.navigate(['/settings']);
-          } else if (existingClubId && !currentUrl.includes('/tabs') && !currentUrl.includes('/settings')) {
-            // Club ID is set and not on tabs or settings, go to tabs
-            await this.router.navigate(['/tabs']);
           }
         });
       }
