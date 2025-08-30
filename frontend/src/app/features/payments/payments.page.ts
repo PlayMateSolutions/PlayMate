@@ -1,26 +1,19 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { 
   IonHeader, 
   IonToolbar, 
   IonTitle, 
   IonContent, 
-  IonList,
-  IonItem, 
-  IonLabel, 
   IonCard,
   IonCardHeader,
   IonCardContent,
   IonCardTitle,
-  IonCardSubtitle,
   IonSearchbar,
-  IonBadge,
-  IonNote,
   IonButtons,
   IonMenuButton,
   IonSkeletonText,
-  IonItemDivider,
-
   IonButton,
   IonIcon,
   ToastController
@@ -28,7 +21,21 @@ import {
 import { PaymentService } from './payment.service';
 import { Payment, PaymentSummary, PaymentGroup } from './payment.interface';
 import { addIcons } from 'ionicons';
-import { refresh } from 'ionicons/icons';
+import { 
+  refresh, 
+  wallet, 
+  calendar, 
+  chevronForwardOutline 
+} from 'ionicons/icons';
+
+// Initialize icons
+addIcons({ 
+  refresh, 
+  wallet, 
+  calendar, 
+  chevronForwardOutline 
+});
+import { GoogleChart, ChartType } from 'angular-google-charts';
 
 @Component({
   selector: 'app-payments',
@@ -37,27 +44,22 @@ import { refresh } from 'ionicons/icons';
   standalone: true,
   imports: [
     CommonModule,
+    RouterLink,
     IonHeader,
     IonToolbar,
     IonTitle,
     IonContent,
-    IonList,
-    IonItem,
-    IonLabel,
     IonCard,
     IonCardHeader,
     IonCardContent,
     IonCardTitle,
-    IonCardSubtitle,
     IonSearchbar,
-    IonBadge,
-    IonNote,
     IonButtons,
     IonMenuButton,
     IonSkeletonText,
-    IonItemDivider,
     IonButton,
-    IonIcon
+    IonIcon,
+    GoogleChart
   ]
 })
 export class PaymentsPage implements OnInit {
@@ -66,6 +68,41 @@ export class PaymentsPage implements OnInit {
   displayedGroups: PaymentGroup[] = [];
   searchQuery = '';
 
+  // Chart related properties
+  chartType = ChartType.LineChart;
+  chartColumns = ['Month', 'Amount', { type: 'string', role: 'tooltip' }];
+  chartData: any[][] = [];
+  chartOptions = {
+    backgroundColor: 'transparent',
+    colors: ['#2dd36f'], // success color
+    chartArea: {
+      left: 60,
+      top: 20,
+      width: '85%',
+      height: '75%'
+    },
+    hAxis: {
+      textStyle: { fontSize: 12, color: '#666' },
+      gridlines: { color: 'transparent' }
+    },
+    vAxis: {
+      textStyle: { fontSize: 12, color: '#666' },
+      gridlines: { color: '#e0e0e0', count: 5 },
+      minValue: 0
+    },
+    legend: { position: 'none' },
+    animation: {
+      startup: true,
+      duration: 1000,
+      easing: 'out'
+    },
+    pointSize: 5,
+    lineWidth: 2
+  };
+  
+  currentMonthEarnings = 0;
+  currentMonthPayments = 0;
+
   constructor(
     private paymentService: PaymentService,
     private toastController: ToastController
@@ -73,6 +110,33 @@ export class PaymentsPage implements OnInit {
     addIcons({ refresh });
   }
 
+  private prepareChartData(summary: PaymentSummary | null) {
+    if (!summary) {
+      this.chartData = [];
+      return;
+    }
+
+    // Convert monthBreakdown to array and sort by month
+    const monthlyData = Object.entries(summary.monthBreakdown)
+      .map(([month, data]) => ({
+        month,
+        amount: data.amount,
+        count: data.count
+      }))
+      .sort((a, b) => a.month.localeCompare(b.month));
+
+    // Create chart data array
+    this.chartData = monthlyData.map(data => {
+      const date = new Date(data.month + '-01');
+      const monthName = date.toLocaleString('default', { month: 'short', year: '2-digit' });
+      return [
+        monthName,
+        data.amount,
+        `${monthName}\nAmount: ₹${data.amount}\nPayments: ${data.count}`
+      ];
+    });
+  }
+  
   ngOnInit() {
     // Subscribe to payments stream
     this.paymentService.payments$.subscribe(payments => {
@@ -81,7 +145,10 @@ export class PaymentsPage implements OnInit {
       }
     });
 
-    // Initial load
+    // Subscribe to summary to update chart
+    this.summary$.subscribe(summary => {
+      this.prepareChartData(summary);
+    });    // Initial load
     this.paymentService.loadData().catch(error => {
       console.error('Error initializing payments:', error);
     });
@@ -90,10 +157,19 @@ export class PaymentsPage implements OnInit {
   private processPayments(payments: Payment[]) {
     // Group payments by month
     const groups = new Map<string, PaymentGroup>();
+    const currentMonth = new Date().toISOString().substring(0, 7);
+    this.currentMonthEarnings = 0;
+    this.currentMonthPayments = 0;
     
     payments.forEach(payment => {
       const date = new Date(payment.date);
       const monthKey = date.toISOString().substring(0, 7); // YYYY-MM format
+      
+      // Track current month earnings
+      if (monthKey === currentMonth) {
+        this.currentMonthEarnings += payment.amount;
+        this.currentMonthPayments++;
+      }
       
       if (!groups.has(monthKey)) {
         groups.set(monthKey, {
@@ -155,5 +231,10 @@ export class PaymentsPage implements OnInit {
   showPaymentDetails(payment: Payment) {
     // TODO: Navigate to payment details page
     console.log('Show payment details:', payment);
+  }
+
+  goToPaymentsList() {
+    // Navigation handled by RouterLink
+    console.log('Navigating to payments list...');
   }
 }

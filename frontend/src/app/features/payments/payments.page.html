@@ -20,23 +20,47 @@
 </ion-header>
 
 <ion-content>
-  <!-- Statistics Card -->
-  <ion-card *ngIf="!(loading$ | async)">
+  <!-- Stats Cards -->
+  <div class="stats-grid" *ngIf="!(loading$ | async)">
+    <!-- Total Earnings Card -->
+    <div class="stat-card" [routerLink]="['list']">
+      <div class="stat-icon total-earnings">
+        <ion-icon name="wallet"></ion-icon>
+      </div>
+      <div class="stat-label">Total Earnings</div>
+      <div class="stat-value">₹{{ (summary$ | async)?.totalAmount || 0 | number:'1.0-0' }}</div>
+      <div class="stat-subtext">{{ (summary$ | async)?.totalPayments || 0 }} total payments</div>
+      <div class="view-details">
+        <ion-icon name="chevron-forward-outline" size="small"></ion-icon>
+        <small>View All</small>
+      </div>
+    </div>
+    
+    <!-- Monthly Earnings Card -->
+    <div class="stat-card">
+      <div class="stat-icon monthly-earnings">
+        <ion-icon name="calendar"></ion-icon>
+      </div>
+      <div class="stat-label">This Month</div>
+      <div class="stat-value">₹{{ currentMonthEarnings | number:'1.0-0' }}</div>
+      <div class="stat-subtext">{{ currentMonthPayments }} payments this month</div>
+    </div>
+  </div>
+
+  <!-- Monthly Earnings Chart -->
+  <ion-card *ngIf="!(loading$ | async) && chartData.length > 0" class="chart-card">
     <ion-card-header>
-      <ion-card-title>Payment Statistics</ion-card-title>
-      <ion-card-subtitle>{{ (summary$ | async)?.totalPayments || 0 }} total payments</ion-card-subtitle>
+      <ion-card-title>Monthly Earnings</ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      <div class="stats-grid">
-        <div class="stat-item">
-          <strong>Total Amount</strong>
-          <span>₹{{ (summary$ | async)?.totalAmount || 0 | number:'1.0-0' }}</span>
-        </div>
-        <div class="stat-item">
-          <strong>Unique Members</strong>
-          <span>{{ (summary$ | async)?.uniqueMembers || 0 }}</span>
-        </div>
-        <!-- Monthly comparison will be added here -->
+      <div style="display: flex; justify-content: center; align-items: center;">
+        <google-chart
+          [type]="chartType"
+          [data]="chartData"
+          [columns]="chartColumns"
+          [options]="chartOptions"
+          [height]="300">
+        </google-chart>
       </div>
     </ion-card-content>
   </ion-card>
@@ -56,46 +80,17 @@
     </ion-card>
   </div>
 
-  <!-- Payment Groups List -->
-  <div class="payment-list" *ngIf="!(loading$ | async) && displayedGroups.length > 0">
-    <div *ngFor="let group of displayedGroups" class="date-group">
-      <ion-item-divider sticky="true" color="light">
-        <ion-label>{{ group.formattedDate }}</ion-label>
-        <ion-note slot="end">₹{{ group.total | number:'1.0-0' }}</ion-note>
-      </ion-item-divider>
-      
-      <ion-list lines="full">
-        <ion-item *ngFor="let payment of group.payments" class="payment-item" (click)="showPaymentDetails(payment)">
-          <ion-label>
-            <h2>{{ payment.memberName || 'Unknown Member' }}
-              <ion-note color="medium" class="id-note">#{{ payment.memberId }}</ion-note>
-            </h2>
-            <ion-note color="medium">
-              {{ payment.date | date:'mediumDate' }} · {{ payment.paymentType }}
-              <ion-badge *ngIf="payment.status !== 'active'" color="danger" class="status-badge">
-                {{ payment.status }}
-              </ion-badge>
-            </ion-note>
-          </ion-label>
-          <ion-note slot="end" color="success" class="amount-note">
-            ₹{{ payment.amount | number:'1.0-0' }}
-          </ion-note>
-        </ion-item>
-      </ion-list>
-    </div>
-
-    <!-- Infinite Scroll -->
-
-  </div>
-
-  <!-- No Payments Message -->
-  <ion-card *ngIf="!(loading$ | async) && displayedGroups.length === 0" class="no-data-card">
-    <ion-card-content class="ion-text-center">
-      <ion-label color="medium">
-        <h2>No Payments Found</h2>
-        <p *ngIf="!searchQuery">There are no payment records.</p>
-        <p *ngIf="searchQuery">No payments match your search criteria.</p>
-      </ion-label>
+  <!-- View All Payments Card -->
+  <ion-card *ngIf="!(loading$ | async)" class="action-card" [routerLink]="['list']">
+    <ion-card-content>
+      <div class="action-content">
+        <ion-icon name="list-outline" color="primary"></ion-icon>
+        <div class="action-text">
+          <h3>View All Payments</h3>
+          <p>See detailed payment history</p>
+        </div>
+        <ion-icon name="chevron-forward-outline" color="medium"></ion-icon>
+      </div>
     </ion-card-content>
   </ion-card>
 </ion-content>

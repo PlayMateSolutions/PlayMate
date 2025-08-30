@@ -1,31 +1,89 @@
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-  padding: 8px 0;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 12px;
 }
 
-.stat-item {
+.stat-card {
+  background-color: var(--ion-card-background);
+  border-radius: 12px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  
-  strong {
-    font-size: 0.9rem;
-    color: var(--ion-color-medium);
-    margin-bottom: 4px;
-  }
-  
-  span {
-    font-size: 1.2rem;
-    font-weight: bold;
+  align-items: flex-start;
+  position: relative;
+  box-shadow: var(--ion-card-box-shadow);
+  transition: transform 0.2s ease;
+
+  &[routerLink] {
+    cursor: pointer;
+    
+    &:hover {
+      transform: translateY(-2px);
+    }
   }
 }
 
-.id-note {
-  margin-left: 8px;
+.stat-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+
+  ion-icon {
+    font-size: 20px;
+    color: white;
+  }
+
+  &.total-earnings {
+    background-color: var(--ion-color-primary);
+  }
+
+  &.monthly-earnings {
+    background-color: var(--ion-color-success);
+  }
+}
+
+.stat-label {
+  color: var(--ion-color-medium);
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--ion-color-dark);
+  margin-bottom: 4px;
+}
+
+.stat-subtext {
+  color: var(--ion-color-medium);
+  font-size: 0.85rem;
+}
+
+.view-details {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--ion-color-primary);
   font-size: 0.8rem;
+
+  ion-icon {
+    font-size: 1rem;
+  }
+}
+
+.chart-card {
+  margin: 12px;
 }
 
 .amount-note {

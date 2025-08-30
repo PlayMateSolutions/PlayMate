@@ -23,8 +23,18 @@ export const routes: Routes = [
       },
       {
         path: 'payments',
-        loadComponent: () =>
-          import('../features/payments/payments.page').then((m) => m.PaymentsPage),
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('../features/payments/payments.page').then((m) => m.PaymentsPage),
+          },
+          {
+            path: 'list',
+            loadComponent: () =>
+              import('../features/payments/payments-list/payments-list.page').then((m) => m.PaymentsListPage),
+          }
+        ]
       },
       {
         path: '',
