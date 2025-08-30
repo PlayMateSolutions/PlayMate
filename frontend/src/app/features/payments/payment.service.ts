@@ -57,8 +57,10 @@ export class PaymentService {
       console.log('Cached payment records:', cachedPayments.length);
       
       if (cachedPayments.length > 0) {
-        this.paymentsSubject.next(cachedPayments);
-        this.calculateSummary(cachedPayments);
+        // Link with current member data when loading from cache
+        const linkedPayments = await this.linkWithMemberData(cachedPayments);
+        this.paymentsSubject.next(linkedPayments);
+        this.calculateSummary(linkedPayments);
       }
       
       this.lastSyncSubject.next(lastSync);
@@ -208,13 +210,24 @@ export class PaymentService {
         });
       });
 
-      const memberMap = new Map(members.map(m => [m.id, m]));
+      // Log some samples to debug
+      console.log('Sample member IDs:', members.slice(0, 3).map(m => `[${typeof m.id}] ${m.id}`));
+      console.log('Sample payment member IDs:', payments.slice(0, 3).map(p => `[${typeof p.memberId}] ${p.memberId}`));
+
+      // Create map with normalized string IDs
+      const memberMap = new Map(members.map(m => [String(m.id).trim(), m]));
 
       return payments.map(payment => {
-        const member = memberMap.get(payment.memberId);
+        const memberId = String(payment.memberId).trim();
+        const member = memberMap.get(memberId);
+        
+        if (!member) {
+          console.log(`No member found for ID: [${typeof payment.memberId}] ${payment.memberId}`);
+        }
+        
         return {
           ...payment,
-          memberName: member ? `${member.firstName} ${member.lastName}`.trim() : 'Unknown Member'
+          memberName: member ? `${member.firstName} ${member.lastName}`.trim() : `Unknown Member [${memberId}]`
         };
       });
     } catch (error) {

@@ -3,7 +3,7 @@ import { Member } from '../../../shared/interfaces/member.interface';
 export class MembersDB {
   private static dbName = 'PlayMateDB';
   private static storeName = 'members';
-  private static version = 2;
+  private static version = 3;
 
   static openDB(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
