@@ -220,72 +220,32 @@ function getPaymentById(paymentId) {
  * @param {Object} filters - Optional filters (memberId, startDate, endDate, sport, status)
  * @return {Array} Array of payment objects
  */
-function getPaymentRecords(filters = {}) {
-  const ss =
-    filters.context && filters.context.spreadsheet
-      ? filters.context.spreadsheet
-      : SpreadsheetApp.getActiveSpreadsheet();
-  const paymentsSheet = ss.getSheetByName(SHEET_NAMES.PAYMENTS);
-
-  // Get all data except header row
-  const paymentsData = paymentsSheet.getDataRange().getValues();
-  const records = [];
-
-  for (let i = 1; i < paymentsData.length; i++) {
-    const row = paymentsData[i];
-
-    // Skip empty rows
-    if (!row[PAYMENTS_COLUMNS.ID]) {
-      continue;
+function getPaymentRecords(payload = {}) {
+  try {
+    var Payments = getPaymentsTable(payload.context);
+    var records = Payments.all();
+    
+    // Filter by memberId if provided
+    if (payload.memberId) {
+      var filterMemberId = parseInt(payload.memberId);
+      records = records.filter(function (r) {
+        return r["memberId"] === filterMemberId;
+      });
     }
 
-    // Apply filters
-    if (
-      filters.memberId &&
-      row[PAYMENTS_COLUMNS.MEMBER_ID] !== filters.memberId
-    ) {
-      continue;
+    // Filter by lastPaymentId if provided
+    if (payload.lastPaymentId) {
+      var filterId = parseInt(payload.lastPaymentId);
+      records = records.filter(function (r) {
+        return r["id"] > filterId;
+      });
     }
-
-    if (filters.sport && row[PAYMENTS_COLUMNS.SPORT] !== filters.sport) {
-      continue;
-    }
-
-    if (filters.status && row[PAYMENTS_COLUMNS.STATUS] !== filters.status) {
-      continue;
-    }
-
-    if (filters.startDate) {
-      const recordDate = new Date(row[PAYMENTS_COLUMNS.DATE]);
-      const startDate = new Date(filters.startDate);
-      if (recordDate < startDate) {
-        continue;
-      }
-    }
-
-    if (filters.endDate) {
-      const recordDate = new Date(row[PAYMENTS_COLUMNS.DATE]);
-      const endDate = new Date(filters.endDate);
-      if (recordDate > endDate) {
-        continue;
-      }
-    }
-
-    // Convert row data to a payment object
-    records.push({
-      id: row[PAYMENTS_COLUMNS.ID],
-      memberId: row[PAYMENTS_COLUMNS.MEMBER_ID],
-      date: row[PAYMENTS_COLUMNS.DATE],
-      amount: row[PAYMENTS_COLUMNS.AMOUNT],
-      paymentType: row[PAYMENTS_COLUMNS.PAYMENT_TYPE],
-      periodStart: row[PAYMENTS_COLUMNS.PERIOD_START],
-      periodEnd: row[PAYMENTS_COLUMNS.PERIOD_END],
-      status: row[PAYMENTS_COLUMNS.STATUS],
-      notes: row[PAYMENTS_COLUMNS.NOTES],
-    });
+    
+    return records;
+  } catch (error) {
+    Logger.log("Error in getPaymentRecords: " + error.message);
+    throw error;
   }
-
-  return records;
 }
 
 /**

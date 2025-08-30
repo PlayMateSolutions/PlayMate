@@ -3,7 +3,7 @@ import { Attendance } from '../../../shared/interfaces/attendance.interface';
 export class AttendanceDB {
   private static dbName = 'PlayMateDB';
   private static storeName = 'attendance';
-  private static version = 2;
+  private static version = 3;
 
   static openDB(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {

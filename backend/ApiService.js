@@ -496,17 +496,10 @@ function handleRecordPayment(payload) {
  * @return {Object} List of payment records
  */
 function handleGetPayments(payload) {
-  const filters = payload.filters || {};
-
-  // Convert date strings to Date objects if present
-  if (filters.startDate) {
-    filters.startDate = new Date(filters.startDate);
-  }
-  if (filters.endDate) {
-    filters.endDate = new Date(filters.endDate);
-  }
-
-  return getPaymentRecords(filters);
+   return getPaymentRecords({
+    ...payload,
+    context: payload.context
+  });
 }
 
 /**
