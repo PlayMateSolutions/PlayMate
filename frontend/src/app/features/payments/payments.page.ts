@@ -10,7 +10,6 @@ import {
   IonCardHeader,
   IonCardContent,
   IonCardTitle,
-  IonSearchbar,
   IonButtons,
   IonMenuButton,
   IonSkeletonText,
@@ -53,7 +52,6 @@ import { GoogleChart, ChartType } from 'angular-google-charts';
     IonCardHeader,
     IonCardContent,
     IonCardTitle,
-    IonSearchbar,
     IonButtons,
     IonMenuButton,
     IonSkeletonText,
@@ -66,7 +64,6 @@ export class PaymentsPage implements OnInit {
   loading$ = this.paymentService.loading$;
   summary$ = this.paymentService.summary$;
   displayedGroups: PaymentGroup[] = [];
-  searchQuery = '';
 
   // Chart related properties
   chartType = ChartType.LineChart;
@@ -221,11 +218,6 @@ export class PaymentsPage implements OnInit {
     } finally {
       this.refreshing = false;
     }
-  }
-
-  onSearchChange(event: any) {
-    this.searchQuery = event.detail.value?.toLowerCase() || '';
-    // TODO: Implement search functionality
   }
 
   showPaymentDetails(payment: Payment) {
