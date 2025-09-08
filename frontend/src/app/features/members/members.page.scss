@@ -1,5 +1,5 @@
 ion-content {
-  --background: var(--ion-color-light-shade);
+  --background: var(--ion-background-color);
 }
 
 ion-toolbar {
@@ -13,7 +13,7 @@ ion-toolbar {
 
 ion-searchbar {
   padding: 16px;
-  --background: var(--ion-color-light);
+  --background: var(--ion-item-background, var(--ion-background-color));
   --border-radius: 8px;
   --box-shadow: none;
 }
@@ -34,22 +34,22 @@ ion-searchbar {
 // Segments toolbar styling
 .segments-toolbar {
   padding: 8px 16px;
-  background: var(--ion-color-light);
+  background: var(--ion-item-background, var(--ion-background-color));
   min-height: 56px;
-  border-bottom: 1px solid var(--ion-color-light-shade);
+  border-bottom: 1px solid var(--ion-border-color, var(--ion-color-step-150));
   
   ion-segment {
-    --background: white;
+    --background: var(--ion-segment-background, var(--ion-item-background, var(--ion-background-color)));
     --border-radius: 8px;
     --border-width: 1px;
-    --border-color: var(--ion-color-light-shade);
+    --border-color: var(--ion-border-color, var(--ion-color-step-150));
     --box-shadow: none;
     
     ion-segment-button {
-      --background: white;
+      --background: var(--ion-segment-background, var(--ion-item-background, var(--ion-background-color)));
       --background-checked: var(--ion-color-primary);
-      --color: var(--ion-color-medium);
-      --color-checked: white;
+      --color: var(--ion-text-color-step-600, var(--ion-text-color));
+      --color-checked: var(--ion-color-primary-contrast);
       --indicator-height: 0;
       --padding-top: 4px;
       --padding-bottom: 4px;
@@ -61,7 +61,7 @@ ion-searchbar {
       transition: all 0.2s ease;
       
       &:hover {
-        --background: var(--ion-color-light);
+        --background: var(--ion-hover-background, var(--ion-item-background, var(--ion-background-color)));
       }
       
       ion-label {
@@ -91,8 +91,8 @@ ion-searchbar {
     gap: 8px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    background: var(--ion-color-light);
-    border-bottom: 1px solid var(--ion-color-light-shade);
+    background: var(--ion-item-background, var(--ion-background-color));
+    border-bottom: 1px solid var(--ion-border-color, var(--ion-color-step-150));
 
     &::-webkit-scrollbar {
       display: none;
@@ -102,22 +102,22 @@ ion-searchbar {
       cursor: pointer;
       transition: all 0.2s ease;
       margin: 0;
-      --background: white;
-      --color: var(--ion-color-medium);
-      --border-color: var(--ion-color-light-shade);
+      --background: var(--ion-segment-background, var(--ion-item-background, var(--ion-background-color)));
+      --color: var(--ion-text-color-step-600, var(--ion-text-color));
+      --border-color: var(--ion-border-color, var(--ion-color-step-150));
       --border-width: 2px;
       font-weight: 500;
       white-space: nowrap;
 
       &:hover {
-        --background: var(--ion-color-light-shade);
+        --background: var(--ion-hover-background, var(--ion-item-background, var(--ion-background-color)));
         transform: translateY(-1px);
       }
 
       ion-icon:first-child {
         margin-right: 6px;
         font-size: 16px;
-        color: var(--ion-color-dark);
+        color: var(--ion-text-color, var(--ion-color-dark));
         opacity: 0.8;
       }
 
@@ -125,7 +125,7 @@ ion-searchbar {
         margin-left: 6px;
         font-size: 14px;
         opacity: 0.8;
-        color: var(--ion-color-dark);
+        color: var(--ion-text-color, var(--ion-color-dark));
       }
 
       &.active {
@@ -136,7 +136,7 @@ ion-searchbar {
 
         ion-icon:first-child,
         .direction-icon {
-          color: white;
+          color: var(--ion-color-primary-contrast);
           opacity: 1;
         }
       }
@@ -148,13 +148,13 @@ ion-searchbar {
     display: flex;
     align-items: center;
     gap: 8px;
-    background: var(--ion-color-light);
-    border-bottom: 1px solid var(--ion-color-light-shade);
+    background: var(--ion-item-background, var(--ion-background-color));
+    border-bottom: 1px solid var(--ion-border-color, var(--ion-color-step-150));
     font-size: 14px;
     font-weight: 500;
     
     ion-text {
-      color: var(--ion-color-medium) !important;
+      color: var(--ion-text-color-step-600, var(--ion-text-color)) !important;
     }
     
     ion-spinner {
@@ -166,7 +166,7 @@ ion-searchbar {
   ion-card {
     margin: 8px 16px;
     border-radius: 12px;
-    background: var(--ion-color-light);
+    background: var(--ion-card-background, var(--ion-item-background, var(--ion-background-color)));
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     overflow: hidden;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -202,16 +202,16 @@ ion-searchbar {
         font-size: 16px;
         font-weight: 600;
         margin-bottom: 8px;
-        color: var(--ion-color-dark);
+        color: var(--ion-text-color, var(--ion-color-dark));
         display: flex;
         align-items: center;
         gap: 8px;
 
         .member-id {
-          color: var(--ion-color-medium);
+          color: var(--ion-text-color-step-600, var(--ion-color-medium));
           font-size: 0.8em;
           padding: 2px 6px;
-          background: var(--ion-color-light);
+          background: var(--ion-item-background, var(--ion-background-color));
           border-radius: 4px;
           font-weight: normal;
         }
@@ -220,7 +220,7 @@ ion-searchbar {
       div {
         margin-bottom: 4px;
         font-size: 14px;
-        color: var(--ion-color-medium);
+        color: var(--ion-text-color-step-600, var(--ion-color-medium));
         display: flex;
         align-items: center;
         gap: 6px;
@@ -277,7 +277,7 @@ ion-searchbar {
     justify-content: center;
     text-align: center;
     padding: 48px 32px;
-    color: var(--ion-color-medium);
+    color: var(--ion-text-color-step-600, var(--ion-color-medium));
 
     ion-icon {
       font-size: 72px;
@@ -289,7 +289,7 @@ ion-searchbar {
       margin: 0;
       font-size: 20px;
       font-weight: 500;
-      color: var(--ion-color-dark);
+      color: var(--ion-text-color, var(--ion-color-dark));
     }
 
     p {
@@ -306,6 +306,13 @@ ion-searchbar {
   }
 }
 
+// Only set text color to black for selected segment in light mode
+ion-segment-button.segment-button-checked,
+ion-segment-button.segment-button-checked ion-label {
+  color: #000 !important;
+  --color: #000 !important;
+}
+
 // Enhanced toolbar styling
 ion-toolbar.toolbar-primary {
   --background: var(--ion-color-primary);
@@ -315,17 +322,17 @@ ion-toolbar.toolbar-primary {
 
 // Enhanced segment styling
 ion-segment.segment-enhanced {
-  --background: var(--ion-segment-background);
-  --color: var(--ion-segment-color);
-  --color-checked: var(--ion-segment-color-checked);
+  --background: var(--ion-segment-background, var(--ion-item-background, var(--ion-background-color)));
+  --color: var(--ion-segment-color, var(--ion-text-color));
+  --color-checked: var(--ion-segment-color-checked, var(--ion-color-primary-contrast));
   border-radius: 8px;
   padding: 4px;
 }
 
 // Enhanced search bar styling
 ion-searchbar.search-enhanced {
-  --background: var(--ion-input-background);
-  --color: var(--ion-input-color);
+  --background: var(--ion-input-background, var(--ion-item-background, var(--ion-background-color)));
+  --color: var(--ion-input-color, var(--ion-text-color));
   --border-radius: 8px;
   --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }

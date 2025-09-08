@@ -19,8 +19,8 @@
     </ion-buttons>
   </ion-toolbar>
   
-  <ion-toolbar class="segments-toolbar">
-    <ion-segment mode="ios" class="segment-enhanced" [(ngModel)]="selectedSegment" (ionChange)="segmentChanged($event)">
+  <ion-toolbar>
+    <ion-segment [(ngModel)]="selectedSegment" (ionChange)="segmentChanged($event)" mode="ios">
       <ion-segment-button value="all">
         <ion-label>All</ion-label>
       </ion-segment-button>
