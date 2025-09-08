@@ -163,6 +163,9 @@ export class AuthService {
       new Date(session.expiresAt).toISOString()
     );
 
+    /*  
+    // Commenting out token refresh logic for testing
+    // There seems to be an issue with token expiry handling in the frontend
     if (session.expiresAt <= Date.now()) {
       console.log(
         'Token expired at:',
@@ -214,6 +217,7 @@ export class AuthService {
         return null;
       }
     }
+    */
 
     console.log('Returning valid token');
     return session.token;
