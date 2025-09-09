@@ -140,9 +140,9 @@ export class AttendancePage implements OnInit {
     backgroundColor: 'transparent',
     colors: ['#4CAF50'],
     chartArea: {
-      left: 60,
+      left: 20, // reduced from 60
       top: 20,
-      width: '85%',
+      width: '90%',
       height: '75%'
     },
     hAxis: {
@@ -163,6 +163,12 @@ export class AttendancePage implements OnInit {
   };
 
   ngOnInit() {
+    // Set chart type based on initial period
+    if (this.viewPeriod === 'weekly') {
+      this.chartType = ChartType.ColumnChart;
+    } else if (this.viewPeriod === 'monthly') {
+      this.chartType = ChartType.LineChart;
+    }
     this.loadAttendanceData();
   }
 
@@ -425,14 +431,18 @@ export class AttendancePage implements OnInit {
   onPeriodChange(event: any) {
     this.viewPeriod = event.detail.value;
     console.log('Period changed to:', this.viewPeriod);
-    
+    // Set chart type based on period
+    if (this.viewPeriod === 'weekly') {
+      this.chartType = ChartType.ColumnChart;
+    } else if (this.viewPeriod === 'monthly') {
+      this.chartType = ChartType.LineChart;
+    }
     // Reset to current period when switching views
     if (this.viewPeriod === 'weekly') {
       this.setCurrentWeekStart();
     } else if (this.viewPeriod === 'monthly') {
       this.currentMonth = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), 1);
     }
-    
     // Recalculate chart data with new period
     this.loadAttendanceData();
   }
@@ -522,20 +532,20 @@ export class AttendancePage implements OnInit {
     const maxValue = this.chartData.length > 0 
       ? Math.max(...this.chartData.map(item => item[1]), 10) * 1.1 
       : 10;
-      
     // Update chart options based on the data and view period
     this.chartOptions = {
       backgroundColor: 'transparent',
       colors: ['#4CAF50'],
       chartArea: {
-        left: 60,
+        left: 20, // reduced from 60
         top: 20,
-        width: this.viewPeriod === 'monthly' && this.chartData.length > 20 ? '80%' : '85%',
+        width: this.viewPeriod === 'monthly' && this.chartData.length > 20 ? '80%' : '90%',
         height: '75%'
       },
       hAxis: {
         textStyle: { fontSize: 12, color: '#666' },
-        gridlines: { color: 'transparent' }
+        gridlines: { color: 'transparent' },
+        ...(this.viewPeriod === 'monthly' ? { showTextEvery: 5 } : {})
       },
       vAxis: {
         textStyle: { fontSize: 12, color: '#666' },
