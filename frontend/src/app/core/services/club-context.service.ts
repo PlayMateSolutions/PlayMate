@@ -7,6 +7,8 @@ export class ClubContextService {
   private readonly MEMBER_REFRESH_KEY = 'lastMemberRefresh';
   private readonly PAYMENT_REFRESH_KEY = 'lastPaymentRefresh';
   private readonly ATTENDANCE_REFRESH_KEY = 'lastAttendanceRefresh';
+  private readonly DARK_MODE_KEY = 'darkMode';
+  private readonly LANGUAGE_KEY = 'language';
 
   constructor() {
     // Load from localStorage on service init
@@ -50,5 +52,17 @@ export class ClubContextService {
   getLastAttendanceRefresh(): Date | null {
     const stored = localStorage.getItem(this.ATTENDANCE_REFRESH_KEY);
     return stored ? new Date(stored) : null;
+  }
+  setDarkMode(enabled: boolean) {
+    localStorage.setItem(this.DARK_MODE_KEY, enabled.toString());
+  }
+  getDarkMode(): boolean {
+    return localStorage.getItem(this.DARK_MODE_KEY) === 'true';
+  }
+  setLanguage(lang: string) {
+    localStorage.setItem(this.LANGUAGE_KEY, lang);
+  }
+  getLanguage(): string {
+    return localStorage.getItem(this.LANGUAGE_KEY) || 'en';
   }
 }

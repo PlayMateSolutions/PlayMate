@@ -120,10 +120,10 @@
           <div>Expires: {{ formatDate(member.expiryDate) }}</div>
         </div>
         <div class="card-actions">
-          <ion-button fill="clear" color="success" (click)="renewMembership(member)" class="action-button primary">
+          <ion-button fill="clear" color="warning" (click)="renewMembership(member)" class="action-button primary">
             <ion-icon name="refresh-outline"></ion-icon>
           </ion-button>
-          <ion-button fill="clear" color="primary" (click)="sendPaymentReminder(member)" class="action-button secondary">
+          <ion-button fill="clear" color="success" (click)="sendPaymentReminder(member)" class="action-button secondary whatsapp-btn">
             <ion-icon name="logo-whatsapp"></ion-icon>
           </ion-button>
         </div>

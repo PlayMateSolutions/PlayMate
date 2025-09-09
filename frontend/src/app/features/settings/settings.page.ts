@@ -1,4 +1,3 @@
-
 import { Component, OnInit } from '@angular/core';
 import { 
   ToastController,
@@ -122,11 +121,11 @@ export class SettingsPage implements OnInit {
 
   toggleDarkMode() {
     document.body.classList.toggle('dark-theme', this.darkMode);
-    localStorage.setItem('darkMode', this.darkMode.toString());
+    this.clubContext.setDarkMode(this.darkMode);
   }
 
   changeLanguage() {
-    localStorage.setItem('language', this.language);
+    this.clubContext.setLanguage(this.language);
     // You can add translation logic here
   }
 
