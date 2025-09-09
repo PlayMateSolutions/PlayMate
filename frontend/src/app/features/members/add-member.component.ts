@@ -2,19 +2,31 @@ import { ModalController } from '@ionic/angular';
 import { Component, EventEmitter, Output } from '@angular/core';
 import { Member } from '../../shared/interfaces/member.interface';
 import { FormsModule } from '@angular/forms';
-import { IonInput, IonButton, IonLabel, IonItem, IonList, IonText } from '@ionic/angular/standalone';
+import { IonInput, IonButton, IonLabel, IonItem, IonList, IonText, IonIcon, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
+import { 
+  chevronUpOutline, 
+  chevronDownOutline, 
+  closeOutline 
+} from 'ionicons/icons';
+import { addIcons } from 'ionicons';
 
 @Component({
   selector: 'app-add-member',
   templateUrl: './add-member.component.html',
   styleUrls: ['./add-member.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonInput, IonButton, IonLabel, IonItem, IonList, IonText],
+  imports: [CommonModule, FormsModule, IonInput, IonButton, IonLabel, IonItem, IonList, IonText, IonIcon, IonSelect, IonSelectOption],
   providers: [ModalController]
 })
 export class AddMemberComponent {
-  constructor(private modalCtrl: ModalController) {}
+  constructor(private modalCtrl: ModalController) {
+    addIcons({
+      'chevron-up-outline': chevronUpOutline,
+      'chevron-down-outline': chevronDownOutline,
+      'close-outline': closeOutline
+    });
+  }
   @Output() memberAdded = new EventEmitter<Omit<Member, 'id'>>();
   @Output() cancelled = new EventEmitter<void>();
 
@@ -27,6 +39,8 @@ export class AddMemberComponent {
   lastName = '';
   email = '';
   notes = '';
+  gender = '';
+  dob = '';
   // Add more optional fields as needed
 
   showOptional = false;
@@ -45,6 +59,8 @@ export class AddMemberComponent {
       lastName: this.lastName.trim(),
       email: this.email.trim(),
       notes: this.notes.trim(),
+      gender: this.gender.trim(),
+      dateOfBirth: this.dob.trim(),
       joinDate: new Date(),
       createdDate: new Date().toISOString(),
       expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),

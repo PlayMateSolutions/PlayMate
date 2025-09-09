@@ -100,6 +100,7 @@ function getMemberTable(context) {
  * @return {string} ID of the newly created member
  */
 function addMember(memberData) {
+  Logger.log('addMember: memberData = ' + JSON.stringify(memberData));
   var Member = getMemberTable(memberData.context);
 
   // Check for duplicate phone number

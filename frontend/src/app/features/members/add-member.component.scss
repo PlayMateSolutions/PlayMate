@@ -19,3 +19,41 @@
 ion-list {
   margin-bottom: 1rem;
 }
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.close-btn {
+  font-size: 1.5rem;
+  margin-left: auto;
+  color: var(--ion-color-medium);
+}
+
+.optional-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  padding: 0 0.25rem;
+}
+
+.optional-label {
+  font-size: 1rem;
+  color: var(--ion-color-medium);
+}
+
+.arrow-toggle-btn {
+  --padding-start: 0;
+  --padding-end: 0;
+  font-size: 1.2rem;
+  border-radius: 50%;
+}
+
+.arrow-toggle-btn ion-icon {
+  font-size: 1.5rem;
+  background: transparent;
+}

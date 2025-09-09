@@ -1,5 +1,10 @@
 <div class="add-member-modal">
-  <h2>Add New Member</h2>
+  <div class="modal-header">
+    <h2>Add New Member</h2>
+    <ion-button fill="clear" class="close-btn" (click)="cancel()" slot="end">
+      <ion-icon name="close-outline"></ion-icon>
+    </ion-button>
+  </div>
   <form (ngSubmit)="submit()">
     <ion-list>
       <ion-item>
@@ -15,10 +20,25 @@
         <ion-input [(ngModel)]="place" name="place" required></ion-input>
       </ion-item>
     </ion-list>
-    <ion-button expand="block" fill="outline" (click)="toggleOptional()" type="button">
-      {{ showOptional ? 'Hide' : 'Show' }} Optional Fields
-    </ion-button>
+    <div class="optional-toggle-row">
+      <span class="optional-label">Additional Info</span>
+      <ion-button fill="clear" size="small" (click)="toggleOptional()" class="arrow-toggle-btn" type="button">
+        <ion-icon slot="icon-only" [name]="showOptional ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+      </ion-button>
+    </div>
     <ion-list *ngIf="showOptional">
+      <ion-item>
+        <ion-label position="stacked">Gender</ion-label>
+        <ion-select [(ngModel)]="gender" name="gender" interface="popover" placeholder="Select Gender">
+          <ion-select-option value="Male">Male</ion-select-option>
+          <ion-select-option value="Female">Female</ion-select-option>
+          <ion-select-option value="Other">Other</ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Date of Birth</ion-label>
+        <ion-input [(ngModel)]="dob" name="dob" type="date"></ion-input>
+      </ion-item>
       <ion-item>
         <ion-label position="stacked">Last Name</ion-label>
         <ion-input [(ngModel)]="lastName" name="lastName"></ion-input>
@@ -35,7 +55,6 @@
     <ion-text color="danger" *ngIf="error">{{ error }}</ion-text>
     <div class="modal-actions">
       <ion-button expand="block" type="submit">Add Member</ion-button>
-      <ion-button expand="block" fill="clear" color="medium" (click)="cancel()">Cancel</ion-button>
     </div>
   </form>
 </div>

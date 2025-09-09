@@ -15,6 +15,7 @@ export interface UserSession {
   name: string;
   picture?: string;
   expiresAt: number;
+  accessToken?: string;
 }
 
 @Injectable({
@@ -93,7 +94,8 @@ export class AuthService {
 
       if (result?.accessToken?.token) {
         const session: UserSession = {
-          token: result.accessToken.token || '',
+          token: result.idToken || '',
+          accessToken: result.accessToken.token || '',
           email: result.profile.email || '',
           name: result.profile.name || '',
           picture: result.profile.imageUrl || '',

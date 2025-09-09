@@ -13,6 +13,8 @@ export interface Member {
   membershipType?: string;
   lastPaymentDate?: Date;
   notes?: string;
+  gender?: string;
+  dateOfBirth?: string;
 }
 
 
