@@ -302,7 +302,7 @@ export class MembersPage implements OnInit {
           this.members[index] = {
             ...member,
             expiryDate: result.data.expiryDate,
-            status: 'active'
+            status: 'Active'
           };
           // Re-apply current filters and sorting
           this.filterMembers();

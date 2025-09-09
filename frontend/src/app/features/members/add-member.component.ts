@@ -49,7 +49,7 @@ export class AddMemberComponent {
       createdDate: new Date().toISOString(),
       expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
       sports: [],
-      status: 'active',
+      status: 'Active',
       membershipType: 'basic',
       lastPaymentDate: new Date()
     };

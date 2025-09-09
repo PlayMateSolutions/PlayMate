@@ -118,18 +118,28 @@ export class MemberService {
   }
 
   addMember(member: Omit<Member, 'id'>): Observable<Member> {
-    return from(this.getRequestPayload('addMember', member)).pipe(
-      switchMap(payload => {
+    return from(this.authService.getAuthToken()).pipe(
+      switchMap(token => {
+        if (!token) {
+          throw new Error('No valid auth token');
+        }
         const params = new HttpParams()
+          .set('sportsClubId', this.clubContext.getSportsClubId() || '')
           .set('action', 'addMember')
-          .set('payload', JSON.stringify(payload));
+          .set('authorization', 'Bearer ' + token);
 
-        return this.http.post<ApiResponse<Member>>(this.apiUrl, null, {
+        const headers = new HttpHeaders({
+          'Content-Type': 'text/plain;charset=utf-8'
+        });
+
+        const options = {
+          headers,
           params,
-          headers: new HttpHeaders({
-            'Content-Type': 'text/plain;charset=utf-8'
-          })
-        }).pipe(
+          responseType: 'json' as const,
+          observe: 'body' as const
+        };
+
+        return this.http.post<ApiResponse<Member>>(this.apiUrl, member, options).pipe(
           map(response => {
             if (response.status === 'success' && response.data) {
               return response.data;

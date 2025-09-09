@@ -9,7 +9,7 @@ export interface Member {
   createdDate: string;
   expiryDate: string;
   sports: string[];
-  status: 'active' | 'inactive';
+  status: 'Active' | 'Inactive';
   membershipType?: string;
   lastPaymentDate?: Date;
   notes?: string;
