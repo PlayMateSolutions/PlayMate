@@ -54,7 +54,10 @@
     </ion-list>
     <ion-text color="danger" *ngIf="error">{{ error }}</ion-text>
     <div class="modal-actions">
-      <ion-button expand="block" type="submit">Add Member</ion-button>
+      <ion-button expand="block" type="submit" [disabled]="!firstName || !phone || !place || loading">
+        <ion-spinner *ngIf="loading" name="crescent" slot="start"></ion-spinner>
+        Add Member
+      </ion-button>
     </div>
   </form>
 </div>

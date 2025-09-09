@@ -81,18 +81,4 @@
       </ion-card-content>
     </ion-card>
   </div>
-
-  <!-- View All Payments Card -->
-  <ion-card *ngIf="!(loading$ | async)" class="action-card" [routerLink]="['list']">
-    <ion-card-content>
-      <div class="action-content">
-        <ion-icon name="list-outline" color="primary"></ion-icon>
-        <div class="action-text">
-          <h3>View All Payments</h3>
-          <p>See detailed payment history</p>
-        </div>
-        <ion-icon name="chevron-forward-outline" color="medium"></ion-icon>
-      </div>
-    </ion-card-content>
-  </ion-card>
 </ion-content>

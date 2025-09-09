@@ -2,7 +2,7 @@ import { ModalController } from '@ionic/angular';
 import { Component, EventEmitter, Output } from '@angular/core';
 import { Member } from '../../shared/interfaces/member.interface';
 import { FormsModule } from '@angular/forms';
-import { IonInput, IonButton, IonLabel, IonItem, IonList, IonText, IonIcon, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
+import { IonInput, IonButton, IonLabel, IonItem, IonList, IonText, IonIcon, IonSelect, IonSelectOption, IonSpinner } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { 
   chevronUpOutline, 
@@ -10,17 +10,23 @@ import {
   closeOutline 
 } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
+import { MemberService } from './services/member.service';
+import { ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-add-member',
   templateUrl: './add-member.component.html',
   styleUrls: ['./add-member.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonInput, IonButton, IonLabel, IonItem, IonList, IonText, IonIcon, IonSelect, IonSelectOption],
-  providers: [ModalController]
+  imports: [CommonModule, FormsModule, IonInput, IonButton, IonLabel, IonItem, IonList, IonText, IonIcon, IonSelect, IonSelectOption, IonSpinner],
+  providers: [ModalController, MemberService, ToastController]
 })
 export class AddMemberComponent {
-  constructor(private modalCtrl: ModalController) {
+  constructor(
+    private modalCtrl: ModalController,
+    private memberService: MemberService,
+    private toastController: ToastController
+  ) {
     addIcons({
       'chevron-up-outline': chevronUpOutline,
       'chevron-down-outline': chevronDownOutline,
@@ -45,6 +51,7 @@ export class AddMemberComponent {
 
   showOptional = false;
   error = '';
+  loading = false;
 
   async submit() {
     this.error = '';
@@ -69,7 +76,24 @@ export class AddMemberComponent {
       membershipType: 'basic',
       lastPaymentDate: new Date()
     };
-    await this.modalCtrl.dismiss({ member: newMember });
+    this.loading = true;
+    this.memberService.addMember(newMember).subscribe({
+      next: async (createdMember) => {
+        this.loading = false;
+        const toast = await this.toastController.create({
+          message: 'Member added successfully',
+          duration: 2000,
+          color: 'success',
+          position: 'bottom'
+        });
+        await toast.present();
+        await this.modalCtrl.dismiss({ member: createdMember });
+      },
+      error: async (error) => {
+        this.loading = false;
+        this.error = error.message || 'Failed to add member';
+      }
+    });
   }
 
   async cancel() {

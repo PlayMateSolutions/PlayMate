@@ -367,18 +367,7 @@ export class MembersPage implements OnInit {
     modal.onWillDismiss().then((result) => {
       const data = result.data;
       if (data && data.member) {
-        this.loading = true;
-        this.memberService.addMember(data.member).subscribe({
-          next: () => {
-            this.showToast('Member added successfully');
-            this.loadMembers();
-          },
-          error: (error) => {
-            console.error('Error adding member:', error);
-            this.showToast('Failed to add member', 'danger');
-            this.loading = false;
-          }
-        });
+        this.loadMembers();
       }
     });
 

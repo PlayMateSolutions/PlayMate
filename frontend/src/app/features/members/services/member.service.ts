@@ -144,6 +144,9 @@ export class MemberService {
             if (response.status === 'success' && response.data) {
               return response.data;
             }
+            if (response.status === 'error' && response.error?.message) {
+              throw new Error(response.error.message);
+            }
             throw new Error('Failed to add member');
           })
         );
