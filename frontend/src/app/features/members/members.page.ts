@@ -50,6 +50,8 @@ import {
   calendarOutline,
   footballOutline, personOutline, timeOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
+import { ClubContextService } from '../../core/services/club-context.service';
+import { RelativeTimePipe } from './relative-time.pipe';
 
 
 @Component({
@@ -79,7 +81,8 @@ import { addIcons } from 'ionicons';
     IonSpinner,
     IonText,
     IonChip,
-    IonMenuButton
+    IonMenuButton,
+    RelativeTimePipe
   ],
   providers: [MemberService]
 })
@@ -93,12 +96,14 @@ export class MembersPage implements OnInit {
   loading: boolean = false; // Indicates API call loading state
   error: string | null = null;
   isSearchVisible: boolean = false;
+  lastMemberSync: Date | null = null;
   constructor(
     private memberService: MemberService,
     private alertController: AlertController,
     private toastController: ToastController,
     private translateService: TranslateService,
     private modalController: ModalController,
+    private clubContext: ClubContextService
   ) {    
     // Initialize available languages
     this.translateService.addLangs(['en', 'ta']);
@@ -109,6 +114,7 @@ export class MembersPage implements OnInit {
     this.translateService.use(browserLang.match(/en|ta/) ? browserLang : 'en');
 
     addIcons({addOutline,personOutline,calendarOutline,timeOutline,refreshOutline,logoWhatsapp,peopleOutline,personAddOutline,createOutline,trashOutline,mailOutline,callOutline,footballOutline,arrowUpOutline,arrowDownOutline,searchOutline,closeOutline});
+    this.lastMemberSync = this.clubContext.getLastMemberRefresh();
   }
 
   ngOnInit() {
@@ -133,6 +139,7 @@ export class MembersPage implements OnInit {
         this.filteredMembers = [...result.members];
         this.sortMembers();
         this.loading = false;
+        this.lastMemberSync = this.clubContext.getLastMemberRefresh();
       },
       error: (error) => {
         this.error = 'Error loading members';
@@ -151,6 +158,7 @@ export class MembersPage implements OnInit {
         this.filteredMembers = [...result.members];
         this.sortMembers();
         this.loading = false;
+        this.lastMemberSync = this.clubContext.getLastMemberRefresh();
         
         // Show success toast
         this.showToast('Members refreshed successfully', 'success');

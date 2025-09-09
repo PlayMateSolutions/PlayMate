@@ -50,13 +50,19 @@
 </ion-header>
 
 <ion-content>
-  <!-- Results count and loading state -->
-  <div class="results-count">
-    <ion-text color="medium" *ngIf="!loading">
-      Showing {{ filteredMembers.length }} members
-    </ion-text>
-    <ion-spinner *ngIf="loading"></ion-spinner>
-    <ion-text color="danger" *ngIf="error">{{ error }}</ion-text>
+  <div class="results-row">
+    <div class="results-count">
+      <ion-text color="medium" *ngIf="!loading">
+        Showing {{ filteredMembers.length }} members
+      </ion-text>
+      <ion-spinner *ngIf="loading"></ion-spinner>
+      <ion-text color="danger" *ngIf="error">{{ error }}</ion-text>
+    </div>
+    <div class="last-sync-info">
+      <ion-text color="medium" class="last-sync-label">
+        Last synced: {{ lastMemberSync | relativeTime }}
+      </ion-text>
+    </div>
   </div>
 
   <!-- Sort controls -->

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { 
@@ -35,6 +35,8 @@ addIcons({
   chevronForwardOutline 
 });
 import { GoogleChart, ChartType } from 'angular-google-charts';
+import { ClubContextService } from '../../core/services/club-context.service';
+import { RelativeTimePipe } from '../members/relative-time.pipe';
 
 @Component({
   selector: 'app-payments',
@@ -57,8 +59,10 @@ import { GoogleChart, ChartType } from 'angular-google-charts';
     IonSkeletonText,
     IonButton,
     IonIcon,
-    GoogleChart
-  ]
+    GoogleChart,
+    RelativeTimePipe
+  ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class PaymentsPage implements OnInit {
   loading$ = this.paymentService.loading$;
@@ -99,12 +103,15 @@ export class PaymentsPage implements OnInit {
   
   currentMonthEarnings = 0;
   currentMonthPayments = 0;
+  lastPaymentSync: Date | null = null;
 
   constructor(
     private paymentService: PaymentService,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private clubContext: ClubContextService
   ) {
     addIcons({ refresh });
+    this.lastPaymentSync = this.clubContext.getLastPaymentRefresh();
   }
 
   private prepareChartData(summary: PaymentSummary | null) {
@@ -191,12 +198,12 @@ export class PaymentsPage implements OnInit {
 
   async refreshPayments() {
     if (this.refreshing) return;
-    
     try {
       this.refreshing = true;
       console.log('Refreshing payment data...');
       
-      await this.paymentService.loadData();
+      await this.paymentService.refreshData();
+      this.lastPaymentSync = this.clubContext.getLastPaymentRefresh();
       
       console.log('Payment data refreshed successfully');
       const toast = await this.toastController.create({

@@ -48,7 +48,6 @@ export class MemberService {
   }
 
   refreshMembers(): Observable<{members: Member[], isFresh: boolean}> {
-    // Fetch fresh data from backend and update cache
     return from(this.authService.getAuthToken()).pipe(
       switchMap(token => {
         const clubId = this.clubContext.getSportsClubId() || '';
@@ -71,6 +70,7 @@ export class MemberService {
         return this.http.get<ApiResponse<Member[]>>(this.apiUrl, options).pipe(
           map(response => {
             if (response.status === 'error') throw new Error(response.error?.message);
+            this.clubContext.setLastMemberRefresh(new Date());
             return response.data || [];
           }),
           switchMap(members => from(MembersDB.setAll(members)).pipe(map(() => members))),

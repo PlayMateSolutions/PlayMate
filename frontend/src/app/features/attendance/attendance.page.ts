@@ -48,6 +48,8 @@ import {
   card,
   analytics
 } from 'ionicons/icons';
+import { ClubContextService } from '../../core/services/club-context.service';
+import { RelativeTimePipe } from '../members/relative-time.pipe';
 
 interface DailyAttendanceData {
   date: string;
@@ -79,7 +81,8 @@ interface DailyAttendanceData {
     IonSegment,
     IonSegmentButton,
     IonLabel,
-    GoogleChart
+    GoogleChart,
+    RelativeTimePipe
   ]
 })
 export class AttendancePage implements OnInit {
@@ -104,11 +107,13 @@ export class AttendancePage implements OnInit {
   totalAttendanceCount = 0;
   expiredMembershipsCount = 0;
   hasDataForCurrentPeriod = false;
+  lastAttendanceSync: Date | null = null;
 
   constructor(
     private attendanceService: AttendanceService,
     private toastController: ToastController,
-    private router: Router
+    private router: Router,
+    private clubContext: ClubContextService
   ) {
     addIcons({ 
       refresh, 
@@ -135,6 +140,7 @@ export class AttendancePage implements OnInit {
     this.setCurrentWeekStart();
     // Initialize current month
     this.currentMonth = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), 1);
+    this.lastAttendanceSync = this.clubContext.getLastAttendanceRefresh();
   }
   chartOptions: any = {
     backgroundColor: 'transparent',
@@ -202,6 +208,9 @@ export class AttendancePage implements OnInit {
       
       // Update chart options to include annotations
       this.updateChartOptions();
+      
+      // Update last attendance sync time
+      this.lastAttendanceSync = this.clubContext.getLastAttendanceRefresh();
       
       console.log('Daily data:', this.dailyData);
       console.log('Chart data:', this.chartData);

@@ -56,6 +56,15 @@
     <ion-text color="medium">Loading attendance data...</ion-text>
   </div>
 
+  <!-- Last Sync Info - Styled like members page -->
+  <div class="results-row" *ngIf="!loading">
+    <div class="last-sync-info">
+      <ion-text color="medium" class="last-sync-label">
+        Last synced: {{ lastAttendanceSync | relativeTime }}
+      </ion-text>
+    </div>
+  </div>
+
   <!-- Stats Cards - Only Average and Active Users -->
   <div class="stats-grid" *ngIf="!loading && hasDataForCurrentPeriod">
     <!-- Active Users Card -->

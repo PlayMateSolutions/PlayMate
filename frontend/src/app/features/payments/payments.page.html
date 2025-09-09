@@ -13,6 +13,15 @@
 </ion-header>
 
 <ion-content>
+  <!-- Last Payment Sync Info -->
+  <div class="results-row" *ngIf="!(loading$ | async)">
+    <div class="last-sync-info" >
+      <ion-text color="medium" class="last-sync-label">
+        Last synced: {{ lastPaymentSync | relativeTime }}
+      </ion-text>
+    </div>
+  </div>
+
   <!-- Stats Cards -->
   <div class="stats-grid" *ngIf="!(loading$ | async)">
     <!-- Total Earnings Card -->

@@ -270,7 +270,8 @@ export class PaymentService {
   }
 
   async refreshData(): Promise<void> {
-    await this.syncPayments(true);
+    await this.syncPayments();
+    this.clubContext.setLastPaymentRefresh(new Date());
   }
 
   async loadData(): Promise<void> {

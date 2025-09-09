@@ -169,6 +169,7 @@ export class AttendanceService {
         
         await AttendanceDB.setLastSyncTime(new Date());
         this.lastSyncSubject.next(new Date());
+        this.clubContext.setLastAttendanceRefresh(new Date());
 
         // Reload all data and recalculate analytics
         const allAttendance = await AttendanceDB.getAll();
