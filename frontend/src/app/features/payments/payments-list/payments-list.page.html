@@ -1,0 +1,56 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/payments"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Payment History</ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar
+      placeholder="Search payments"
+      (ionInput)="onSearchChange($event)"
+      [debounce]="500">
+    </ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="payment-list" *ngIf="!(loading$ | async) && displayedGroups.length > 0">
+    <div *ngFor="let group of displayedGroups" class="date-group">
+      <ion-item-divider sticky="true" color="light">
+        <ion-label>{{ group.formattedDate }}</ion-label>
+        <ion-note slot="end">₹{{ group.total | number:'1.0-0' }}</ion-note>
+      </ion-item-divider>
+      
+      <ion-list lines="full">
+        <ion-item *ngFor="let payment of group.payments" class="payment-item" (click)="showPaymentDetails(payment)">
+          <ion-label>
+            <h2>{{ payment.memberName || 'Unknown Member' }}
+              <ion-note color="medium" class="id-note">#{{ payment.memberId }}</ion-note>
+            </h2>
+            <ion-note color="medium">
+              {{ payment.date | date:'mediumDate' }} · {{ payment.paymentType }}
+              <ion-badge *ngIf="payment.status !== 'active'" color="danger" class="status-badge">
+                {{ payment.status }}
+              </ion-badge>
+            </ion-note>
+          </ion-label>
+          <ion-note slot="end" color="success" class="amount-note">
+            ₹{{ payment.amount | number:'1.0-0' }}
+          </ion-note>
+        </ion-item>
+      </ion-list>
+    </div>
+  </div>
+
+  <!-- No Payments Message -->
+  <ion-card *ngIf="!(loading$ | async) && displayedGroups.length === 0" class="no-data-card">
+    <ion-card-content class="ion-text-center">
+      <ion-label color="medium">
+        <h2>No Payments Found</h2>
+        <p *ngIf="!searchQuery">There are no payment records.</p>
+        <p *ngIf="searchQuery">No payments match your search criteria.</p>
+      </ion-label>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

@@ -210,10 +210,6 @@ export class PaymentService {
         });
       });
 
-      // Log some samples to debug
-      console.log('Sample member IDs:', members.slice(0, 3).map(m => `[${typeof m.id}] ${m.id}`));
-      console.log('Sample payment member IDs:', payments.slice(0, 3).map(p => `[${typeof p.memberId}] ${p.memberId}`));
-
       // Create map with normalized string IDs
       const memberMap = new Map(members.map(m => [String(m.id).trim(), m]));
 

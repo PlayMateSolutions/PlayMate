@@ -1,4 +1,5 @@
 import { Attendance } from '../../../shared/interfaces/attendance.interface';
+import { PlayMateDB } from '../../../core/services/playmate-db';
 
 export class AttendanceDB {
   private static dbName = 'PlayMateDB';
@@ -7,22 +8,11 @@ export class AttendanceDB {
 
   static openDB(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open(AttendanceDB.dbName, AttendanceDB.version);
-      
+      const request = indexedDB.open(AttendanceDB.dbName, PlayMateDB.version);
       request.onupgradeneeded = (event: any) => {
         const db = event.target.result;
-        
-        // Create attendance store if it doesn't exist
-        if (!db.objectStoreNames.contains(AttendanceDB.storeName)) {
-          const store = db.createObjectStore(AttendanceDB.storeName, { keyPath: 'id' });
-          // Create indexes for efficient querying
-          store.createIndex('memberId', 'memberId', { unique: false });
-          store.createIndex('date', 'date', { unique: false });
-          store.createIndex('membershipStatus', 'membershipStatus', { unique: false });
-          store.createIndex('dateRange', ['date', 'memberId'], { unique: false });
-        }
+        PlayMateDB.onUpgrade(db);
       };
-      
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });

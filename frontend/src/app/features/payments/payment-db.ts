@@ -1,4 +1,5 @@
 import { Payment } from './payment.interface';
+import { PlayMateDB } from '../../core/services/playmate-db';
 
 export class PaymentDB {
   private static dbName = 'PlayMateDB';
@@ -6,34 +7,13 @@ export class PaymentDB {
   private static version = 3;
 
   static openDB(): Promise<IDBDatabase> {
-    console.log('[PaymentDB] Starting database open...', { name: PaymentDB.dbName, version: PaymentDB.version });
+    console.log('[PaymentDB] Starting database open...', { name: PaymentDB.dbName, version: PlayMateDB.version });
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open(PaymentDB.dbName, PaymentDB.version);
-      
+      const request = indexedDB.open(PaymentDB.dbName, PlayMateDB.version);
       request.onupgradeneeded = (event: any) => {
-        console.log('[PaymentDB] Database upgrade needed', { oldVersion: event.oldVersion, newVersion: event.newVersion });
         const db = event.target.result;
-        
-        console.log('[PaymentDB] Current object stores:', Array.from(db.objectStoreNames));
-        // Create payments store if it doesn't exist
-        if (!db.objectStoreNames.contains(PaymentDB.storeName)) {
-          console.log('[PaymentDB] Creating payments store...');
-          try {
-            const store = db.createObjectStore(PaymentDB.storeName, { keyPath: 'id' });
-            // Create indexes for efficient querying
-            store.createIndex('memberId', 'memberId', { unique: false });
-            store.createIndex('date', 'date', { unique: false });
-            store.createIndex('paymentType', 'paymentType', { unique: false });
-            console.log('[PaymentDB] Successfully created payments store and indexes');
-          } catch (error) {
-            console.error('[PaymentDB] Error creating store:', error);
-            throw error;
-          }
-        } else {
-          console.log('[PaymentDB] Payments store already exists');
-        }
+        PlayMateDB.onUpgrade(db);
       };
-      
       request.onsuccess = () => {
         const db = request.result;
         console.log('[PaymentDB] Database opened successfully', {
@@ -43,7 +23,6 @@ export class PaymentDB {
         });
         resolve(db);
       };
-      
       request.onerror = () => {
         console.error('[PaymentDB] Error opening database:', request.error);
         reject(request.error);

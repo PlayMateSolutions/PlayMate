@@ -1,0 +1,41 @@
+.payment-list {
+  margin-top: 1rem;
+}
+
+.date-group {
+  ion-item-divider {
+    --background: var(--ion-color-light);
+    font-weight: 500;
+  }
+}
+
+.payment-item {
+  .id-note {
+    font-size: 0.8em;
+    margin-left: 0.5rem;
+  }
+
+  .amount-note {
+    font-size: 1.1em;
+    font-weight: 500;
+  }
+
+  .status-badge {
+    margin-left: 0.5rem;
+    font-size: 0.7em;
+  }
+}
+
+.no-data-card {
+  margin: 1rem;
+  text-align: center;
+  
+  h2 {
+    font-size: 1.2em;
+    margin-bottom: 0.5rem;
+  }
+  
+  p {
+    color: var(--ion-color-medium);
+  }
+}
