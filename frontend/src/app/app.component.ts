@@ -16,6 +16,9 @@ import { personCircleOutline, logOutOutline } from 'ionicons/icons';
 import { PopoverController } from '@ionic/angular/standalone';
 import { ProfileMenuComponent } from './shared/components/profile-menu/profile-menu.component';
 import { SocialLogin } from '@capgo/capacitor-social-login';
+import { MemberService } from './features/members/services/member.service';
+import { AttendanceService } from './features/attendance/services/attendance.service';
+import { PaymentService } from './features/payments/payment.service';
 
 @Component({
   selector: 'app-root',
@@ -40,16 +43,37 @@ import { SocialLogin } from '@capgo/capacitor-social-login';
 export class AppComponent implements OnInit {
   userSession$: Observable<UserSession | null>;
 
-
   constructor(
     private authService: AuthService,
     private router: Router,
     private popoverController: PopoverController,
     private route: ActivatedRoute,
-    private clubContext: ClubContextService
+    private clubContext: ClubContextService,
+    private memberService: MemberService,
+    private attendanceService: AttendanceService,
+    private paymentService: PaymentService
   ) {
     addIcons({ personCircleOutline, logOutOutline });
     this.userSession$ = this.authService.userSession$;
+  }
+
+  private refreshAll() {
+    // Only refresh members if last refresh was more than 12 hours ago
+    const lastMemberRefresh = this.clubContext.getLastMemberRefresh();
+    const now = new Date();
+    const twelveHours = 12 * 60 * 60 * 1000;
+    console.log('[AppComponent] Last member refresh:', lastMemberRefresh);
+    if (!lastMemberRefresh || (now.getTime() - new Date(lastMemberRefresh).getTime()) > twelveHours) {
+      console.log('[AppComponent] Refreshing members (last refresh > 12h or never)');
+      this.memberService.refreshMembers().subscribe({
+        next: () => {
+          console.log('[AppComponent] Members refreshed, now refreshing attendance and payments in parallel');
+          this.attendanceService.refreshData().catch(err => console.error('Error refreshing attendance:', err));
+          this.paymentService.refreshData().catch(err => console.error('Error refreshing payments:', err));
+        },
+        error: err => console.error('Error refreshing members:', err)
+      });
+    }
   }
 
   async ngOnInit() {
@@ -87,6 +111,9 @@ export class AppComponent implements OnInit {
         });
       }
     });
+
+    // Refresh all data on app launch
+    this.refreshAll();
   }
 
   async showProfileMenu(event: Event) {
