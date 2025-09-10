@@ -1,17 +1,23 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { IonIcon } from '@ionic/angular/standalone';
+import { chevronBackOutline, chevronForwardOutline } from 'ionicons/icons';
+import { addIcons } from 'ionicons';
+
+addIcons({ chevronBackOutline, chevronForwardOutline });
 
 @Component({
   selector: 'app-calendar-grid',
   standalone: true,
   templateUrl: './calendar-grid.component.html',
   styleUrls: ['./calendar-grid.component.scss'],
-  imports: [CommonModule]
+  imports: [CommonModule, IonIcon]
 })
 export class CalendarGridComponent {
+  @Input() events: string[] = []; // Array of ISO date strings (e.g., '2025-09-10')
+
   @Input() month: number = new Date().getMonth(); // 0-indexed
   @Input() year: number = new Date().getFullYear();
-  @Input() events: string[] = []; // Array of ISO date strings (e.g., '2025-09-10')
 
   monthNames = [
     'January', 'February', 'March', 'April', 'May', 'June',
@@ -49,5 +55,23 @@ export class CalendarGridComponent {
     return date.getDate() === today.getDate() &&
            date.getMonth() === today.getMonth() &&
            date.getFullYear() === today.getFullYear();
+  }
+
+  prevMonth() {
+    if (this.month === 0) {
+      this.month = 11;
+      this.year--;
+    } else {
+      this.month--;
+    }
+  }
+
+  nextMonth() {
+    if (this.month === 11) {
+      this.month = 0;
+      this.year++;
+    } else {
+      this.month++;
+    }
   }
 }
