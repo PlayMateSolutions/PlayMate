@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, BehaviorSubject, from, of, combineLatest } from 'rxjs';
+import { Observable, BehaviorSubject, from, of, combineLatest, pipe } from 'rxjs';
 import { map, switchMap, tap, catchError } from 'rxjs/operators';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
@@ -407,7 +407,7 @@ export class AttendanceService {
 
   getAttendanceByMember(memberId: string): Observable<Attendance[]> {
     return this.attendance$.pipe(
-      map(attendance => attendance.filter(record => record.memberId === memberId))
+      map(attendance => attendance.filter(record => String(record.memberId) === memberId))
     );
   }
 

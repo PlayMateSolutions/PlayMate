@@ -27,6 +27,14 @@
       </div>
     </ion-card-content>
   </ion-card>
+  <div style="margin-top: 1.5rem;">
+    <h3 style="margin-bottom: 0.5rem;">Attendance</h3>
+    <app-calendar-grid
+      [month]="currentMonth"
+      [year]="currentYear"
+      [events]="attendanceDates">
+    </app-calendar-grid>
+  </div>
   <!-- Attendance and payment data will be shown below -->
 </ion-content>
 <ion-content *ngIf="!member">
