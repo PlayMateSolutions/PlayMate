@@ -13,6 +13,10 @@ import {
   IonItemDivider,
   MenuController
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { peopleOutline, cashOutline, calendarOutline, settingsOutline } from 'ionicons/icons';
+
+addIcons({ peopleOutline, cashOutline, calendarOutline, settingsOutline });
 
 @Component({
   selector: 'app-menu',
