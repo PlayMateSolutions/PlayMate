@@ -15,6 +15,7 @@ addIcons({ chevronBackOutline, chevronForwardOutline });
 })
 export class CalendarGridComponent {
   @Input() events: string[] = []; // Array of ISO date strings (e.g., '2025-09-10')
+  @Input() paymentEvents: string[] = []; // Dates with payments (ISO strings)
 
   @Input() month: number = new Date().getMonth(); // 0-indexed
   @Input() year: number = new Date().getFullYear();
@@ -59,6 +60,12 @@ export class CalendarGridComponent {
     if (!date) return false;
     const iso = date.toISOString().slice(0, 10);
     return this.events.includes(iso);
+  }
+
+  isPaymentDay(date: Date | null): boolean {
+    if (!date) return false;
+    const iso = date.toISOString().slice(0, 10);
+    return this.paymentEvents.includes(iso);
   }
 
   isToday(date: Date | null): boolean {

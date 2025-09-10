@@ -18,7 +18,7 @@
   </div>
   <div class="calendar-body">
     <div *ngFor="let week of weeks" class="calendar-row">
-      <div *ngFor="let date of week" class="calendar-cell" [ngClass]="{'event-day': isEventDay(date), 'empty': !date, 'today': isToday(date)}">
+      <div *ngFor="let date of week" class="calendar-cell" [ngClass]="{'event-day': isEventDay(date), 'empty': !date, 'today': isToday(date), 'payment-day': isPaymentDay(date)}">
         <span *ngIf="date">{{ date.getDate() }}</span>
       </div>
     </div>

@@ -41,6 +41,7 @@ export class MemberDetailPage implements OnInit, OnDestroy {
   attendanceDates: string[] = [];
   selectedTab: 'attendance' | 'payments' = 'attendance';
   payments: Payment[] = [];
+  paymentDates: string[] = [];
   private paymentSub?: Subscription;
 
   constructor(
@@ -65,6 +66,7 @@ export class MemberDetailPage implements OnInit, OnDestroy {
       });
       this.paymentSub = this.paymentService.getPaymentsByMember(memberId).subscribe(payments => {
         this.payments = payments.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        this.paymentDates = payments.map(p => new Date(p.date).toISOString().slice(0, 10));
       });
     }
   }

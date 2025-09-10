@@ -39,7 +39,10 @@
 
   <div *ngIf="selectedTab === 'attendance'">
     <h3 style="margin-bottom: 0.5rem;">Attendance</h3>
-    <app-calendar-grid [events]="attendanceDates"></app-calendar-grid>
+    <app-calendar-grid 
+      [events]="attendanceDates"
+      [paymentEvents]="paymentDates">
+    </app-calendar-grid>
   </div>
 
   <div *ngIf="selectedTab === 'payments'">
