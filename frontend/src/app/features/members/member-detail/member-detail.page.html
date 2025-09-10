@@ -1,0 +1,38 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/members"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Member Details</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content *ngIf="member">
+  <ion-card class="member-detail-card" [ngClass]="member.status ? member.status.toLowerCase() : ''">
+    <ion-card-content class="card-content">
+      <div class="member-info-row" style="display: flex; align-items: center;">
+        <div class="member-avatar" style="width:48px; height:48px; border-radius:50%; background:#3880ff; color:#fff; display:flex; align-items:center; justify-content:center; font-size:1.5em; font-weight:bold; margin-right:16px;">
+          {{ member.firstName ? member.firstName.charAt(0).toUpperCase() : '?' }}
+        </div>
+        <div class="member-info" style="flex:1;">
+          <div class="member-name">
+            <strong>{{ member.firstName }} {{ member.lastName }}</strong>
+            <small class="member-id">ID: {{ member.id }}</small>
+          </div>
+          <div>Phone: {{ member.phone || 'N/A' }}</div>
+          <div>Status: {{ member.status || 'N/A' }}</div>
+          <div>Joined: {{ member.joinDate ? (member.joinDate | date:'mediumDate') : 'N/A' }}</div>
+          <div>Expiry: {{ member.expiryDate ? (member.expiryDate | date:'mediumDate') : 'N/A' }}</div>
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
+  <!-- Attendance and payment data will be shown below -->
+</ion-content>
+<ion-content *ngIf="!member">
+  <ion-card>
+    <ion-card-content>
+      <div class="ion-text-danger">Member not found.</div>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

@@ -52,6 +52,7 @@ import {
 import { addIcons } from 'ionicons';
 import { ClubContextService } from '../../core/services/club-context.service';
 import { RelativeTimePipe } from './relative-time.pipe';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -103,7 +104,8 @@ export class MembersPage implements OnInit {
     private toastController: ToastController,
     private translateService: TranslateService,
     private modalController: ModalController,
-    private clubContext: ClubContextService
+    private clubContext: ClubContextService,
+    private router: Router
   ) {    
     // Initialize available languages
     this.translateService.addLangs(['en', 'ta']);
@@ -419,6 +421,10 @@ export class MembersPage implements OnInit {
     
     // Open in browser
     window.open(whatsappUrl, '_blank');
+  }
+
+  openMemberDetail(member: Member) {
+    this.router.navigate(['/tabs/members', member.id]);
   }
 
   private async showToast(message: string, color: 'success' | 'danger' | 'warning' = 'success') {

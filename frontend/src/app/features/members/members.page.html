@@ -109,7 +109,7 @@
 
   <!-- Member list cards -->
   <ng-container *ngIf="filteredMembers.length > 0; else noMembers">
-    <ion-card *ngFor="let member of filteredMembers" [ngClass]="getMembershipStatus(member.expiryDate)">
+    <ion-card *ngFor="let member of filteredMembers" [ngClass]="getMembershipStatus(member.expiryDate)" (click)="openMemberDetail(member)">
       <ion-card-content class="card-content">
         <div class="member-info">
           <div class="member-name">
@@ -120,10 +120,10 @@
           <div>Expires: {{ formatDate(member.expiryDate) }}</div>
         </div>
         <div class="card-actions">
-          <ion-button fill="clear" color="warning" (click)="renewMembership(member)" class="action-button primary">
+          <ion-button fill="clear" color="warning" (click)="renewMembership(member); $event.stopPropagation();" class="action-button primary">
             <ion-icon name="refresh-outline"></ion-icon>
           </ion-button>
-          <ion-button fill="clear" color="success" (click)="sendPaymentReminder(member)" class="action-button secondary whatsapp-btn">
+          <ion-button fill="clear" color="success" (click)="sendPaymentReminder(member); $event.stopPropagation();" class="action-button secondary whatsapp-btn">
             <ion-icon name="logo-whatsapp"></ion-icon>
           </ion-button>
         </div>

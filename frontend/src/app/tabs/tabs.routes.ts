@@ -37,6 +37,10 @@ export const routes: Routes = [
         ]
       },
       {
+        path: 'members/:id',
+        loadChildren: () => import('../features/members/member-detail/member-detail.routes').then(m => m.MEMBER_DETAIL_ROUTES),
+      },
+      {
         path: '',
         redirectTo: 'members',
         pathMatch: 'full'
