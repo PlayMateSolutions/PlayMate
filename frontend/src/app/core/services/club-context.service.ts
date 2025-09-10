@@ -28,8 +28,9 @@ export class ClubContextService {
   }
 
   clear() {
-    this.sportsClubId = null;
-    localStorage.removeItem(this.STORAGE_KEY);
+    this.sportsClubId = this.getSportsClubId();
+    localStorage.clear();
+    this.setSportsClubId(this.sportsClubId!);// Retain sportsClubId as the user rarely changes it
   }
 
   setLastMemberRefresh(date: Date) {

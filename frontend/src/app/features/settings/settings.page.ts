@@ -26,6 +26,7 @@ import { FormsModule } from '@angular/forms';
 import { ClubContextService } from '../../core/services/club-context.service';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { PlayMateDB } from '../../core/services/playmate-db';
 
 @Component({
   selector: 'app-settings',
@@ -130,24 +131,22 @@ export class SettingsPage implements OnInit {
   }
 
   async logout() {
+    const confirmed = window.confirm('Are you sure you want to logout? This will delete all your local PlayMate data.');
+    if (!confirmed) return;
     try {
       // Clear auth session
       await this.authService.logout();
 
-      // Clear local storage
-      // localStorage.clear();
+      // Delete PlayMateDB IndexedDB
+      try {
+        await PlayMateDB.deleteDatabase();
+        console.log('PlayMateDB deleted successfully');
+      } catch (err) {
+        console.error('Error deleting PlayMateDB:', err);
+      }
 
-      // Clear IndexedDB members database
-      const request = window.indexedDB.deleteDatabase('members');
-      request.onsuccess = () => {
-        console.log('Members database deleted successfully');
-      };
-      request.onerror = () => {
-        console.error('Error deleting members database');
-      };
-
-      // Clear club context
-      // this.clubContext.clear();
+      // Optionally clear club context
+      this.clubContext.clear();
 
       // Navigate to login page
       await this.router.navigate(['/login'], { replaceUrl: true });

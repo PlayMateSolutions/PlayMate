@@ -23,4 +23,16 @@ export class PlayMateDB {
       attendanceStore.createIndex('dateRange', ['date', 'memberId'], { unique: false });
     }
   }
+
+  /**
+   * Deletes the entire PlayMateDB IndexedDB database
+   */
+  static deleteDatabase(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const request = window.indexedDB.deleteDatabase(PlayMateDB.dbName);
+      request.onsuccess = () => resolve();
+      request.onerror = (event) => reject(event);
+      request.onblocked = () => reject(new Error('Delete blocked'));
+    });
+  }
 }
