@@ -276,7 +276,7 @@ export class PaymentService {
 
   getPaymentsByMember(memberId: string): Observable<Payment[]> {
     return this.payments$.pipe(
-      map(payments => payments.filter(record => record.memberId === memberId))
+      map(payments => payments.filter(record => String(record.memberId) === memberId))
     );
   }
 

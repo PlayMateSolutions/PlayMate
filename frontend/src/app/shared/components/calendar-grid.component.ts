@@ -43,6 +43,18 @@ export class CalendarGridComponent {
     return weeks;
   }
 
+  get totalDaysInMonth(): number {
+    return new Date(this.year, this.month + 1, 0).getDate();
+  }
+
+  get presentDays(): number {
+    // Count unique event days in this month/year
+    return this.events.filter(dateStr => {
+      const d = new Date(dateStr);
+      return d.getFullYear() === this.year && d.getMonth() === this.month;
+    }).length;
+  }
+
   isEventDay(date: Date | null): boolean {
     if (!date) return false;
     const iso = date.toISOString().slice(0, 10);

@@ -27,13 +27,39 @@
       </div>
     </ion-card-content>
   </ion-card>
-  <div style="margin-top: 1.5rem;">
+
+  <ion-segment value="attendance" (ionChange)="onTabChange($event)" style="margin: 1.5rem 0 1rem 0;">
+    <ion-segment-button value="attendance">
+      <ion-label>Attendance</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="payments">
+      <ion-label>Payments</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <div *ngIf="selectedTab === 'attendance'">
     <h3 style="margin-bottom: 0.5rem;">Attendance</h3>
-    <app-calendar-grid      
-      [events]="attendanceDates">
-    </app-calendar-grid>
+    <app-calendar-grid [events]="attendanceDates"></app-calendar-grid>
   </div>
-  <!-- Attendance and payment data will be shown below -->
+
+  <div *ngIf="selectedTab === 'payments'">
+    <h3 style="margin-bottom: 0.5rem;">Payments</h3>
+    <ion-list *ngIf="payments.length > 0">
+      <ion-item *ngFor="let payment of payments">
+        <ion-label>
+          <div style="font-weight: 600;">₹{{ payment.amount | number:'1.0-0' }} <span style="font-size:0.9em; color:var(--ion-color-medium);">{{ payment.paymentType }}</span></div>
+          <div style="font-size:0.95em; color:var(--ion-color-medium);">{{ payment.date | date:'mediumDate' }}</div>
+          <div *ngIf="payment.notes" style="font-size:0.9em; color:var(--ion-color-tertiary);">{{ payment.notes }}</div>
+        </ion-label>
+        <ion-note slot="end" [color]="payment.status === 'Paid' ? 'success' : 'warning'" [ngStyle]="payment.status === 'Paid' ? {'background':'#2dd36f','color':'#fff','border-radius':'8px','padding':'2px 10px','font-weight':'bold'} : {}">
+          {{ payment.status }}
+        </ion-note>
+      </ion-item>
+    </ion-list>
+    <div *ngIf="payments.length === 0" class="ion-text-center ion-padding">
+      <ion-note color="medium">No payments found for this member.</ion-note>
+    </div>
+  </div>
 </ion-content>
 <ion-content *ngIf="!member">
   <ion-card>

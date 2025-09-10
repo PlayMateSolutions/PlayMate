@@ -8,6 +8,9 @@
       <ion-icon name="chevron-forward-outline" style="font-size: 1.25rem;"></ion-icon>
     </button>
   </div>
+  <div class="calendar-summary" style="text-align:center; margin-bottom:0.5rem; color: var(--ion-color-primary); font-weight: 500;">
+    Total Present: {{ presentDays }} / {{ totalDaysInMonth }} days
+  </div>
   <div class="calendar-header">
     <div *ngFor="let day of ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']" class="calendar-cell calendar-header-cell">
       {{ day }}
