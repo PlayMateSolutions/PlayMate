@@ -7,14 +7,14 @@
 
 .stat-card {
   background-color: var(--ion-card-background);
-  border-radius: 12px;
+  border-radius: 8px;
   padding: 16px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   position: relative;
-  box-shadow: var(--ion-card-box-shadow);
-  transition: transform 0.2s ease;
+  transition: background-color 0.2s ease;
 
   &[routerLink] {
     cursor: pointer;
@@ -22,6 +22,10 @@
     &:hover {
       transform: translateY(-2px);
     }
+  }
+
+  &:active {
+    background-color: rgba(0, 0, 0, 0.05);
   }
 }
 
@@ -58,7 +62,7 @@
 .stat-value {
   font-size: 1.8rem;
   font-weight: 700;
-  color: var(--ion-color-primary-contrast, #fff) !important;
+  color: var(--ion-color-success, #2dd36f) !important;
   margin-bottom: 4px;
 }
 
