@@ -59,7 +59,8 @@ jobs:
         cp www/index.html www/404.html
         ls www
 
-    # Remove CNAME step as we're using GitHub Pages default domain
+    - name: Add CNAME file
+      run: echo 'app.gymmate.co.in' > www/CNAME
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
