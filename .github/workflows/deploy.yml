@@ -54,7 +54,7 @@ jobs:
         # Clean build artifacts
         rm -rf www/
         # Run production build
-        ionic build --prod -- --base-href 'https://jsramraj.github.io/PlayMate/'
+        ionic build --prod -- --base-href 'https://app.gymmate.co.in'
         # Copy compiled index.html as 404.html for GitHub Pages SPA routing
         cp www/index.html www/404.html
         ls www
