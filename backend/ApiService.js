@@ -163,6 +163,14 @@ function handleRequest(e, method) {
         result = handleUpdateSportsClub(payload);
         break;
 
+      // Expenses endpoints
+      case "recordExpense":
+        result = recordExpense(payload);
+        break;
+      case "getExpenses":
+        result = getAllExpenses(payload);
+        break;
+
       // If action is not recognized
       default:
         return createErrorResponse("Unknown action: " + action, 400);

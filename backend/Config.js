@@ -9,7 +9,8 @@ const SHEET_NAMES = {
   ATTENDANCE: 'Attendance',
   PAYMENTS: 'Payments',
   SETTINGS: 'Settings',
-  SPORTS: 'Sports'
+  SPORTS: 'Sports',
+  EXPENSES: 'Expenses'
 };
 
 // Column indices for Members sheet
