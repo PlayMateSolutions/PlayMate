@@ -1,6 +1,6 @@
 export class PlayMateDB {
   static dbName = 'PlayMateDB';
-  static version = 4; // Bump this when you add/change stores
+  static version = 5; // Bump this when you add/change stores
 
   static onUpgrade(db: IDBDatabase) {
     // Members store
@@ -21,6 +21,12 @@ export class PlayMateDB {
       attendanceStore.createIndex('date', 'date', { unique: false });
       attendanceStore.createIndex('membershipStatus', 'membershipStatus', { unique: false });
       attendanceStore.createIndex('dateRange', ['date', 'memberId'], { unique: false });
+    }
+    // Expenses store
+    if (!db.objectStoreNames.contains('expenses')) {
+      const store = db.createObjectStore('expenses', { keyPath: 'id' });
+      store.createIndex('date', 'date', { unique: false });
+      store.createIndex('category', 'category', { unique: false });
     }
   }
 

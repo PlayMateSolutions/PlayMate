@@ -47,6 +47,24 @@
       <div class="stat-value">₹{{ currentMonthEarnings | number:'1.0-0' }}</div>
       <div class="stat-subtext">{{ currentMonthPayments }} payments this month</div>
     </div>
+
+    <!-- Expenses Card -->
+    <div class="stat-card expense-card">
+      <div class="stat-icon" style="background:#eb445a; color:#fff;">
+        <ion-icon name="wallet"></ion-icon>
+      </div>
+      <div class="stat-label">Total Expenses</div>
+      <div class="stat-value">₹{{ totalExpenses | number:'1.0-0' }}</div>
+      <div class="stat-subtext">All time</div>
+    </div>
+    <div class="stat-card expense-card">
+      <div class="stat-icon" style="background:#eb445a; color:#fff;">
+        <ion-icon name="calendar"></ion-icon>
+      </div>
+      <div class="stat-label">This Month's Expenses</div>
+      <div class="stat-value">₹{{ currentMonthExpenses | number:'1.0-0' }}</div>
+      <div class="stat-subtext">This month</div>
+    </div>
   </div>
 
   <!-- Monthly Earnings Chart -->

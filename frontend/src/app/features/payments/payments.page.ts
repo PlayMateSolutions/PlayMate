@@ -37,6 +37,8 @@ addIcons({
 import { GoogleChart, ChartType } from 'angular-google-charts';
 import { ClubContextService } from '../../core/services/club-context.service';
 import { RelativeTimePipe } from '../members/relative-time.pipe';
+import { ExpenseService } from './expense.service';
+import { Expense } from './expense.interface';
 
 @Component({
   selector: 'app-payments',
@@ -105,10 +107,15 @@ export class PaymentsPage implements OnInit {
   currentMonthPayments = 0;
   lastPaymentSync: Date | null = null;
 
+  expenses: Expense[] = [];
+  totalExpenses = 0;
+  currentMonthExpenses = 0;
+
   constructor(
     private paymentService: PaymentService,
     private toastController: ToastController,
-    private clubContext: ClubContextService
+    private clubContext: ClubContextService,
+    private expenseService: ExpenseService
   ) {
     addIcons({ refresh });
     this.lastPaymentSync = this.clubContext.getLastPaymentRefresh();
@@ -152,9 +159,20 @@ export class PaymentsPage implements OnInit {
     // Subscribe to summary to update chart
     this.summary$.subscribe(summary => {
       this.prepareChartData(summary);
-    });    // Initial load
+    });
+
+    // Subscribe to expenses
+    this.expenseService.expenses$.subscribe(expenses => {
+      this.expenses = expenses;
+      this.calculateExpenses();
+    });
+
+    // Load cached data for payments and expenses
     this.paymentService.loadData().catch(error => {
       console.error('Error initializing payments:', error);
+    });
+    this.expenseService.loadData().catch(error => {
+      console.error('Error initializing expenses:', error);
     });
   }
 
@@ -194,34 +212,46 @@ export class PaymentsPage implements OnInit {
       .sort((a, b) => b.month.localeCompare(a.month));
   }
 
+  private calculateExpenses() {
+    const currentMonth = new Date().toISOString().substring(0, 7);
+    this.totalExpenses = 0;
+    this.currentMonthExpenses = 0;
+    this.expenses.forEach(exp => {
+      this.totalExpenses += exp.amount;
+      const monthKey = exp.date.substring(0, 7);
+      if (monthKey === currentMonth) {
+        this.currentMonthExpenses += exp.amount;
+      }
+    });
+  }
+
   refreshing = false;
 
   async refreshPayments() {
     if (this.refreshing) return;
     try {
       this.refreshing = true;
-      console.log('Refreshing payment data...');
-      
-      await this.paymentService.refreshData();
+      console.log('Refreshing payment and expense data...');
+      await Promise.all([
+        this.paymentService.refreshData(),
+        this.expenseService.refreshData()
+      ]);
       this.lastPaymentSync = this.clubContext.getLastPaymentRefresh();
-      
-      console.log('Payment data refreshed successfully');
+      console.log('Payment and expense data refreshed successfully');
       const toast = await this.toastController.create({
-        message: 'Payment data refreshed successfully',
+        message: 'Payment and expense data refreshed successfully',
         duration: 2000,
         color: 'success'
       });
       await toast.present();
-      
     } catch (error) {
-      console.error('Error refreshing payment data:', error);
+      console.error('Error refreshing payment or expense data:', error);
       const toast = await this.toastController.create({
-        message: 'Failed to refresh payment data',
+        message: 'Failed to refresh payment or expense data',
         duration: 2000,
         color: 'danger'
       });
       await toast.present();
-      
     } finally {
       this.refreshing = false;
     }
