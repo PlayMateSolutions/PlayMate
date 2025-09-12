@@ -300,7 +300,8 @@ export class MembersPage implements OnInit {
       },
       showBackdrop: true,
       backdropDismiss: false,
-      cssClass: 'payment-modal'
+      cssClass: 'payment-modal',
+      presentingElement: document.body.querySelector('ion-app') || undefined
     });
 
     modal.onWillDismiss().then((result) => {

@@ -1,0 +1,17 @@
+.expense-modal {
+  padding: 1.5rem;
+  h2 {
+    margin-bottom: 1rem;
+    font-size: 1.3em;
+    text-align: center;
+  }
+  ion-item {
+    margin-bottom: 0.5rem;
+  }
+  .modal-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}

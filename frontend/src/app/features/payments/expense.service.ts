@@ -49,4 +49,24 @@ export class ExpenseService {
   async loadData(): Promise<void> {
     await this.loadCachedData();
   }
+
+  async addExpense(expense: Partial<Expense>): Promise<void> {
+    // Generate a unique id for the expense
+    const id = 'E' + Date.now();
+    const newExpense: Expense = {
+      id,
+      date: expense.date || new Date().toISOString(),
+      category: expense.category || '',
+      notes: expense.notes || '',
+      amount: Number(expense.amount) || 0,
+      paymentType: 'Cash',
+      recordedBy: expense.recordedBy || '',
+      payee: expense.payee || '',
+      transactionId: expense.transactionId || ''
+    };
+    await ExpenseDB.addRecords([newExpense]);
+    // Update local cache
+    const all = await ExpenseDB.getAll();
+    this.expensesSubject.next(all);
+  }
 }

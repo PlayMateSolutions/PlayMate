@@ -1,0 +1,46 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Log Expense</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-list>
+    <ion-item>
+      <ion-label position="stacked">Date</ion-label>
+      <ion-input [value]="expense.date | date: 'dd MMM yyyy'" id="expenseDate" readonly></ion-input>
+      <ion-popover trigger="expenseDate">
+        <ng-template>
+          <ion-datetime presentation="date" [(ngModel)]="expense.date" [showDefaultButtons]="true" locale="en-US"></ion-datetime>
+        </ng-template>
+      </ion-popover>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Category</ion-label>
+      <ion-input [(ngModel)]="expense.category" name="category" required></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Notes</ion-label>
+      <ion-textarea [(ngModel)]="expense.notes" name="notes"></ion-textarea>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Amount</ion-label>
+      <ion-input type="number" [(ngModel)]="expense.amount" name="amount" required></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Payment Type</ion-label>
+      <ion-input value="Cash" readonly></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Recorded By</ion-label>
+      <ion-input [value]="currentUser" readonly></ion-input>
+    </ion-item>
+  </ion-list>
+  <div class="ion-padding">
+    <ion-button expand="block" (click)="save()" [disabled]="saving || !expense.amount || !expense.category">Log Expense</ion-button>
+    <ion-button expand="block" fill="clear" color="medium" (click)="dismiss()">Cancel</ion-button>
+  </div>
+</ion-content>

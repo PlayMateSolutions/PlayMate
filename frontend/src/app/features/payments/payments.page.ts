@@ -15,7 +15,8 @@ import {
   IonSkeletonText,
   IonButton,
   IonIcon,
-  ToastController
+  ToastController,
+  ModalController
 } from '@ionic/angular/standalone';
 import { PaymentService } from './payment.service';
 import { Payment, PaymentSummary, PaymentGroup } from './payment.interface';
@@ -39,6 +40,8 @@ import { ClubContextService } from '../../core/services/club-context.service';
 import { RelativeTimePipe } from '../members/relative-time.pipe';
 import { ExpenseService } from './expense.service';
 import { Expense } from './expense.interface';
+import { AuthService } from '../../core/services/auth.service';
+import { ExpenseModalComponent } from './expense-modal.component';
 
 @Component({
   selector: 'app-payments',
@@ -117,7 +120,9 @@ export class PaymentsPage implements OnInit {
     private paymentService: PaymentService,
     private toastController: ToastController,
     private clubContext: ClubContextService,
-    private expenseService: ExpenseService
+    private expenseService: ExpenseService,
+    private modalController: ModalController,
+    private authService: AuthService
   ) {
     addIcons({ refresh });
     this.lastPaymentSync = this.clubContext.getLastPaymentRefresh();
@@ -276,5 +281,36 @@ export class PaymentsPage implements OnInit {
   goToPaymentsList() {
     // Navigation handled by RouterLink
     console.log('Navigating to payments list...');
+  }
+
+  async openExpenseModal() {
+    console.log('Opening expense modal...');
+    let userName = 'Unknown';
+    // const session = await this.authService.userSession$.toPromise();
+    // if (session && session.name) userName = session.name;
+    console.log('Current user for expense modal:', userName);
+    const modal = await this.modalController.create({
+      component: ExpenseModalComponent,
+      componentProps: {
+        currentUser: userName
+      },
+      showBackdrop: true,
+      backdropDismiss: false,
+      cssClass: 'expense-modal',
+      presentingElement: document.body.querySelector('ion-app') || undefined
+    });
+    modal.onWillDismiss().then(async (result) => {
+      if (result.data && result.data.expense) {
+        await this.expenseService.addExpense(result.data.expense);
+        this.expenseService.loadData();
+        const toast = await this.toastController.create({
+          message: 'Expense logged successfully',
+          duration: 1500,
+          color: 'success'
+        });
+        toast.present();
+      }
+    });
+    await modal.present();
   }
 }
