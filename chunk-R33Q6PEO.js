@@ -1,0 +1,1 @@
+import{y as r}from"./chunk-AAX3YNDZ.js";var a=(()=>{let t=class t{constructor(){this.refreshAll=null}};t.\u0275fac=function(n){return new(n||t)},t.\u0275prov=r({token:t,factory:t.\u0275fac,providedIn:"root"});let o=t;return o})();export{a};
