@@ -1,10 +1,10 @@
 import { Component, OnInit, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { 
-  IonContent, 
-  IonHeader, 
-  IonToolbar, 
+import {
+  IonContent,
+  IonHeader,
+  IonToolbar,
   IonTitle,
   IonButton,
   IonCard,
@@ -13,7 +13,7 @@ import {
   IonCardContent,
   IonIcon,
   Platform,
-  ToastController
+  ToastController,
 } from '@ionic/angular/standalone';
 import { AuthService } from '../../core/services/auth.service';
 import { ClubContextService } from '../../core/services/club-context.service';
@@ -37,8 +37,8 @@ import { environment } from '../../../environments/environment';
     IonCardHeader,
     IonCardTitle,
     IonCardContent,
-    IonIcon
-  ]
+    IonIcon,
+  ],
 })
 export class LoginPage implements OnInit {
   error: string | null = null;
@@ -51,17 +51,18 @@ export class LoginPage implements OnInit {
     private toastController: ToastController,
     private clubContext: ClubContextService
   ) {
-    addIcons({ 
+    addIcons({
       logoGoogle,
-      personCircleOutline 
+      personCircleOutline,
     });
   }
 
   async ngOnInit() {
+    console.log('Login component initialized');
     try {
-            this.platform.ready().then(async () => {
-      await this.initializeAuth();
-            });
+      this.platform.ready().then(async () => {
+        await this.initializeAuth();
+      });
     } catch (error) {
       console.error('Login initialization failed:', error);
       this.error = 'Failed to initialize login. Please try again later.';
@@ -69,9 +70,11 @@ export class LoginPage implements OnInit {
   }
 
   private async initializeAuth() {
+    console.log('Initializing authentication...');
     const initialized = await this.authService.initGoogleAuth();
     if (!initialized) {
-      this.error = 'Failed to initialize authentication. Please check your internet connection and try again.';
+      this.error =
+        'Failed to initialize authentication. Please check your internet connection and try again.';
     }
   }
 
@@ -91,7 +94,8 @@ export class LoginPage implements OnInit {
       }
     } catch (error) {
       console.error('Login error:', error);
-      this.error = 'Authentication failed. Please ensure you grant all required permissions.';
+      this.error =
+        'Authentication failed. Please ensure you grant all required permissions.';
       await this.showErrorToast('Authentication failed. Please try again.');
     }
   }
@@ -101,7 +105,7 @@ export class LoginPage implements OnInit {
       message,
       duration: 3000,
       color: 'danger',
-      position: 'bottom'
+      position: 'bottom',
     });
     await toast.present();
   }

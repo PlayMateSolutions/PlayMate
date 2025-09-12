@@ -107,13 +107,14 @@ export class AppComponent implements OnInit {
           if (!existingClubId && !currentUrl.includes('/settings')) {
             // No club ID set and not on asettings page, go to settings
             await this.router.navigate(['/settings']);
+          } else {
+            // Have active session and club ID
+            // Refresh all data on app launch
+            this.refreshAll();
           }
         });
       }
     });
-
-    // Refresh all data on app launch
-    this.refreshAll();
   }
 
   async showProfileMenu(event: Event) {

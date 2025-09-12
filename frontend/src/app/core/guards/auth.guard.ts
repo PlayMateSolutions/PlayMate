@@ -18,8 +18,10 @@ export class AuthGuard implements CanActivate {
       map(isAuthenticated => {
         if (!isAuthenticated) {
           this.router.navigate(['/login']);
+          console.log('User is not authenticated, redirecting to login page.');
           return false;
         }
+        console.log('User is authenticated, access granted.');
         return true;
       })
     );
