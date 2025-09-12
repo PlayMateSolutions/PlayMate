@@ -58,6 +58,8 @@ function handleRequest(e, method) {
 
     // List of public actions that only need basic auth token
     const publicActions = ["getMember"];
+    // for certain actions like the bulk attendance, i don't care about the token expiry
+    const ignoreTokenExpiry = ["recordBulkAttendance", "getMembers"].concat(action);
     if (!publicActions.includes(action)) {
       const token = getBearerToken(e);
       Logger.log("token " + token);
@@ -72,7 +74,7 @@ function handleRequest(e, method) {
       } else {
         spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
       }
-      authResult = authorizeUserWithSheet(token, spreadsheet, sportsClubId);
+      authResult = authorizeUserWithSheet(token, spreadsheet, ignoreTokenExpiry, sportsClubId);
       if (!authResult.success) {
         return createErrorResponse(authResult.message, 403);
       }
@@ -288,7 +290,7 @@ function validateAuthToken(token) {
  * @param {string} sportsClubId - Optional sports club ID
  * @return {Object} { success: boolean, userEmail?: string, message?: string }
  */
-function validateJwtToken(token) {
+function validateJwtToken(token, ignoreTokenExpiry = false) {
   Logger.log("Validating JWT token: " + token);
   try {
     // Split the JWT token into parts
@@ -310,10 +312,12 @@ function validateJwtToken(token) {
       // Commenting out expiration check for testing
       // In the frontend, there is an issue with token expiry handling
       // Temporarily allowing expired tokens for testing purposes
-      logger.log(
+      Logger.log(
         "Token expired at: " + new Date(payload.exp * 1000).toISOString()
       );
-      //return { valid: false, error: "Token has expired" };
+      if (!ignoreTokenExpiry) {
+        return { valid: false, error: "Token has expired" };
+      }
     }
 
     // Verify issuer (optional)
@@ -334,9 +338,9 @@ function validateJwtToken(token) {
   }
 }
 
-function authorizeUserWithSheet(token, spreadsheet, sportsClubId = null) {
+function authorizeUserWithSheet(token, spreadsheet, ignoreTokenExpiry, sportsClubId = null) {
   // Try JWT validation first
-  let tokenValidation = validateJwtToken(token);
+  let tokenValidation = validateJwtToken(token, ignoreTokenExpiry);
 
   // If JWT validation fails, fallback to OAuth validation
   if (!tokenValidation.valid) {
