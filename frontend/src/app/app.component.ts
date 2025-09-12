@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ClubContextService } from './core/services/club-context.service';
-import { IonApp, IonRouterOutlet, IonAvatar, IonIcon, IonButton, IonButtons, MenuController } from '@ionic/angular/standalone';
+import { IonApp, IonRouterOutlet, IonAvatar, IonIcon, IonButton, IonButtons, MenuController, IonLoading } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { MenuComponent } from './core/components/menu.component';
@@ -19,6 +19,7 @@ import { SocialLogin } from '@capgo/capacitor-social-login';
 import { MemberService } from './features/members/services/member.service';
 import { AttendanceService } from './features/attendance/services/attendance.service';
 import { PaymentService } from './features/payments/payment.service';
+import { AppRefresherService } from './core/services/app-refresher.service';
 
 @Component({
   selector: 'app-root',
@@ -33,7 +34,8 @@ import { PaymentService } from './features/payments/payment.service';
     IonButton,
     IonButtons,
     HttpClientModule,
-    MenuComponent
+    MenuComponent,
+    IonLoading
   ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
@@ -42,6 +44,7 @@ import { PaymentService } from './features/payments/payment.service';
 })
 export class AppComponent implements OnInit {
   userSession$: Observable<UserSession | null>;
+  loading: boolean = false;
 
   constructor(
     private authService: AuthService,
@@ -51,13 +54,16 @@ export class AppComponent implements OnInit {
     private clubContext: ClubContextService,
     private memberService: MemberService,
     private attendanceService: AttendanceService,
-    private paymentService: PaymentService
+    private paymentService: PaymentService,
+    private appRefresher: AppRefresherService
   ) {
     addIcons({ personCircleOutline, logOutOutline });
     this.userSession$ = this.authService.userSession$;
+    this.appRefresher.refreshAll = this.refreshAll.bind(this);
   }
 
-  private refreshAll() {
+  private async refreshAll(): Promise<void> {
+    this.loading = true;
     // Only refresh members if last refresh was more than 12 hours ago
     const lastMemberRefresh = this.clubContext.getLastMemberRefresh();
     const now = new Date();
@@ -65,14 +71,27 @@ export class AppComponent implements OnInit {
     console.log('[AppComponent] Last member refresh:', lastMemberRefresh);
     if (!lastMemberRefresh || (now.getTime() - new Date(lastMemberRefresh).getTime()) > twelveHours) {
       console.log('[AppComponent] Refreshing members (last refresh > 12h or never)');
-      this.memberService.refreshMembers().subscribe({
-        next: () => {
-          console.log('[AppComponent] Members refreshed, now refreshing attendance and payments in parallel');
-          this.attendanceService.refreshData().catch(err => console.error('Error refreshing attendance:', err));
-          this.paymentService.refreshData().catch(err => console.error('Error refreshing payments:', err));
-        },
-        error: err => console.error('Error refreshing members:', err)
+      await new Promise<void>((resolve) => {
+        this.memberService.refreshMembers().subscribe({
+          next: () => {
+            console.log('[AppComponent] Members refreshed, now refreshing attendance and payments in parallel');
+            Promise.all([
+              this.attendanceService.refreshData().catch(err => console.error('Error refreshing attendance:', err)),
+              this.paymentService.refreshData().catch(err => console.error('Error refreshing payments:', err))
+            ]).finally(() => {
+              this.loading = false;
+              resolve();
+            });
+          },
+          error: err => {
+            console.error('Error refreshing members:', err);
+            this.loading = false;
+            resolve();
+          }
+        });
       });
+    } else {
+      this.loading = false;
     }
   }
 

@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { 
+import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import {
   ToastController,
   IonHeader,
   IonToolbar,
@@ -19,7 +19,7 @@ import {
   IonToggle,
   IonSelect,
   IonSelectOption,
-  IonAvatar
+  IonAvatar,
 } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -27,11 +27,15 @@ import { ClubContextService } from '../../core/services/club-context.service';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { PlayMateDB } from '../../core/services/playmate-db';
+import { ApiService } from '../../core/services/api.service';
+import { addIcons } from 'ionicons';
+import { saveOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.page.html',
   standalone: true,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [
     CommonModule,
     FormsModule,
@@ -53,12 +57,13 @@ import { PlayMateDB } from '../../core/services/playmate-db';
     IonToggle,
     IonSelect,
     IonSelectOption,
-    IonAvatar
-  ]
+    IonAvatar,
+  ],
 })
 export class SettingsPage implements OnInit {
   sportsClubId: string = '';
   hasChanges: boolean = false;
+  loading: boolean = false; // Indicates API call loading state
   darkMode: boolean = false;
   language: string = 'en';
   userEmail: string = '';
@@ -69,7 +74,8 @@ export class SettingsPage implements OnInit {
     private clubContext: ClubContextService,
     private toastCtrl: ToastController,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private apiService: ApiService
   ) {
     // Get the stored theme preference or system preference
     this.darkMode = document.body.classList.contains('dark-theme');
@@ -81,13 +87,14 @@ export class SettingsPage implements OnInit {
     // Load Sports Club ID
     const storedClubId = this.clubContext.getSportsClubId();
     this.sportsClubId = storedClubId || '';
-    
+
     // Load user info
     this.loadUserInfo();
+    addIcons({ saveOutline });
   }
 
   loadUserInfo() {
-    this.authService.userSession$.subscribe(session => {
+    this.authService.userSession$.subscribe((session) => {
       if (session) {
         this.userEmail = session.email;
         this.userName = session.name;
@@ -101,22 +108,70 @@ export class SettingsPage implements OnInit {
   }
 
   async saveSettings() {
-    if (this.sportsClubId.trim()) {
-      this.clubContext.setSportsClubId(this.sportsClubId.trim());
-      const toast = await this.toastCtrl.create({
-        message: 'Settings saved successfully!',
-        duration: 1500,
-        color: 'success'
-      });
-      await toast.present();
-      this.hasChanges = false;
+    this.loading = true;
+    const trimmedClubId = this.sportsClubId.trim();
+    const currentClubId = this.clubContext.getSportsClubId() || '';
+    if (trimmedClubId) {
+      // Only validate with server if club ID has changed
+      if (trimmedClubId !== currentClubId) {
+        try {
+          const response = await this.apiService.get<any>(
+            'getSportsClubById',
+            trimmedClubId
+          );
+          console.log('Club ID validation response:', response);
+          if (
+            response.status === 'success' &&
+            response.data &&
+            response.data.active
+          ) {
+            this.clubContext.setSportsClubId(trimmedClubId);
+            const toast = await this.toastCtrl.create({
+              message: 'Settings saved successfully!',
+              duration: 1500,
+              color: 'success',
+            });
+            await toast.present();
+            this.hasChanges = false;
+          } else {
+            const toast = await this.toastCtrl.create({
+              message: 'Invalid or inactive Sports Club ID.',
+              duration: 1500,
+              color: 'danger',
+            });
+            await toast.present();
+          }
+        } catch (err) {
+          console.error('Error validating club ID:', err);
+          const toast = await this.toastCtrl.create({
+            message: 'Failed to validate Sports Club ID. Please try again.',
+            duration: 1500,
+            color: 'danger',
+          });
+          await toast.present();
+        } finally {
+          this.loading = false;
+        }
+      } else {
+        // No change, just save
+        this.clubContext.setSportsClubId(trimmedClubId);
+        const toast = await this.toastCtrl.create({
+          message: 'Settings saved successfully!',
+          duration: 1500,
+          color: 'success',
+        });
+        await toast.present();
+        this.hasChanges = false;
+        this.loading = false;
+      }
     } else {
       const toast = await this.toastCtrl.create({
         message: 'Please enter a valid Sports Club ID.',
         duration: 1500,
-        color: 'danger'
+        color: 'danger',
       });
       toast.present();
+      this.loading = false;
     }
   }
 
@@ -131,7 +186,9 @@ export class SettingsPage implements OnInit {
   }
 
   async logout() {
-    const confirmed = window.confirm('Are you sure you want to logout? This will delete all your local PlayMate data.');
+    const confirmed = window.confirm(
+      'Are you sure you want to logout? This will delete all your local PlayMate data.'
+    );
     if (!confirmed) return;
     try {
       // Clear auth session
@@ -155,7 +212,7 @@ export class SettingsPage implements OnInit {
       const toast = await this.toastCtrl.create({
         message: 'Error during logout. Please try again.',
         duration: 2000,
-        color: 'danger'
+        color: 'danger',
       });
       await toast.present();
     }

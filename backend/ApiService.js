@@ -13,12 +13,12 @@ const LOCK = LockService.getScriptLock();
  * Initialize the web app service
  */
 function doGet(e) {
-  console.log('received get request')
-  return handleRequest(e, 'GET');
+  console.log("received get request");
+  return handleRequest(e, "GET");
 }
 
 function doPost(e) {
-  return handleRequest(e, 'POST');
+  return handleRequest(e, "POST");
 }
 
 /**
@@ -34,22 +34,22 @@ function handleRequest(e, method) {
     Logger.log(method);
     Logger.log(JSON.stringify(e));
 
-    if (method === 'POST' && e.parameter) {
+    if (method === "POST" && e.parameter) {
       // const request = JSON.parse(e.postData.contents);
       const request = e.parameter;
       action = request.action;
       sportsClubId = request.sportsClubId;
       payload = JSON.parse(e.postData.contents) || {};
-    } else if (method === 'GET' && e.parameter) {
+    } else if (method === "GET" && e.parameter) {
       const request = e.parameter;
-      Logger.log('GET parameter: ' + request);
-      Logger.log('GET request: ' + JSON.stringify(request));
+      Logger.log("GET parameter: " + request);
+      Logger.log("GET request: " + JSON.stringify(request));
       action = request.action;
       sportsClubId = request.sportsClubId;
       payload = request ?? {};
-      Logger.log('GET request payload: ' + JSON.stringify(payload));
+      Logger.log("GET request payload: " + JSON.stringify(payload));
     } else {
-      return createErrorResponse('Invalid request format', 400);
+      return createErrorResponse("Invalid request format", 400);
     }
 
     let spreadsheet = null;
@@ -60,11 +60,14 @@ function handleRequest(e, method) {
     const publicActions = ["getMember"];
     if (!publicActions.includes(action)) {
       const token = getBearerToken(e);
-      Logger.log('token ' + token)
+      Logger.log("token " + token);
       if (sportsClubId) {
         spreadsheet = getSpreadsheetByClubId(sportsClubId);
         if (!spreadsheet) {
-          return createErrorResponse(`Sports club not found: ${sportsClubId}`, 404);
+          return createErrorResponse(
+            `Sports club not found: ${sportsClubId}`,
+            404
+          );
         }
       } else {
         spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
@@ -80,7 +83,7 @@ function handleRequest(e, method) {
     payload.context = {
       spreadsheet,
       userEmail,
-      sportsClubId
+      sportsClubId,
     };
 
     // Route the request to the appropriate handler based on the action
@@ -148,8 +151,8 @@ function handleRequest(e, method) {
       case "getSportsClubs":
         result = handleGetSportsClubs(payload);
         break;
-      case "getSportsClub":
-        result = handleGetSportsClub(payload);
+      case "getSportsClubById":
+        result = handleGetSportsClubById(payload);
         break;
       case "addSportsClub":
         result = handleAddSportsClub(payload);
@@ -165,30 +168,32 @@ function handleRequest(e, method) {
 
     // Return successful response
     return createSuccessResponse(result);
-/**
- * Handle bulk attendance request
- * @param {Object} payload - Should contain attendanceList: Array<Object>
- * @return {Object} Summary of results
- */
-function handleRecordBulkAttendance(payload) {
-  if (!Array.isArray(payload.attendanceList)) {
-    throw new Error("attendanceList (array) is required");
-  }
+    /**
+     * Handle bulk attendance request
+     * @param {Object} payload - Should contain attendanceList: Array<Object>
+     * @return {Object} Summary of results
+     */
+    function handleRecordBulkAttendance(payload) {
+      if (!Array.isArray(payload.attendanceList)) {
+        throw new Error("attendanceList (array) is required");
+      }
 
-  // Try to acquire lock to prevent concurrent writes
-  if (!LOCK.tryLock(10000)) {
-    throw new Error("Failed to acquire lock. The system is busy. Please try again.");
-  }
+      // Try to acquire lock to prevent concurrent writes
+      if (!LOCK.tryLock(10000)) {
+        throw new Error(
+          "Failed to acquire lock. The system is busy. Please try again."
+        );
+      }
 
-  try {
-    // Pass context to each record
-    const context = payload.context;
-    const results = recordBulkAttendance(payload.attendanceList, context);
-    return results;
-  } finally {
-    LOCK.releaseLock();
-  }
-}
+      try {
+        // Pass context to each record
+        const context = payload.context;
+        const results = recordBulkAttendance(payload.attendanceList, context);
+        return results;
+      } finally {
+        LOCK.releaseLock();
+      }
+    }
   } catch (error) {
     // Log the error and return an error response
     console.error("API error:", error);
@@ -196,10 +201,9 @@ function handleRecordBulkAttendance(payload) {
   }
 }
 
-
 function getBearerToken(e) {
   try {
-    Logger.log(e)
+    Logger.log(e);
     var headers = e.parameter; // Google Apps Script does not provide a direct headers object
     if (!headers) {
       headers = e;
@@ -288,23 +292,27 @@ function validateJwtToken(token) {
   Logger.log("Validating JWT token: " + token);
   try {
     // Split the JWT token into parts
-    const parts = token.split('.');
+    const parts = token.split(".");
     if (parts.length !== 3) {
       return { valid: false, error: "Invalid token format" };
     }
 
     // Decode the payload (middle part) using Apps Script utilities
-    var decodedBytes = Utilities.base64Decode(parts[1].replace(/-/g, '+').replace(/_/g, '/'));
+    var decodedBytes = Utilities.base64Decode(
+      parts[1].replace(/-/g, "+").replace(/_/g, "/")
+    );
     var payloadStr = Utilities.newBlob(decodedBytes).getDataAsString();
     var payload = JSON.parse(payloadStr);
-    
+
     // Check token expiration
     const now = Math.floor(Date.now() / 1000);
     if (payload.exp && payload.exp < now) {
       // Commenting out expiration check for testing
       // In the frontend, there is an issue with token expiry handling
       // Temporarily allowing expired tokens for testing purposes
-      logger.log("Token expired at: " + new Date(payload.exp * 1000).toISOString());
+      logger.log(
+        "Token expired at: " + new Date(payload.exp * 1000).toISOString()
+      );
       //return { valid: false, error: "Token has expired" };
     }
 
@@ -318,7 +326,7 @@ function validateJwtToken(token) {
       valid: true,
       email: payload.email,
       name: payload.name,
-      expires_in: payload.exp ? (payload.exp - now) : null
+      expires_in: payload.exp ? payload.exp - now : null,
     };
   } catch (error) {
     Logger.log("Error validating JWT token: " + error);
@@ -329,12 +337,12 @@ function validateJwtToken(token) {
 function authorizeUserWithSheet(token, spreadsheet, sportsClubId = null) {
   // Try JWT validation first
   let tokenValidation = validateJwtToken(token);
-  
+
   // If JWT validation fails, fallback to OAuth validation
   if (!tokenValidation.valid) {
     tokenValidation = validateOAuthToken(token);
   }
-  
+
   if (!tokenValidation.valid) {
     return {
       success: false,
@@ -356,7 +364,7 @@ function authorizeUserWithSheet(token, spreadsheet, sportsClubId = null) {
     // Club access validated, no need to check spreadsheet access
     return { success: true, userEmail };
   }
-  
+
   // No sportsClubId provided, fall back to spreadsheet access check
   const viewers = spreadsheet.getViewers().map((user) => user.getEmail());
   const editors = spreadsheet.getEditors().map((user) => user.getEmail());
@@ -371,14 +379,16 @@ function authorizeUserWithSheet(token, spreadsheet, sportsClubId = null) {
 
 function validateOAuthToken(token) {
   Logger.log("Validating OAuth token: " + token);
-  var url =
-    "https://www.googleapis.com/oauth2/v3/tokeninfo";
+  var url = "https://www.googleapis.com/oauth2/v3/tokeninfo";
 
   try {
     var options = {
-      muteHttpExceptions: true
+      muteHttpExceptions: true,
     };
-    var response = UrlFetchApp.fetch(url + "?access_token=" + encodeURIComponent(token), options);
+    var response = UrlFetchApp.fetch(
+      url + "?access_token=" + encodeURIComponent(token),
+      options
+    );
     var responseCode = response.getResponseCode();
     var json = {};
     try {
@@ -391,7 +401,10 @@ function validateOAuthToken(token) {
 
     if (responseCode !== 200) {
       Logger.log("Invalid Token: HTTP " + responseCode);
-      return { valid: false, error: (json.error_description || json.error || ("HTTP " + responseCode)) };
+      return {
+        valid: false,
+        error: json.error_description || json.error || "HTTP " + responseCode,
+      };
     }
 
     if (json.error) {
@@ -473,7 +486,7 @@ function handleAddMember(payload) {
  * @param {Object} payload - Updated member data with memberId
  * @return {Object} Result indicating success
  */
-function handleUpdateMember(payload) {  
+function handleUpdateMember(payload) {
   // Try to acquire lock to prevent concurrent writes
   if (!LOCK.tryLock(10000)) {
     throw new Error(
@@ -508,7 +521,7 @@ function handleGetAttendance(payload) {
   // Merge filters with the context to ensure spreadsheet is available
   return getAttendanceRecords({
     ...payload,
-    context: payload.context
+    context: payload.context,
   });
 }
 
@@ -545,9 +558,9 @@ function handleRecordPayment(payload) {
  * @return {Object} List of payment records
  */
 function handleGetPayments(payload) {
-   return getPaymentRecords({
+  return getPaymentRecords({
     ...payload,
-    context: payload.context
+    context: payload.context,
   });
 }
 
@@ -734,10 +747,10 @@ function handleGetSportsClubs(payload) {
     const clubs = getAllSportsClubs();
     return {
       success: true,
-      clubs: clubs
+      clubs: clubs,
     };
   } catch (e) {
-    throw new Error('Failed to get sports clubs: ' + e.message);
+    throw new Error("Failed to get sports clubs: " + e.message);
   }
 }
 
@@ -747,19 +760,14 @@ function handleGetSportsClubs(payload) {
  * @param {Object} payload - Request payload with sportsClubId
  * @return {Object} Response object with club data
  */
-function handleGetSportsClub(payload) {
-  try {
-    const club = getClubById(payload.sportsClubId);
-    if (!club) {
-      throw new Error('Sports club not found');
-    }
-    return {
-      success: true,
-      club: club
-    };
-  } catch (e) {
-    throw new Error('Failed to get sports club: ' + e.message);
+function handleGetSportsClubById(payload) {
+  Logger.log("handleGetSportsClubById - Payload: " + JSON.stringify(payload));
+  // Validations and authorizations are already handled before this function is called
+  var club = getClubById(payload.sportsClubId);
+  if (!club) {
+    throw new Error("Sports club not found");
   }
+  return club;
 }
 
 /**
@@ -772,14 +780,14 @@ function handleAddSportsClub(payload) {
   try {
     const clubId = addSportsClub(payload.clubData);
     if (!clubId) {
-      throw new Error('Failed to create sports club');
+      throw new Error("Failed to create sports club");
     }
     return {
       success: true,
-      clubId: clubId
+      clubId: clubId,
     };
   } catch (e) {
-    throw new Error('Failed to add sports club: ' + e.message);
+    throw new Error("Failed to add sports club: " + e.message);
   }
 }
 
@@ -793,12 +801,12 @@ function handleUpdateSportsClub(payload) {
   try {
     const success = updateSportsClub(payload.sportsClubId, payload.clubData);
     if (!success) {
-      throw new Error('Sports club not found');
+      throw new Error("Sports club not found");
     }
     return {
-      success: true
+      success: true,
     };
   } catch (e) {
-    throw new Error('Failed to update sports club: ' + e.message);
+    throw new Error("Failed to update sports club: " + e.message);
   }
 }

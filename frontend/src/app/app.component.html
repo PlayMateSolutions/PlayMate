@@ -1,6 +1,13 @@
 <ion-app>
   <app-menu></app-menu>
   <ion-router-outlet id="main-content"></ion-router-outlet>
+  <ion-loading
+    *ngIf="loading"
+    [isOpen]="loading"
+    message="Refreshing data..."
+    spinner="crescent"
+    backdropDismiss="false">
+  </ion-loading>
 </ion-app>
 
 <!-- Add this to each page's toolbar where you want to show the user profile -->

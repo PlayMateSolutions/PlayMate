@@ -17,6 +17,7 @@ import {
 } from '@ionic/angular/standalone';
 import { AuthService } from '../../core/services/auth.service';
 import { ClubContextService } from '../../core/services/club-context.service';
+import { AppRefresherService } from '../../core/services/app-refresher.service';
 import { addIcons } from 'ionicons';
 import { logoGoogle, personCircleOutline } from 'ionicons/icons';
 import { environment } from '../../../environments/environment';
@@ -49,7 +50,8 @@ export class LoginPage implements OnInit {
     private platform: Platform,
     private zone: NgZone,
     private toastController: ToastController,
-    private clubContext: ClubContextService
+    private clubContext: ClubContextService,
+    private appRefresher: AppRefresherService
   ) {
     addIcons({
       logoGoogle,
@@ -85,6 +87,9 @@ export class LoginPage implements OnInit {
       if (success) {
         // Check if club context is set, if not go to settings first
         if (this.clubContext.getSportsClubId()) {
+          if (this.appRefresher.refreshAll) {
+            await this.appRefresher.refreshAll();
+          }
           await this.router.navigate(['/tabs']);
         } else {
           await this.router.navigate(['/settings']);

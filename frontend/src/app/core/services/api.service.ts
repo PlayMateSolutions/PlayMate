@@ -5,54 +5,68 @@ import { environment } from '../../../environments/environment';
 import { AuthService } from './auth.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ApiService {
   private apiUrl = environment.apiUrl;
 
-  constructor(
-    private http: HttpClient,
-    private authService: AuthService
-  ) { }
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
   private async getHeaders(): Promise<HttpHeaders> {
     let headers = new HttpHeaders({
-      'Content-Type': 'text/plain;charset=utf-8'
+      'Content-Type': 'text/plain;charset=utf-8',
     });
-    
+
     const token = await this.authService.getAuthToken();
     if (token) {
       headers = headers.set('Authorization', `Bearer ${token}`);
     }
-    
+
     return headers;
   }
 
   /**
    * Make a GET request to the API
    */
-  async get<T>(action: string, payload: any = {}): Promise<Observable<T>> {
-    const headers = await this.getHeaders();
-    const params = new HttpParams()
-      .set('action', action)
-      .set('payload', JSON.stringify(payload));
+  async get<T>(
+    action: string,
+    clubId: string,
+    extraParams: { [key: string]: string } = {}
+  ): Promise<T> {
+    const token = await this.authService.getAuthToken();
 
-    return this.http.get<T>(this.apiUrl, {
-      headers,
-      params
+    var params = new HttpParams()
+      .set('sportsClubId', clubId)
+      .set('action', action)
+      .set('authorization', token ? 'Bearer ' + token : '');
+    for (const key of Object.keys(extraParams)) {
+      params = params.set(key, extraParams[key]);
+    }
+
+    const headers = new HttpHeaders({
+      'Content-Type': 'text/plain;charset=utf-8',
     });
+
+    const options = {
+      headers,
+      params,
+      responseType: 'json' as const,
+      observe: 'body' as const,
+    };
+
+    return firstValueFrom(
+      this.http.get<T>(this.apiUrl, options)
+    );
   }
 
   /**
    * Make a POST request to the API
    */
-  async post<T>(action: string, data: any = {}): Promise<Observable<T>> {
+  async post<T>(action: string, data: any = {}): Promise<T> {
     const headers = await this.getHeaders();
-    const payload = {
-      action,
-      data
-    };
-
-    return this.http.post<T>(this.apiUrl, JSON.stringify(payload), { headers });
+    const payload = { action, data };
+    return firstValueFrom(
+      this.http.post<T>(this.apiUrl, JSON.stringify(payload), { headers })
+    );
   }
 }
