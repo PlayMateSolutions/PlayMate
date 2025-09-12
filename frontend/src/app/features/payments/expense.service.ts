@@ -4,6 +4,8 @@ import { Expense } from './expense.interface';
 import { ExpenseDB } from './expense-db';
 import { ApiService } from '../../core/services/api.service';
 import { ClubContextService } from '../../core/services/club-context.service';
+import { AuthService } from 'src/app/core/services/auth.service';
+import { HttpHeaders, HttpParams } from '@angular/common/http';
 
 @Injectable({ providedIn: 'root' })
 export class ExpenseService {
@@ -12,7 +14,11 @@ export class ExpenseService {
   private loadingSubject = new BehaviorSubject<boolean>(false);
   loading$ = this.loadingSubject.asObservable();
 
-  constructor(private api: ApiService, private clubContext: ClubContextService) {}
+  constructor(
+    private api: ApiService,
+    private clubContext: ClubContextService,
+    private authService: AuthService
+  ) {}
 
   async loadCachedData() {
     try {
@@ -52,7 +58,7 @@ export class ExpenseService {
 
   async addExpense(expense: Partial<Expense>): Promise<void> {
     // Generate a unique id for the expense
-    const id = 'E' + Date.now();
+    const id = '0';
     const newExpense: Expense = {
       id,
       date: expense.date || new Date().toISOString(),
@@ -62,8 +68,16 @@ export class ExpenseService {
       paymentType: 'Cash',
       recordedBy: expense.recordedBy || '',
       payee: expense.payee || '',
-      transactionId: expense.transactionId || ''
+      transactionId: expense.transactionId || '',
     };
+
+    const result = await this.api.post<any>('recordExpense', newExpense);
+
+    if (result.status === 'error') {
+      throw new Error(result.error?.message || 'Failed to record expense');
+    }
+
+    // --- End API call ---
     await ExpenseDB.addRecords([newExpense]);
     // Update local cache
     const all = await ExpenseDB.getAll();

@@ -25,7 +25,8 @@ import {
   refresh, 
   wallet, 
   calendar, 
-  chevronForwardOutline 
+  chevronForwardOutline,
+  add
 } from 'ionicons/icons';
 
 // Initialize icons
@@ -33,7 +34,8 @@ addIcons({
   refresh, 
   wallet, 
   calendar, 
-  chevronForwardOutline 
+  chevronForwardOutline,
+  add
 });
 import { GoogleChart, ChartType } from 'angular-google-charts';
 import { ClubContextService } from '../../core/services/club-context.service';

@@ -39,8 +39,14 @@
       <ion-input [value]="currentUser" readonly></ion-input>
     </ion-item>
   </ion-list>
+  <div *ngIf="errorMsg" class="ion-text-center ion-padding">
+    <ion-label color="danger">{{ errorMsg }}</ion-label>
+  </div>
   <div class="ion-padding">
-    <ion-button expand="block" (click)="save()" [disabled]="saving || !expense.amount || !expense.category">Log Expense</ion-button>
+    <ion-button expand="block" (click)="save()" [disabled]="saving || !expense.amount || !expense.category">
+      <ion-spinner *ngIf="saving" name="dots" slot="start"></ion-spinner>
+      Log Expense
+    </ion-button>
     <ion-button expand="block" fill="clear" color="medium" (click)="dismiss()">Cancel</ion-button>
   </div>
 </ion-content>
