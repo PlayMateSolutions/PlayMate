@@ -25,8 +25,8 @@
   <!-- Stats Cards -->
   <div class="stats-grid" *ngIf="!(loading$ | async)">
     <!-- Total Earnings Card -->
-    <div class="stat-card" [routerLink]="['list']">
-      <div class="stat-icon total-earnings">
+    <div class="stat-card earnings-card" [routerLink]="['list']">
+      <div class="stat-icon total-earnings" style="background:#2dd36f; color:#fff;">
         <ion-icon name="wallet"></ion-icon>
       </div>
       <div class="stat-label">Total Earnings</div>
@@ -34,13 +34,12 @@
       <div class="stat-subtext">{{ (summary$ | async)?.totalPayments || 0 }} total payments</div>
       <div class="view-details">
         <ion-icon name="chevron-forward-outline" size="small"></ion-icon>
-        <small>View All</small>
       </div>
     </div>
     
     <!-- Monthly Earnings Card -->
-    <div class="stat-card">
-      <div class="stat-icon monthly-earnings">
+    <div class="stat-card earnings-card">
+      <div class="stat-icon monthly-earnings" style="background:#2dd36f; color:#fff;">
         <ion-icon name="calendar"></ion-icon>
       </div>
       <div class="stat-label">This Month</div>
@@ -54,16 +53,19 @@
         <ion-icon name="wallet"></ion-icon>
       </div>
       <div class="stat-label">Total Expenses</div>
-      <div class="stat-value">₹{{ totalExpenses | number:'1.0-0' }}</div>
-      <div class="stat-subtext">All time</div>
+      <div class="stat-value expense-value">₹{{ totalExpenses | number:'1.0-0' }}</div>
+      <div class="stat-subtext">{{ expenses.length }} entries</div>
+      <div class="view-details">
+        <ion-icon name="chevron-forward-outline" size="small"></ion-icon>
+      </div>
     </div>
     <div class="stat-card expense-card">
       <div class="stat-icon" style="background:#eb445a; color:#fff;">
         <ion-icon name="calendar"></ion-icon>
       </div>
       <div class="stat-label">This Month's Expenses</div>
-      <div class="stat-value">₹{{ currentMonthExpenses | number:'1.0-0' }}</div>
-      <div class="stat-subtext">This month</div>
+      <div class="stat-value expense-value">₹{{ currentMonthExpenses | number:'1.0-0' }}</div>
+      <div class="stat-subtext">{{ currentMonthExpenseCount }} entries</div>
     </div>
   </div>
 

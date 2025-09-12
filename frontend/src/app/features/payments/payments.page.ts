@@ -110,6 +110,8 @@ export class PaymentsPage implements OnInit {
   expenses: Expense[] = [];
   totalExpenses = 0;
   currentMonthExpenses = 0;
+  currentMonthExpenseCount = 0;
+  today = new Date();
 
   constructor(
     private paymentService: PaymentService,
@@ -216,11 +218,13 @@ export class PaymentsPage implements OnInit {
     const currentMonth = new Date().toISOString().substring(0, 7);
     this.totalExpenses = 0;
     this.currentMonthExpenses = 0;
+    this.currentMonthExpenseCount = 0;
     this.expenses.forEach(exp => {
       this.totalExpenses += exp.amount;
       const monthKey = exp.date.substring(0, 7);
       if (monthKey === currentMonth) {
         this.currentMonthExpenses += exp.amount;
+        this.currentMonthExpenseCount++;
       }
     });
   }
