@@ -78,4 +78,14 @@ export class MemberDetailPage implements OnInit, OnDestroy {
   onTabChange(event: any) {
     this.selectedTab = event.detail.value;
   }
+
+  getAvatarColor(letter: string): string {
+    if (!letter || !/^[A-Za-z]$/.test(letter)) return '#888'; // fallback gray
+    const index = letter.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0);
+    if (index < 0 || index > 25) return '#888';
+    const hue = (index * (360 / 26)) % 360;
+    const saturation = 50; // percent
+    const lightness = 60; // percent
+    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+  }
 }

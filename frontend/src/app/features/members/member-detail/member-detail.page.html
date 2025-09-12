@@ -11,7 +11,9 @@
   <ion-card class="member-detail-card" [ngClass]="member.status ? member.status.toLowerCase() : ''">
     <ion-card-content class="card-content">
       <div class="member-info-row" style="display: flex; align-items: center;">
-        <div class="member-avatar" style="width:48px; height:48px; border-radius:50%; background:#3880ff; color:#fff; display:flex; align-items:center; justify-content:center; font-size:1.5em; font-weight:bold; margin-right:16px;">
+        <div class="member-avatar" 
+             [style.background]="getAvatarColor(member.firstName ? member.firstName.charAt(0) : '?')" 
+             style="width:48px; height:48px; border-radius:50%; color:#fff; display:flex; align-items:center; justify-content:center; font-size:1.5em; font-weight:bold; margin-right:16px;">
           {{ member.firstName ? member.firstName.charAt(0).toUpperCase() : '?' }}
         </div>
         <div class="member-info" style="flex:1;">

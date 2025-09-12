@@ -45,11 +45,16 @@ export class AuthService {
 
   private async loadSession() {
     const session = await this.storage.get(this.STORAGE_KEY);
+    if (session) {
+      console.log('Session found, expires:', new Date(session.expiresAt).toISOString());
+    } else {
+      console.log('No session found');
+    }
     if (session && session.expiresAt > Date.now()) {
       this._isAuthenticated.next(true);
       this._userSession.next(session);
     } else {
-      await this.storage.remove(this.STORAGE_KEY);
+      //await this.storage.remove(this.STORAGE_KEY);
       this._isAuthenticated.next(false);
       this._userSession.next(null);
     }
