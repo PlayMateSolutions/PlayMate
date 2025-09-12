@@ -73,11 +73,11 @@ export class PaymentsPage implements OnInit {
 
   // Chart related properties
   chartType = ChartType.LineChart;
-  chartColumns = ['Month', 'Amount', { type: 'string', role: 'tooltip' }];
+  chartColumns = ['Month', 'Payments', 'Expenses', { type: 'string', role: 'tooltip' }];
   chartData: any[][] = [];
   chartOptions = {
     backgroundColor: 'transparent',
-    colors: ['#2dd36f'], // success color
+    colors: ['#2dd36f', '#eb445a'], // success and danger colors
     chartArea: {
       left: 60,
       top: 20,
@@ -93,7 +93,7 @@ export class PaymentsPage implements OnInit {
       gridlines: { color: '#e0e0e0', count: 5 },
       minValue: 0
     },
-    legend: { position: 'none' },
+    legend: { position: 'top', alignment: 'center', textStyle: {color: '#666'} },
     animation: {
       startup: true,
       duration: 1000,
@@ -129,23 +129,30 @@ export class PaymentsPage implements OnInit {
       return;
     }
 
-    // Convert monthBreakdown to array and sort by month
-    const monthlyData = Object.entries(summary.monthBreakdown)
-      .map(([month, data]) => ({
-        month,
-        amount: data.amount,
-        count: data.count
-      }))
-      .sort((a, b) => a.month.localeCompare(b.month));
+    // Gather all months from payments and expenses
+    const paymentMonths = Object.keys(summary.monthBreakdown);
+    const expenseMonths = this.expenses.map(e => e.date.substring(0, 7));
+    const allMonthsSet = new Set([...paymentMonths, ...expenseMonths]);
+    const allMonths = Array.from(allMonthsSet).sort();
+
+    // Build expense totals by month
+    const expenseTotals: { [month: string]: number } = {};
+    this.expenses.forEach(e => {
+      const m = e.date.substring(0, 7);
+      expenseTotals[m] = (expenseTotals[m] || 0) + e.amount;
+    });
 
     // Create chart data array
-    this.chartData = monthlyData.map(data => {
-      const date = new Date(data.month + '-01');
+    this.chartData = allMonths.map(month => {
+      const date = new Date(month + '-01');
       const monthName = date.toLocaleString('default', { month: 'short', year: '2-digit' });
+      const paymentAmount = summary.monthBreakdown[month]?.amount || 0;
+      const expenseAmount = expenseTotals[month] || 0;
       return [
         monthName,
-        data.amount,
-        `${monthName}\nAmount: ₹${data.amount}\nPayments: ${data.count}`
+        paymentAmount,
+        expenseAmount,
+        `${monthName}\nExpenses: ₹${expenseAmount}`
       ];
     });
   }
