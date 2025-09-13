@@ -1,6 +1,6 @@
 {
-  "name": "PlayMate - Gym Management App",
-  "short_name": "PlayMate",
+  "name": "GymMate - Gym Management App",
+  "short_name": "GymMate",
   "description": "Professional gym and sports club management application",
   "start_url": "/",
   "display": "standalone",

@@ -1,10 +1,10 @@
-# PlayMate Frontend
+# GymMate Frontend
 
 A modern gym and sports club management application built with Ionic Angular.
 
-## 🏋️ About PlayMate
+## 🏋️ About GymMate
 
-PlayMate is a comprehensive gym management system designed to streamline operations for fitness centers and sports clubs. The application provides an intuitive interface for managing members, tracking attendance, handling payments, and configuring club settings.
+GymMate is a comprehensive gym management system designed to streamline operations for fitness centers and sports clubs. The application provides an intuitive interface for managing members, tracking attendance, handling payments, and configuring club settings.
 
 ## 🚀 Features
 
@@ -39,7 +39,7 @@ Before running this application, ensure you have:
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/jsramraj/PlayMate.git
+   git clone https://github.com/jsramraj/GymMate.git
    cd PlayMate/frontend
    ```
 

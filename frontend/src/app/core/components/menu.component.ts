@@ -24,7 +24,7 @@ addIcons({ peopleOutline, cashOutline, calendarOutline, settingsOutline });
     <ion-menu contentId="main-content">
       <ion-header>
         <ion-toolbar color="primary">
-          <ion-title>PlayMate</ion-title>
+          <ion-title>GymMate</ion-title>
         </ion-toolbar>
       </ion-header>
       <ion-content>

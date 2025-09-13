@@ -187,7 +187,7 @@ export class SettingsPage implements OnInit {
 
   async logout() {
     const confirmed = window.confirm(
-      'Are you sure you want to logout? This will delete all your local PlayMate data.'
+      'Are you sure you want to logout? This will delete all your local GymMate data.'
     );
     if (!confirmed) return;
     try {
