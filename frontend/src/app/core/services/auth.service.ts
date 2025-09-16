@@ -84,7 +84,7 @@ export class AuthService {
       const response = await SocialLogin.login({
         provider: 'google',
         options: {
-          scopes: ['email', 'profile', 'https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/script.external_request'],
+          scopes: ['email', 'profile', 'https://www.googleapis.com/auth/drive.file', 'https://www.googleapis.com/auth/script.external_request'],
         },
       });
 
