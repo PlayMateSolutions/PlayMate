@@ -43,10 +43,13 @@ export class AuthService {
     }
   }
 
-  private async loadSession() {
+  public async loadSession() {
     const session = await this.storage.get(this.STORAGE_KEY);
     if (session) {
-      console.log('Session found, expires:', new Date(session.expiresAt).toISOString());
+      console.log(
+        'Session found, expires:',
+        new Date(session.expiresAt).toISOString()
+      );
     } else {
       console.log('No session found');
     }
@@ -54,9 +57,7 @@ export class AuthService {
       this._isAuthenticated.next(true);
       this._userSession.next(session);
     } else {
-      //await this.storage.remove(this.STORAGE_KEY);
-      this._isAuthenticated.next(false);
-      this._userSession.next(null);
+      await this.renewSession();
     }
   }
 
@@ -84,8 +85,15 @@ export class AuthService {
       const response = await SocialLogin.login({
         provider: 'google',
         options: {
-          scopes: ['email', 'profile', 'https://www.googleapis.com/auth/drive.file', 'https://www.googleapis.com/auth/script.external_request'],
+          scopes: [
+            'email',
+            'profile',
+            'https://www.googleapis.com/auth/drive.file',
+            'https://www.googleapis.com/auth/spreadsheets',
+            'https://www.googleapis.com/auth/script.external_request',
+          ],
         },
+        
       });
 
       // Restore query params after login
@@ -156,6 +164,14 @@ export class AuthService {
     await this.storage.remove(this.STORAGE_KEY);
     this._isAuthenticated.next(false);
     this._userSession.next(null);
+  }
+
+  async renewSession() {
+    console.log('Renewing session...');
+
+    console.log('Is logged in ' + JSON.stringify(await SocialLogin.isLoggedIn({ provider: 'google' })));
+
+    return this.login();
   }
 
   async getAuthToken(): Promise<string | null> {

@@ -52,16 +52,17 @@ export class AppComponent implements OnInit {
     private popoverController: PopoverController,
     private route: ActivatedRoute,
     private clubContext: ClubContextService,
-    private memberService: MemberService,
-    private attendanceService: AttendanceService,
-    private paymentService: PaymentService,
-    private appRefresher: AppRefresherService
+    // private memberService: MemberService,
+    // private attendanceService: AttendanceService,
+    // private paymentService: PaymentService,
+    // private appRefresher: AppRefresherService
   ) {
     addIcons({ personCircleOutline, logOutOutline });
     this.userSession$ = this.authService.userSession$;
-    this.appRefresher.refreshAll = this.refreshAll.bind(this);
+    // this.appRefresher.refreshAll = this.refreshAll.bind(this);
   }
 
+  /*
   private async refreshAll(): Promise<void> {
     this.loading = true;
     // Only refresh members if last refresh was more than 12 hours ago
@@ -94,6 +95,7 @@ export class AppComponent implements OnInit {
       this.loading = false;
     }
   }
+    */
 
   async ngOnInit() {
     // Initialize Social Login
@@ -106,6 +108,10 @@ export class AppComponent implements OnInit {
     } catch (error) {
       console.error('Failed to initialize Social Login:', error);
     }
+
+    await this.authService.loadSession().catch(err => {
+      console.error('Error loading session on app init:', err);
+    });
 
     // Handle club context only after authentication is confirmed
     this.authService.isAuthenticated$.subscribe(async (isAuthenticated) => {
@@ -129,7 +135,8 @@ export class AppComponent implements OnInit {
           } else {
             // Have active session and club ID
             // Refresh all data on app launch
-            this.refreshAll();
+            console.log('Active session found, refreshing all data');
+            // this.refreshAll();
           }
         });
       }
