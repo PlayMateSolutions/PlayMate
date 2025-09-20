@@ -89,8 +89,8 @@ export class AuthService {
             'email',
             'profile',
             // 'https://www.googleapis.com/auth/drive.file',
-            'https://www.googleapis.com/auth/spreadsheets',
-            'https://www.googleapis.com/auth/script.external_request',
+            // 'https://www.googleapis.com/auth/spreadsheets',
+            // 'https://www.googleapis.com/auth/script.external_request',
           ],
         },
         
