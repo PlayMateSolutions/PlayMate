@@ -77,13 +77,11 @@ export class RecordPaymentComponent {
     
     // Set period start to first day of current month
     const startDate = new Date();
-    startDate.setDate(1);
     this.payment.periodStart = startDate.toISOString();
 
     // Set period end to last day of selected month
     const endDate = new Date(startDate);
     endDate.setMonth(endDate.getMonth() + 1);
-    endDate.setDate(0);
     this.payment.periodEnd = endDate.toISOString();
   }
 

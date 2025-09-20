@@ -286,8 +286,18 @@ export class MembersPage implements OnInit {
   }
 
   async sendPaymentReminder(member: Member) {
-    const expiryDate = this.formatDate(member.expiryDate);
-    const message = `Hi ${member.firstName}, your gym membership expires on ${expiryDate}. Please renew your membership to continue enjoying our services.`;
+    // Get language from club context, fallback to 'en'
+    const lang = this.clubContext.getLanguage ? this.clubContext.getLanguage() : 'en';
+    await this.translateService.use(lang);
+
+    const status = this.getMembershipStatus(member.expiryDate);
+    const params = {
+      name: member.firstName,
+      date: this.formatDate(member.expiryDate),
+      days: this.getRemainingDays(member.expiryDate).toString()
+    };
+    // Read the message template from translation files (en.json/ta.json)
+    const message = await this.translateService.get(`membership.${status}`, params).toPromise();
     const whatsappUrl = `https://wa.me/${member.phone}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_system');
   }

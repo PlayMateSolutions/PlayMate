@@ -182,7 +182,7 @@ export class SettingsPage implements OnInit {
 
   changeLanguage() {
     this.clubContext.setLanguage(this.language);
-    // You can add translation logic here
+    this.hasChanges = true;
   }
 
   async logout() {
