@@ -24,6 +24,9 @@ import { FormsModule } from '@angular/forms';
 import { Member } from '../../shared/interfaces/member.interface';
 import { CommonModule } from '@angular/common';
 import { PaymentService } from './services/payment.service';
+import { TranslateService } from '@ngx-translate/core';
+import { ClubContextService } from '../../core/services/club-context.service';
+import { formatDateHuman } from '../../shared/utils/date-utils';
 
 @Component({
   selector: 'app-record-payment',
@@ -69,7 +72,9 @@ export class RecordPaymentComponent {
   constructor(
     private modalCtrl: ModalController,
     private paymentService: PaymentService,
-    private loadingCtrl: LoadingController
+    private loadingCtrl: LoadingController,
+    private translateService: TranslateService,
+    private clubContext: ClubContextService
   ) {}
 
   ngOnInit() {
@@ -95,6 +100,22 @@ export class RecordPaymentComponent {
     );
   }
 
+  async sendPaymentStatusWhatsApp(member: Member, expiryDate: string) {
+    // Get language from club context, fallback to 'en'
+    const lang = this.clubContext.getLanguage ? this.clubContext.getLanguage() : 'en';
+    await this.translateService.use(lang);
+
+    // Use 'active' status for successful payment
+    const params = {
+      name: member.firstName,
+      date: formatDateHuman(expiryDate),
+      days: ''
+    };
+    const message = await this.translateService.get('membership.renewed', params).toPromise();
+    const whatsappUrl = `https://wa.me/${member.phone}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_system');
+  }
+
   async recordPayment() {
     if (!this.isValid()) {
       return;
@@ -114,6 +135,8 @@ export class RecordPaymentComponent {
           paymentId: response.data.paymentId,
           expiryDate: response.data.expiryDate
         });
+        // Open WhatsApp with payment status message
+        await this.sendPaymentStatusWhatsApp(this.member, response.data.expiryDate);
       } else {
         throw new Error(response?.error?.message || 'Failed to record payment');
       }

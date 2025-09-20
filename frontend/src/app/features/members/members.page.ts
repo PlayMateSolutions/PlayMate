@@ -53,6 +53,7 @@ import { addIcons } from 'ionicons';
 import { ClubContextService } from '../../core/services/club-context.service';
 import { RelativeTimePipe } from './relative-time.pipe';
 import { Router } from '@angular/router';
+import { formatDateHuman } from '../../shared/utils/date-utils';
 
 
 @Component({
@@ -251,18 +252,7 @@ export class MembersPage implements OnInit {
   }
 
   formatDate(date: string): string {
-    if (!date) return 'N/A';
-
-    try {
-      const dateObj = new Date(date);
-      return dateObj.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-      });
-    } catch (e) {
-      return date;
-    }
+    return formatDateHuman(date);
   }
 
   getRemainingDays(expiryDate: string): number {
@@ -293,7 +283,7 @@ export class MembersPage implements OnInit {
     const status = this.getMembershipStatus(member.expiryDate);
     const params = {
       name: member.firstName,
-      date: this.formatDate(member.expiryDate),
+      date: formatDateHuman(member.expiryDate),
       days: this.getRemainingDays(member.expiryDate).toString()
     };
     // Read the message template from translation files (en.json/ta.json)
@@ -415,7 +405,7 @@ export class MembersPage implements OnInit {
     const membershipStatus = this.getMembershipStatus(member.expiryDate);
     const params = {
       name: `${member.firstName} ${member.lastName}`,
-      date: this.formatDate(member.expiryDate),
+      date: formatDateHuman(member.expiryDate),
       days: this.getRemainingDays(member.expiryDate).toString()
     };
     
