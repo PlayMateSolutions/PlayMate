@@ -57,7 +57,7 @@ export class AuthService {
       this._isAuthenticated.next(true);
       this._userSession.next(session);
     } else {
-      await this.renewSession();
+      // await this.renewSession();
     }
   }
 
@@ -88,7 +88,9 @@ export class AuthService {
           scopes: [
             'email',
             'profile',
-            'https://www.googleapis.com/auth/drive.file'
+            // 'https://www.googleapis.com/auth/drive.file',
+            'https://www.googleapis.com/auth/spreadsheets',
+            'https://www.googleapis.com/auth/script.external_request',
           ],
         },
         
