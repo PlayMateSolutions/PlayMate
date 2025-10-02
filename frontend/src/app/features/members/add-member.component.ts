@@ -70,7 +70,7 @@ export class AddMemberComponent {
       dateOfBirth: this.dob.trim(),
       joinDate: new Date(),
       createdDate: new Date().toISOString(),
-      expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      expiryDate: new Date().toISOString(),
       sports: [],
       status: 'Active',
       membershipType: 'basic',
