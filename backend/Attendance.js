@@ -87,7 +87,8 @@ function recordAttendance(attendanceData) {
   delete attrs.context;
   var newAttendance = Attendance.create(attrs);
   if (newAttendance === false) {
-    throw new Error("Validation failed: Invalid attendance data.");
+    // TODO: Fix this later. As of now the mobile app does not handle this scenario well
+   // throw new Error("Validation failed: Invalid attendance data.");
   }
   // Update last updated timestamp for attendance
   if (attendanceData.context && attendanceData.context.spreadsheet) {
