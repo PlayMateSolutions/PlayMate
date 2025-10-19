@@ -24,6 +24,7 @@ export interface UserSession {
 export class AuthService {
   private _isAuthenticated = new BehaviorSubject<boolean>(false);
   private _userSession = new BehaviorSubject<UserSession | null>(null);
+  private _isReady = new BehaviorSubject<boolean>(false);
   private readonly STORAGE_KEY = 'user_session';
   private storageReady = false;
 
@@ -40,16 +41,16 @@ export class AuthService {
       await this.storage.create();
       this.storageReady = true;
       await this.loadSession();
+      this._isReady.next(true);
     }
   }
 
   public async loadSession() {
     const session = await this.storage.get(this.STORAGE_KEY);
+
     if (session) {
-      console.log(
-        'Session found, expires:',
-        new Date(session.expiresAt).toISOString()
-      );
+      const minutesLeft = Math.round((session.expiresAt - Date.now()) / 60000);
+      console.log('Session found, expires in', minutesLeft, 'minutes at', new Date(session.expiresAt).toISOString());
     } else {
       console.log('No session found');
     }
@@ -57,8 +58,13 @@ export class AuthService {
       this._isAuthenticated.next(true);
       this._userSession.next(session);
     } else {
+      this._isAuthenticated.next(false);
       // await this.renewSession();
     }
+  }
+
+  get HaveValidSession(): boolean {
+    return this._isAuthenticated.value;
   }
 
   get isAuthenticated$(): Observable<boolean> {
@@ -67,6 +73,10 @@ export class AuthService {
 
   get userSession$(): Observable<UserSession | null> {
     return this._userSession.asObservable();
+  }
+
+  get isReady$(): Observable<boolean> {
+    return this._isReady.asObservable();
   }
 
   async initGoogleAuth(): Promise<boolean> {
@@ -88,7 +98,7 @@ export class AuthService {
           scopes: [
             'email',
             'profile',
-            // 'https://www.googleapis.com/auth/drive.file',
+            'https://www.googleapis.com/auth/drive.file',
             // 'https://www.googleapis.com/auth/spreadsheets',
             // 'https://www.googleapis.com/auth/script.external_request',
           ],
@@ -172,6 +182,12 @@ export class AuthService {
     console.log('Is logged in ' + JSON.stringify(await SocialLogin.isLoggedIn({ provider: 'google' })));
 
     return this.login();
+  }
+
+
+  async getSession(): Promise<UserSession | null> {
+    const session = await this.storage.get(this.STORAGE_KEY);
+    return session || null;
   }
 
   async getAuthToken(): Promise<string | null> {

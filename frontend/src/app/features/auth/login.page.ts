@@ -77,6 +77,9 @@ export class LoginPage implements OnInit {
     if (!initialized) {
       this.error =
         'Failed to initialize authentication. Please check your internet connection and try again.';
+    } else {
+      console.log('Authentication initialized successfully');
+      this.handleGoogleSignIn();
     }
   }
 
@@ -88,7 +91,7 @@ export class LoginPage implements OnInit {
         // Check if club context is set, if not go to settings first
         if (this.clubContext.getSportsClubId()) {
           if (this.appRefresher.refreshAll) {
-            await this.appRefresher.refreshAll();
+           // await this.appRefresher.refreshAll();
           }
           await this.router.navigate(['/tabs']);
         } else {

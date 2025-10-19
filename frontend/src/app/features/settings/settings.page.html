@@ -34,6 +34,26 @@
         </ion-input>
         <ion-note>This ID is used to identify your club in the system</ion-note>
       </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Linked Spreadsheet</ion-label>
+        <button (click)="pickerVisible = true">Show picker</button>
+
+      <drive-picker
+        *ngIf="pickerVisible"
+        [attr.client-id]="clientId"
+        [attr.app-id]="appId"
+        [attr.view-id]="'SPREADSHEETS'"
+        [attr.oauth-token]="oauthToken"
+        multiselect="false"
+        (picked)="onDrivePicked($event)"
+        debounce-delay="100"
+      >
+        <drive-picker-docs-view />
+      </drive-picker>
+
+        <ion-note>{{ spreadsheetId ? 'Spreadsheet linked' : 'No spreadsheet selected' }}</ion-note>
+     </ion-item>
+
     </ion-item-group>
 
     <!-- App Settings -->

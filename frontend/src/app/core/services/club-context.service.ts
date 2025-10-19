@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class ClubContextService {
+  
   private sportsClubId: string | null = null;
   private readonly STORAGE_KEY = 'sportsClubId';
   private readonly MEMBER_REFRESH_KEY = 'lastMemberRefresh';
@@ -25,6 +26,15 @@ export class ClubContextService {
 
   getSportsClubId(): string | null {
     return this.sportsClubId;
+  }
+
+  setSpreadSheet(selectedDoc: any) {
+    localStorage.setItem('selectedSpreadsheet', JSON.stringify(selectedDoc));
+  }
+
+  getSpreadSheet(): any {
+    const stored = localStorage.getItem('selectedSpreadsheet');
+    return stored ? JSON.parse(stored) : null;
   }
 
   clear() {

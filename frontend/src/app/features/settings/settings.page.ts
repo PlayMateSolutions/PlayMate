@@ -1,4 +1,4 @@
-import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA, ViewChild, ElementRef } from '@angular/core';
 import {
   ToastController,
   IonHeader,
@@ -30,6 +30,8 @@ import { PlayMateDB } from '../../core/services/playmate-db';
 import { ApiService } from '../../core/services/api.service';
 import { addIcons } from 'ionicons';
 import { saveOutline } from 'ionicons/icons';
+import "@googleworkspace/drive-picker-element";
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-settings',
@@ -62,6 +64,8 @@ import { saveOutline } from 'ionicons/icons';
 })
 export class SettingsPage implements OnInit {
   sportsClubId: string = '';
+  spreadsheetId: string = '';
+  spreadsheetName: string = '';
   hasChanges: boolean = false;
   loading: boolean = false; // Indicates API call loading state
   darkMode: boolean = false;
@@ -69,6 +73,14 @@ export class SettingsPage implements OnInit {
   userEmail: string = '';
   userName: string = '';
   userPicture: string = '';
+
+  public pickerVisible = false;
+
+  public clientId = environment.googleSignInClientId;
+  public appId = 'playmate-462313';
+  public oauthToken = 'test';
+
+  @ViewChild('drivePickerElement') drivePickerElement!: ElementRef<any>;
 
   constructor(
     private clubContext: ClubContextService,
@@ -91,6 +103,36 @@ export class SettingsPage implements OnInit {
     // Load user info
     this.loadUserInfo();
     addIcons({ saveOutline });
+  }
+
+  async ngAfterViewInit() {
+    var session = await this.authService.getSession();
+    this.oauthToken = session?.accessToken || '';
+
+    console.log('OAuth Token:', this.oauthToken);
+
+    const currentSheet = this.clubContext.getSpreadSheet();
+    if (currentSheet) {
+      this.pickerVisible = false;
+      console.log('Current Spreadsheet:', currentSheet);
+      return;
+    }
+
+    // const pickerEl = document.querySelector<any>("drive-picker");
+    // if (pickerEl) {
+    //   pickerEl.visible = true;
+    //   console.log('Drive Picker initialized:', pickerEl);
+
+    //   pickerEl.addEventListener("picker:picked", (event: any) => {
+    //     console.log("Document picked:", event);
+    //     const selectedDoc = event.detail.docs[0];
+    //     this.clubContext.setSpreadSheet(selectedDoc)
+    //   });
+
+    //   pickerEl.addEventListener("picker:canceled", (event: any) => {
+    //     console.log("Picker cancelled:", event);
+    //   });
+    // }
   }
 
   loadUserInfo() {
@@ -216,5 +258,19 @@ export class SettingsPage implements OnInit {
       });
       await toast.present();
     }
+  }
+
+  openPicker() {
+    if (this.drivePickerElement && this.drivePickerElement.nativeElement) {
+      this.drivePickerElement.nativeElement.visible = true;
+    } else {
+      console.error('Drive Picker element not found');
+    }
+  }
+
+  onDrivePicked(event: any) {
+    console.log('Drive document picked event:', event);
+    const selectedDoc = event.detail.docs[0];
+   console.log('Selected Spreadsheet:', selectedDoc);
   }
 }
