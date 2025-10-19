@@ -42,16 +42,16 @@
         *ngIf="pickerVisible"
         [attr.client-id]="clientId"
         [attr.app-id]="appId"
-        [attr.view-id]="'SPREADSHEETS'"
         [attr.oauth-token]="oauthToken"
+        [attr.multiselect]="false"
         multiselect="false"
-        (picked)="onDrivePicked($event)"
+        (picker-picked)="onDrivePicked($event)"
         debounce-delay="100"
       >
-        <drive-picker-docs-view />
+        <drive-picker-docs-view view-id="SPREADSHEETS"></drive-picker-docs-view>
       </drive-picker>
 
-        <ion-note>{{ spreadsheetId ? 'Spreadsheet linked' : 'No spreadsheet selected' }}</ion-note>
+        <ion-note>{{ selectedSpreadsheet == null ? 'No spreadsheet selected' : 'Spreadsheet linked' }}</ion-note>
      </ion-item>
 
     </ion-item-group>

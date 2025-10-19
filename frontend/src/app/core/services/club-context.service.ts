@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Spreadsheet } from 'src/app/shared/interfaces/spreadsheet.interface';
 
 @Injectable({ providedIn: 'root' })
 export class ClubContextService {
@@ -28,11 +29,11 @@ export class ClubContextService {
     return this.sportsClubId;
   }
 
-  setSpreadSheet(selectedDoc: any) {
+  setSpreadSheet(selectedDoc: Spreadsheet) {
     localStorage.setItem('selectedSpreadsheet', JSON.stringify(selectedDoc));
   }
 
-  getSpreadSheet(): any {
+  getSpreadSheet(): Spreadsheet | null {
     const stored = localStorage.getItem('selectedSpreadsheet');
     return stored ? JSON.parse(stored) : null;
   }
