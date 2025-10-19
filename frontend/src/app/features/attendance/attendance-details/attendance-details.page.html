@@ -41,9 +41,9 @@
       
       <!-- Simplified attendance items -->
       <ion-list lines="full">
-        <ion-item *ngFor="let record of group.records" class="attendance-item">
+        <ion-item *ngFor="let record of group.records" class="attendance-item" (click)="openMemberDetail(record)">
           <ion-label>
-            {{ record.memberName || 'Unknown Member' }}
+            {{ (record.memberId == -1 ? record.notes : record.memberName) || 'Unknown Member' }}
             <ion-note color="medium" class="id-note">#{{ record.memberId || 'N/A' }}</ion-note>
           </ion-label>
           <ion-badge *ngIf="record.membershipStatus !== 'active'" color="danger" slot="end" class="expired-badge">Expired</ion-badge>

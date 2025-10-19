@@ -485,7 +485,7 @@ export class AttendancePage implements OnInit {
     const endDate = dateRange[dateRange.length - 1];
     
     // Navigate to attendance details with query parameters
-    this.router.navigate(['/tabs/attendance-details'], { 
+    this.router.navigate(['/tabs/attendance/details'], { 
       queryParams: { 
         startDate: startDate,
         endDate: endDate,

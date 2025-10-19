@@ -17,7 +17,7 @@ export const routes: Routes = [
           import('../features/attendance/attendance.page').then((m) => m.AttendancePage),
       },
       {
-        path: 'attendance-details',
+        path: 'attendance/details',
         loadComponent: () =>
           import('../features/attendance/attendance-details/attendance-details.page').then((m) => m.AttendanceDetailsPage),
       },

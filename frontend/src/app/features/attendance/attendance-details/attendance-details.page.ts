@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { 
   IonHeader, 
   IonToolbar, 
@@ -25,7 +25,8 @@ import {
   IonIcon,
   IonNote,
   IonBadge,
-  InfiniteScrollCustomEvent
+  InfiniteScrollCustomEvent,
+  NavController
 } from '@ionic/angular/standalone';
 import { AttendanceDB } from '../services/attendance-db';
 import { Attendance } from '../../../shared/interfaces/attendance.interface';
@@ -81,7 +82,7 @@ export class AttendanceDetailsPage implements OnInit {
   currentPage = 1;
   recordsPerPage = 20;
 
-  constructor(private route: ActivatedRoute) {
+  constructor(private route: ActivatedRoute, private router: Router, private navController: NavController) {
     // Add required icons
     addIcons({
       listOutline,
@@ -239,6 +240,12 @@ export class AttendanceDetailsPage implements OnInit {
       }
     } catch (error) {
       console.error('Error scrolling:', error);
+    }
+  }
+
+  openMemberDetail(record: any) {
+    if (record.memberId && record.memberId !== -1) {
+      this.navController.navigateForward(['/tabs/members', record.memberId]);
     }
   }
 }
