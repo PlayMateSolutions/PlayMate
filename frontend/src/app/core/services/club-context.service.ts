@@ -29,7 +29,11 @@ export class ClubContextService {
     return this.sportsClubId;
   }
 
-  setSpreadSheet(selectedDoc: Spreadsheet) {
+  setSpreadSheet(selectedDoc: Spreadsheet | null) {
+    if (!selectedDoc) {
+      localStorage.removeItem('selectedSpreadsheet');
+      return;
+    }
     localStorage.setItem('selectedSpreadsheet', JSON.stringify(selectedDoc));
   }
 

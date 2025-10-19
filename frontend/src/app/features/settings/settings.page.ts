@@ -35,7 +35,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { PlayMateDB } from '../../core/services/playmate-db';
 import { ApiService } from '../../core/services/api.service';
 import { addIcons } from 'ionicons';
-import { saveOutline } from 'ionicons/icons';
+import { saveOutline, logoGoogle } from 'ionicons/icons';
 import '@googleworkspace/drive-picker-element';
 import { environment } from 'src/environments/environment';
 import { Spreadsheet } from 'src/app/shared/interfaces/spreadsheet.interface';
@@ -109,7 +109,7 @@ export class SettingsPage implements OnInit {
 
     // Load user info
     this.loadUserInfo();
-    addIcons({ saveOutline });
+    addIcons({ saveOutline, logoGoogle });
   }
 
   async ngAfterViewInit() {
@@ -158,6 +158,8 @@ export class SettingsPage implements OnInit {
     this.loading = true;
     const trimmedClubId = this.sportsClubId.trim();
     const currentClubId = this.clubContext.getSportsClubId() || '';
+    this.clubContext.setSpreadSheet(this.selectedSpreadsheet);
+
     if (trimmedClubId) {
       // Only validate with server if club ID has changed
       if (trimmedClubId !== currentClubId) {
@@ -292,10 +294,8 @@ export class SettingsPage implements OnInit {
   }
 
   onDrivePicked(event: any) {
-    console.log('Drive document picked event:', event);
     const selectedDoc = event.detail.docs[0];
-    var spreadsheet = this.toSpreadsheet(selectedDoc);
-    this.clubContext.setSpreadSheet(spreadsheet);
-    console.log('Selected Spreadsheet:', spreadsheet);
+    this.selectedSpreadsheet = this.toSpreadsheet(selectedDoc);
+    this.hasChanges = true;
   }
 }

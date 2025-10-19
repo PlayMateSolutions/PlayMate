@@ -34,24 +34,36 @@
         </ion-input>
         <ion-note>This ID is used to identify your club in the system</ion-note>
       </ion-item>
-      <ion-item>
-        <ion-label position="stacked">Linked Spreadsheet</ion-label>
-        <button (click)="pickerVisible = true">Show picker</button>
+      <ion-item style="padding-bottom: 12px;">
+        <ion-label position="stacked" style="margin-bottom: 12px;">Linked Spreadsheet</ion-label>
+        <ng-container *ngIf="!selectedSpreadsheet">
+          <ion-button expand="block" (click)="pickerVisible = true" style="margin-bottom: 12px;">
+            <ion-icon name="document-outline" slot="start"></ion-icon>
+            Select Spreadsheet
+          </ion-button>
+        </ng-container>
+        <ng-container *ngIf="selectedSpreadsheet">
+          <div style="display: flex; align-items: center;">
+            <ion-icon name="logo-google" style="font-size: 1.5em; margin-right: 8px;"></ion-icon>
+            <span style="font-weight: 500;">{{ selectedSpreadsheet.name }}</span>
+            <ion-button fill="clear" color="medium" size="small" (click)="pickerVisible = true" style="margin-left: 8px;">
+              <ion-icon name="swap-horizontal-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </div>
+        </ng-container>
 
-      <drive-picker
-        *ngIf="pickerVisible"
-        [attr.client-id]="clientId"
-        [attr.app-id]="appId"
-        [attr.oauth-token]="oauthToken"
-        [attr.multiselect]="false"
-        multiselect="false"
-        (picker-picked)="onDrivePicked($event)"
-        debounce-delay="100"
-      >
-        <drive-picker-docs-view view-id="SPREADSHEETS"></drive-picker-docs-view>
-      </drive-picker>
-
-        <ion-note>{{ selectedSpreadsheet == null ? 'No spreadsheet selected' : 'Spreadsheet linked' }}</ion-note>
+        <drive-picker
+          *ngIf="pickerVisible"
+          [attr.client-id]="clientId"
+          [attr.app-id]="appId"
+          [attr.oauth-token]="oauthToken"
+          [attr.multiselect]="false"
+          multiselect="false"
+          (picker-picked)="onDrivePicked($event)"
+          debounce-delay="100"
+        >
+          <drive-picker-docs-view view-id="SPREADSHEETS"></drive-picker-docs-view>
+        </drive-picker>
      </ion-item>
 
     </ion-item-group>
