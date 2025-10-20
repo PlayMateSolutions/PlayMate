@@ -57,12 +57,14 @@
           [attr.client-id]="clientId"
           [attr.app-id]="appId"
           [attr.oauth-token]="oauthToken"
-          [attr.multiselect]="false"
-          multiselect="false"
+          max-items="1"
+          title="Select a Google Spreadsheet to link"          
           (picker-picked)="onDrivePicked($event)"
           debounce-delay="100"
         >
-          <drive-picker-docs-view view-id="SPREADSHEETS"></drive-picker-docs-view>
+          <drive-picker-docs-view 
+            view-id="SPREADSHEETS"
+            query='GymMate'></drive-picker-docs-view>
         </drive-picker>
      </ion-item>
 
