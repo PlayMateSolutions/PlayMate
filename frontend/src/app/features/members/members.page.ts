@@ -54,7 +54,7 @@ import { ClubContextService } from '../../core/services/club-context.service';
 import { RelativeTimePipe } from './relative-time.pipe';
 import { Router } from '@angular/router';
 import { formatDateHuman } from '../../shared/utils/date-utils';
-
+import { GymMateGoogleSheetService } from './services/google-sheet.service';
 
 @Component({
   selector: 'app-members',
@@ -86,7 +86,10 @@ import { formatDateHuman } from '../../shared/utils/date-utils';
     IonMenuButton,
     RelativeTimePipe
   ],
-  providers: [MemberService]
+  providers: [
+    MemberService,
+    GymMateGoogleSheetService
+  ]
 })
 export class MembersPage implements OnInit {
   members: Member[] = [];
@@ -106,7 +109,8 @@ export class MembersPage implements OnInit {
     private translateService: TranslateService,
     private modalController: ModalController,
     private clubContext: ClubContextService,
-    private router: Router
+    private router: Router,
+    private googleSheetService: GymMateGoogleSheetService
   ) {    
     // Initialize available languages
     this.translateService.addLangs(['en', 'ta']);
@@ -152,7 +156,22 @@ export class MembersPage implements OnInit {
     });
   }
 
-  refreshMembers() {
+  async refreshMembers() {
+    this.loading = true;
+    this.error = null;
+
+   await this.googleSheetService.RefreshMembersData().then((members: Member[]) => {
+      this.members = members;
+      this.filteredMembers = [...members];
+      this.sortMembers();
+      this.loading = false;
+      console.log('Members refreshed from Google Sheets successfully ', members);
+   }).catch((error : any) => {
+      console.error('Error refreshing members from Google Sheets:', error);
+   });
+
+    
+    return;
     this.loading = true;
     this.error = null;
     this.memberService.refreshMembers().subscribe({
