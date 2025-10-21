@@ -52,7 +52,7 @@
 <ion-content>
   <div class="results-row">
     <div class="results-count">
-      <ion-text color="medium" *ngIf="!loading">
+      <ion-text color="medium" *ngIf="!loading" class="last-sync-label">
         Showing {{ filteredMembers.length }} members
       </ion-text>
       <ion-spinner *ngIf="loading"></ion-spinner>
