@@ -6,6 +6,7 @@ import { Member } from 'src/app/shared/interfaces/member.interface';
 import { Attendance } from 'src/app/shared/interfaces/attendance.interface';
 import { Payment } from '../../payments/payment.interface';
 import { Expense } from '../../payments/expense.interface';
+import { ClubSettings } from '../../settings/club-settings.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -61,6 +62,11 @@ export class GymMateGoogleSheetService {
     payee: 'payee',
     transactionId: 'transactionId',
     recordedBy: 'recordedBy',
+  };
+
+  private readonly clubSettingsAttributesMapping = {
+    settings: 'Setting',
+    value: 'Value',
   };
 
   constructor(
@@ -120,7 +126,6 @@ export class GymMateGoogleSheetService {
   }
 
   public async RefreshPaymentsData(): Promise<Payment[]> {
-    
     return new Promise((resolve, reject) => {
       this.googleSheetsDbService
         .get('Payments', this.paymentsAttributesMapping)
@@ -142,6 +147,67 @@ export class GymMateGoogleSheetService {
         .subscribe({
           next: (data) => {
             resolve(data as Expense[]);
+          },
+          error: (error) => {
+            reject(error);
+          },
+        });
+    });
+  }
+
+  public async FetchClubSettings(spreadsheetId: string): Promise<ClubSettings> {
+    this.googleSheetsDbService.spreadsheetId = spreadsheetId;
+    return new Promise((resolve, reject) => {
+      this.googleSheetsDbService
+        .get('Settings', this.clubSettingsAttributesMapping)
+        .subscribe({
+          next: (data: any[]) => {
+            console.log('Raw club settings data fetched:', data);
+            const settings: ClubSettings = {
+              clubId: '',
+              clubName: '',
+              adminEmail: '',
+              currency: '',
+              latePaymentDays: 0,
+              apiToken: '',
+              apiUrl: '',
+              version: '',
+              lastUpdated: '',
+              attendanceLastUpdated: '',
+              membersLastUpdated: '',
+              paymentsLastUpdated: '',
+              expensesLastUpdated: '',
+            };
+
+            // Process each row
+            data.forEach((row) => {
+              if (row.settings === 'ClubId') settings.clubId = row.value || '';
+              if (row.settings === 'Club Name')
+                settings.clubName = row.value || '';
+              if (row.settings === 'Admin Email')
+                settings.adminEmail = row.value || '';
+              if (row.settings === 'Currency')
+                settings.currency = row.value || '';
+              if (row.settings === 'Late Payment Days')
+                settings.latePaymentDays = parseInt(row.value || '0');
+              if (row.settings === 'API Token')
+                settings.apiToken = row.value || '';
+              if (row.settings === 'API URL') settings.apiUrl = row.value || '';
+              if (row.settings === 'Version')
+                settings.version = row.value || '';
+              if (row.settings === 'Last Updated')
+                settings.lastUpdated = row.value || '';
+              if (row.settings === 'Attendance Last Updated')
+                settings.attendanceLastUpdated = row.value || '';
+              if (row.settings === 'Members Last Updated')
+                settings.membersLastUpdated = row.value || '';
+              if (row.settings === 'Payments Last Updated')
+                settings.paymentsLastUpdated = row.value || '';
+              if (row.settings === 'Expenses Last Updated')
+                settings.expensesLastUpdated = row.value || '';
+            });
+
+            resolve(settings);
           },
           error: (error) => {
             reject(error);

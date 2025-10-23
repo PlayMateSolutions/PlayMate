@@ -35,10 +35,11 @@ import { AuthService } from '../../core/services/auth.service';
 import { PlayMateDB } from '../../core/services/playmate-db';
 import { ApiService } from '../../core/services/api.service';
 import { addIcons } from 'ionicons';
-import { saveOutline, logoGoogle } from 'ionicons/icons';
+import { saveOutline, logoGoogle, createOutline } from 'ionicons/icons';
 import '@googleworkspace/drive-picker-element';
 import { environment } from 'src/environments/environment';
 import { Spreadsheet } from 'src/app/shared/interfaces/spreadsheet.interface';
+import { GymMateGoogleSheetService } from '../members/services/google-sheet.service';
 
 @Component({
   selector: 'app-settings',
@@ -61,7 +62,6 @@ import { Spreadsheet } from 'src/app/shared/interfaces/spreadsheet.interface';
     IonItemDivider,
     IonItem,
     IonLabel,
-    IonInput,
     IonNote,
     IonToggle,
     IonSelect,
@@ -93,7 +93,8 @@ export class SettingsPage implements OnInit {
     private toastCtrl: ToastController,
     private router: Router,
     private authService: AuthService,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private googleSheetService: GymMateGoogleSheetService
   ) {
     // Get the stored theme preference or system preference
     this.darkMode = document.body.classList.contains('dark-theme');
@@ -109,7 +110,7 @@ export class SettingsPage implements OnInit {
 
     // Load user info
     this.loadUserInfo();
-    addIcons({ saveOutline, logoGoogle });
+    addIcons({ saveOutline, logoGoogle, createOutline });
   }
 
   async ngAfterViewInit() {
@@ -154,6 +155,12 @@ export class SettingsPage implements OnInit {
     this.hasChanges = true;
   }
 
+  async clearDatabase() {
+    await PlayMateDB.deleteDatabase().catch((err) => {
+      console.error('Error deleting PlayMateDB during settings save:', err);
+    });
+  }
+
   async saveSettings() {
     this.loading = true;
     const trimmedClubId = this.sportsClubId.trim();
@@ -175,6 +182,8 @@ export class SettingsPage implements OnInit {
             response.data.active
           ) {
             this.clubContext.setSportsClubId(trimmedClubId);
+            await this.clearDatabase();
+            
             const toast = await this.toastCtrl.create({
               message: 'Settings saved successfully!',
               duration: 1500,
@@ -297,5 +306,12 @@ export class SettingsPage implements OnInit {
     const selectedDoc = event.detail.docs[0];
     this.selectedSpreadsheet = this.toSpreadsheet(selectedDoc);
     this.hasChanges = true;
+
+    this.googleSheetService.FetchClubSettings(this.selectedSpreadsheet.id).then((clubsettings) => {
+      console.log('Club settings fetched from selected spreadsheet:', clubsettings);
+      this.sportsClubId = clubsettings.clubId || '';
+    }).catch((err : any) => {
+      console.error('Error fetching club settings from spreadsheet:', err);
+    });
   }
 }
