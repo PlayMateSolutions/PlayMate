@@ -9,6 +9,7 @@ import { MemberService } from '../../members/services/member.service';
 import { AttendanceDB } from './attendance-db';
 import { Attendance, AttendanceFilters, AttendanceAnalytics, DailyAttendanceStats } from '../../../shared/interfaces/attendance.interface';
 import { Member } from '../../../shared/interfaces/member.interface';
+import { GymMateGoogleSheetService } from '../../members/services/google-sheet.service';
 
 interface ApiResponse<T> {
   status: 'success' | 'error';
@@ -38,7 +39,8 @@ export class AttendanceService {
     private http: HttpClient,
     private authService: AuthService,
     private clubContext: ClubContextService,
-    private memberService: MemberService
+    private memberService: MemberService,
+    private googleSheetService: GymMateGoogleSheetService
   ) {
     // Initialize with empty data immediately to prevent blocking
     this.attendanceSubject.next([]);
@@ -84,7 +86,7 @@ export class AttendanceService {
       
       if (shouldSync) {
         // Run sync in background to avoid blocking
-        this.syncAttendance().catch(error => {
+        this.syncAttendance(true).catch(error => {
           console.error('Background sync failed:', error);
         });
       }
@@ -100,82 +102,35 @@ export class AttendanceService {
     try {
       this.loadingSubject.next(true);
       
-      const token = await this.authService.getAuthToken();
-      const clubId = this.clubContext.getSportsClubId() || '';
+      console.log('Fetching attendance data from Google Sheets...');
       
-      console.log('Attendance sync - Token:', token ? 'Present' : 'Missing');
-      console.log('Attendance sync - Club ID:', clubId);
+      const attendanceRecords = await this.googleSheetService.RefreshAttendanceData();
+      const linkedAttendanceRecords = await this.linkWithMemberData(attendanceRecords);
       
-      // Prepare payload data like member service
-      let payloadData: any = {};
-      
-      // Use incremental sync unless forced full sync
-      if (!forceFullSync) {
-        const lastAttendanceId = await AttendanceDB.getLastAttendanceId();
-        if (lastAttendanceId) {
-          payloadData.lastAttendanceId = lastAttendanceId;
-        }
+      if (forceFullSync || !await AttendanceDB.getLastAttendanceId()) {
+        // Full sync - replace all data
+        await AttendanceDB.setAll(linkedAttendanceRecords);
+      } else {
+        // Incremental sync - add new records
+        await AttendanceDB.addRecords(linkedAttendanceRecords);
       }
 
-      let params = new HttpParams()
-        .set('action', 'getAttendance')
-        .set('sportsClubId', clubId)
-        .set('authorization', token ? 'Bearer ' + token : '');
+      // Update sync time
+      await AttendanceDB.setLastSyncTime(new Date());
+      this.lastSyncSubject.next(new Date());
+      this.clubContext.setLastAttendanceRefresh(new Date());
 
-      // Add payload if we have data
-      if (Object.keys(payloadData).length > 0) {
-        params = params.set('payload', JSON.stringify(payloadData));
+      // Update attendance ID if available
+      if (linkedAttendanceRecords.length > 0) {
+        const maxId = Math.max(...linkedAttendanceRecords.map(r => parseInt(r.id || '0'))).toString();
+        await AttendanceDB.setLastAttendanceId(maxId);
       }
 
-      const headers = new HttpHeaders({
-        'Content-Type': 'text/plain;charset=utf-8'
-      });
+      // Reload all data and recalculate analytics
+      this.attendanceSubject.next(linkedAttendanceRecords);
+      this.calculateAnalytics(linkedAttendanceRecords);
 
-      const options = {
-        headers,
-        params,
-        responseType: 'json' as const,
-        observe: 'body' as const
-      };
-
-      const response = await this.http.get<ApiResponse<Attendance[]>>(
-        this.apiUrl,
-        options
-      ).toPromise();
-
-      if (response?.status === 'error') {
-        throw new Error(response.error?.message || 'API returned error status');
-      }
-
-      if (response?.status === 'success' && response.data) {
-        let attendanceRecords = Array.isArray(response.data) ? response.data : [response.data];
-        
-        // Link with member data
-        attendanceRecords = await this.linkWithMemberData(attendanceRecords);
-        
-        if (forceFullSync || !await AttendanceDB.getLastAttendanceId()) {
-          // Full sync - replace all data
-          await AttendanceDB.setAll(attendanceRecords);
-        } else {
-          // Incremental sync - add new records
-          await AttendanceDB.addRecords(attendanceRecords);
-        }
-
-        // Update last attendance ID and sync time
-        if (attendanceRecords.length > 0) {
-          const maxId = Math.max(...attendanceRecords.map(r => parseInt((r as any).id || '0'))).toString();
-          await AttendanceDB.setLastAttendanceId(maxId);
-        }
-        
-        await AttendanceDB.setLastSyncTime(new Date());
-        this.lastSyncSubject.next(new Date());
-        this.clubContext.setLastAttendanceRefresh(new Date());
-
-        // Reload all data and recalculate analytics
-        const allAttendance = await AttendanceDB.getAll();
-        this.attendanceSubject.next(allAttendance);
-        this.calculateAnalytics(allAttendance);
-      }
+      console.log('Successfully synced attendance data from Google Sheets');
 
     } catch (error) {
       console.error('Error syncing attendance:', error);

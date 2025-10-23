@@ -1,13 +1,13 @@
 /**
  * Extends a member's expiry date based on payment
  * @param {Object} params - { memberId, periodStart, periodEnd, context }
- * @return {string|null} New expiry date in YYYY-MM-DD format if successful, null otherwise
+ * @return {string|null} New expiry date in ISO format (e.g., 2025-10-23T13:44:46.753Z) if successful, null otherwise
  */
 function extendMemberExpiryDate(params) {
   Logger.log('[extendMemberExpiryDate] params: ' + JSON.stringify(params));
   var Member = getMemberTable(params.context);
   Logger.log('[extendMemberExpiryDate] Member table initialized');
-  var member = Member.find(params.id);
+  var member = Member.find(Number(params.id));
   if (!member) {
     Logger.log('[extendMemberExpiryDate] Member not found: ' + params.id);
     return null;
@@ -33,11 +33,12 @@ function extendMemberExpiryDate(params) {
       newExpiry = periodEnd;
     }
   }
-  member['expiryDate'] = newExpiry;
+  var isoExpiry = newExpiry.toISOString();
+  member['expiryDate'] = isoExpiry;
   Logger.log('[extendMemberExpiryDate] Member updated: ' + JSON.stringify(member));
   member.save();
-  Logger.log('[extendMemberExpiryDate] Expiry date set for memberId: ' + params.id + ' to ' + newExpiry);
-  return newExpiry;
+  Logger.log('[extendMemberExpiryDate] Expiry date set for memberId: ' + params.id + ' to ' + isoExpiry);
+  return isoExpiry;
 }
 
 // Helper to get Tamotsu Member table
@@ -143,7 +144,7 @@ function addMember(memberData) {
  */
 function updateMember(memberId, payload) {
   var Member = getMemberTable(payload.context);
-  var member = Member.find(memberId);
+  var member = Member.find(String(memberId));
   if (!member) {
     return false;
   }
