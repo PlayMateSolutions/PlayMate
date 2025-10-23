@@ -5,8 +5,7 @@ export interface Member {
   email: string;
   phone: string;
   place: string;
-  joinDate: Date;
-  createdDate: string;
+  joinDate: string;
   expiryDate: string;
   sports: string[];
   status: 'Active' | 'Inactive';

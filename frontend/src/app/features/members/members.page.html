@@ -121,6 +121,7 @@
             <span style="color:#808080; font-size:15px;">&#9679;</span> {{ member.place || 'N/A' }}
           </div>
           <div>Expires: {{ formatDate(member.expiryDate) }}</div>
+          <div>Join Date: {{ formatDate(member.joinDate) }}</div>
         </div>
         <div class="card-actions">
           <ion-button fill="clear" color="warning" (click)="renewMembership(member); $event.stopPropagation();" class="action-button primary">

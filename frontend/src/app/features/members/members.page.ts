@@ -226,8 +226,8 @@ export class MembersPage implements OnInit {
           compareB = new Date(b.expiryDate).getTime();
           break;
         case 'createdDate':
-          compareA = new Date(a.id).getTime();
-          compareB = new Date(b.id).getTime();
+          compareA = new Number(a.id);
+          compareB = new Number(b.id);
           break;
         default:
           compareA = `${a.firstName} ${a.lastName}`.toLowerCase();

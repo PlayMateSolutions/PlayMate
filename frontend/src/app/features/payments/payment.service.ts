@@ -105,11 +105,17 @@ export class PaymentService {
       console.log('Fetching payment data from Google Sheets...');
       
       // Get payments from Google Sheets
-      const newPayments = await this.googleSheetService.RefreshPaymentsData();
+      const rawPayments = await this.googleSheetService.RefreshPaymentsData();
 
-      if (newPayments && newPayments.length > 0) {
+      if (rawPayments && rawPayments.length > 0) {
+        // Transform payments to ensure amounts are numbers
+        const paymentsWithNumbers = rawPayments.map(payment => ({
+          ...payment,
+          amount: Number(payment.amount) || 0
+        }));
+
         // Link with member data
-        const linkedPayments = await this.linkWithMemberData(newPayments);
+        const linkedPayments = await this.linkWithMemberData(paymentsWithNumbers);
         
         if (forceFullSync || !await PaymentDB.getLastPaymentId()) {
           // Full sync - replace all data
@@ -200,7 +206,7 @@ export class PaymentService {
     };
 
     payments.forEach(payment => {
-      summary.totalAmount += Number(payment.amount) || 0;
+      summary.totalAmount += payment.amount;
 
       const date = new Date(payment.date);
       const monthKey = date.toISOString().substring(0, 7);
@@ -213,7 +219,7 @@ export class PaymentService {
       }
 
       summary.monthBreakdown[monthKey].count++;
-      summary.monthBreakdown[monthKey].amount += Number(payment.amount) || 0;
+      summary.monthBreakdown[monthKey].amount += payment.amount;
     });
     console.log('Calculated payment summary:', summary);
 

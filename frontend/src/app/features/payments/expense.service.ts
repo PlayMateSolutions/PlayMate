@@ -37,9 +37,16 @@ export class ExpenseService {
       console.log('Fetching expense data from Google Sheets...');
       
       // Get expenses from Google Sheets
-      const expenses = await this.googleSheetService.RefreshExpensesData();
+      const rawExpenses = await this.googleSheetService.RefreshExpensesData();
+      
+      // Transform expenses to ensure amounts are numbers
+      const expenses = rawExpenses.map(expense => ({
+        ...expense,
+        amount: Number(expense.amount) || 0
+      }));
+      
       console.log(`Fetched ${expenses.length} expense records from Google Sheets`);
-      console.log('Fetched expense records:', expenses);
+      console.log('Processed expense records:', expenses);
       
       // Update local storage and state
       await ExpenseDB.setAll(expenses);
