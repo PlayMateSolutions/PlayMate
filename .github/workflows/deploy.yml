@@ -47,6 +47,7 @@ jobs:
         echo "  production: true," >> src/environments/environment.prod.ts
         echo "  apiUrl: '${{ secrets.API_URL }}'," >> src/environments/environment.prod.ts
         echo "  googleSignInClientId: '${{ secrets.GOOGLE_CLIENT_ID }}'," >> src/environments/environment.prod.ts
+        echo "  googleProjectNumber: '${{ secrets.GOOGLE_PROJECT_NUMBER }}'," >> src/environments/environment.prod.ts
         echo "};" >> src/environments/environment.prod.ts
 
     - name: Build
