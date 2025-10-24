@@ -115,8 +115,11 @@
           <div class="member-name">
             <strong>{{ member.firstName }} {{ member.lastName }}</strong>
             <small class="member-id">ID: {{ member.id }}</small>
-          </div>          
-          <div>Phone: {{ member.phone || 'N/A' }}</div>
+          </div>
+          <div>
+           {{ member.phone || 'N/A' }} 
+            <span style="color:#808080; font-size:15px;">&#9679;</span> {{ member.place || 'N/A' }}
+          </div>
           <div>Expires: {{ formatDate(member.expiryDate) }}</div>
         </div>
         <div class="card-actions">

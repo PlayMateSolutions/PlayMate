@@ -16,11 +16,17 @@ export class PlayMateDB {
     }
     // Attendance store
     if (!db.objectStoreNames.contains('attendance')) {
-      const attendanceStore = db.createObjectStore('attendance', { keyPath: 'id' });
+      const attendanceStore = db.createObjectStore('attendance', {
+        keyPath: 'id',
+      });
       attendanceStore.createIndex('memberId', 'memberId', { unique: false });
       attendanceStore.createIndex('date', 'date', { unique: false });
-      attendanceStore.createIndex('membershipStatus', 'membershipStatus', { unique: false });
-      attendanceStore.createIndex('dateRange', ['date', 'memberId'], { unique: false });
+      attendanceStore.createIndex('membershipStatus', 'membershipStatus', {
+        unique: false,
+      });
+      attendanceStore.createIndex('dateRange', ['date', 'memberId'], {
+        unique: false,
+      });
     }
     // Expenses store
     if (!db.objectStoreNames.contains('expenses')) {
@@ -39,6 +45,40 @@ export class PlayMateDB {
       request.onsuccess = () => resolve();
       request.onerror = (event) => reject(event);
       request.onblocked = () => reject(new Error('Delete blocked'));
+    });
+  }
+
+  static clearAllData(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const request = window.indexedDB.open(
+        PlayMateDB.dbName,
+        PlayMateDB.version
+      );
+
+      request.onsuccess = (event) => {
+        const db = (event.target as IDBOpenDBRequest).result;
+        const storeNames = Array.from(db.objectStoreNames);
+
+        const transaction = db.transaction(storeNames, 'readwrite');
+
+        transaction.oncomplete = () => {
+          db.close();
+          resolve();
+        };
+
+        transaction.onerror = (event) => {
+          db.close();
+          reject(event);
+        };
+
+        // Clear all object stores
+        for (const storeName of storeNames) {
+          const store = transaction.objectStore(storeName);
+          store.clear();
+        }
+      };
+
+      request.onerror = (event) => reject(event);
     });
   }
 }

@@ -7,6 +7,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { ClubContextService } from '../../core/services/club-context.service';
 import { MemberService } from '../members/services/member.service';
 import { Member } from '../../shared/interfaces/member.interface';
+import { GymMateGoogleSheetService } from '../members/services/google-sheet.service';
 
 interface ApiResponse<T> {
   status: 'success' | 'error';
@@ -36,7 +37,8 @@ export class PaymentService {
     private http: HttpClient,
     private authService: AuthService,
     private clubContext: ClubContextService,
-    private memberService: MemberService
+    private memberService: MemberService,
+    private googleSheetService: GymMateGoogleSheetService
   ) {
     // Initialize with empty data immediately to prevent blocking
     this.paymentsSubject.next([]);
@@ -84,7 +86,7 @@ export class PaymentService {
       
       if (shouldSync) {
         // Run sync in background to avoid blocking
-        this.syncPayments().catch(error => {
+        this.syncPayments(true).catch(error => {
           console.error('Background sync failed:', error);
         });
       }
@@ -100,62 +102,20 @@ export class PaymentService {
     try {
       this.loadingSubject.next(true);
       
-      const token = await this.authService.getAuthToken();
-      const clubId = this.clubContext.getSportsClubId() || '';
+      console.log('Fetching payment data from Google Sheets...');
       
-      console.log('Payment sync - Token:', token ? 'Present' : 'Missing');
-      console.log('Payment sync - Club ID:', clubId);
-      
-      // Prepare payload data
-      let payloadData: any = {};
-      
-      // Use incremental sync unless forced full sync
-      if (!forceFullSync) {
-        const lastPaymentId = await PaymentDB.getLastPaymentId();
-        if (lastPaymentId) {
-          payloadData.lastPaymentId = lastPaymentId;
-        }
-      }
+      // Get payments from Google Sheets
+      const rawPayments = await this.googleSheetService.RefreshPaymentsData();
 
-      let params = new HttpParams()
-        .set('action', 'getPayments')
-        .set('sportsClubId', clubId)
-        .set('authorization', token ? 'Bearer ' + token : '');
+      if (rawPayments && rawPayments.length > 0) {
+        // Transform payments to ensure amounts are numbers
+        const paymentsWithNumbers = rawPayments.map(payment => ({
+          ...payment,
+          amount: Number(payment.amount) || 0
+        }));
 
-      // Add payload if we have data
-      if (Object.keys(payloadData).length > 0) {
-        params = params.set('payload', JSON.stringify(payloadData));
-      }
-
-      const headers = new HttpHeaders({
-        'Content-Type': 'text/plain;charset=utf-8'
-      });
-
-      const options = {
-        headers,
-        params,
-        responseType: 'json' as const,
-        observe: 'body' as const
-      };
-
-      const response = await this.http.get<ApiResponse<Payment[]>>(
-        this.apiUrl,
-        options
-      ).toPromise();
-
-      if (response?.status === 'error') {
-        throw new Error(response.error?.message || 'API returned error status');
-      }
-
-      if (!response?.data) {
-        throw new Error('No data received from API');
-      }
-
-      const newPayments = response.data;
-
-      if (newPayments && newPayments.length > 0) {
         // Link with member data
-        const linkedPayments = await this.linkWithMemberData(newPayments);
+        const linkedPayments = await this.linkWithMemberData(paymentsWithNumbers);
         
         if (forceFullSync || !await PaymentDB.getLastPaymentId()) {
           // Full sync - replace all data
@@ -261,12 +221,13 @@ export class PaymentService {
       summary.monthBreakdown[monthKey].count++;
       summary.monthBreakdown[monthKey].amount += payment.amount;
     });
+    console.log('Calculated payment summary:', summary);
 
     this.summarySubject.next(summary);
   }
 
   async refreshData(): Promise<void> {
-    await this.syncPayments();
+    await this.syncPayments(true);
     this.clubContext.setLastPaymentRefresh(new Date());
   }
 

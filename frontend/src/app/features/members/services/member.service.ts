@@ -8,6 +8,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../core/services/auth.service';
 import { ClubContextService } from '../../../core/services/club-context.service';
+import { GymMateGoogleSheetService } from './google-sheet.service';
 
 interface ApiResponse<T> {
   status: 'success' | 'error';
@@ -27,7 +28,8 @@ export class MemberService {
   constructor(
     private http: HttpClient,
     private authService: AuthService,
-    private clubContext: ClubContextService
+    private clubContext: ClubContextService,
+    private googleSheetService: GymMateGoogleSheetService
   ) { }
 
   private async getRequestPayload(action: string, data: any = {}): Promise<any> {
@@ -48,71 +50,17 @@ export class MemberService {
   }
 
   refreshMembers(): Observable<{members: Member[], isFresh: boolean}> {
-    return from(this.authService.getAuthToken()).pipe(
-      switchMap(token => {
-        const clubId = this.clubContext.getSportsClubId() || '';
-        const params = new HttpParams()
-          .set('sportsClubId', clubId)
-          .set('action', 'getMembers')
-          .set('authorization', token ? 'Bearer ' + token : '');
-
-        const headers = new HttpHeaders({
-          'Content-Type': 'text/plain;charset=utf-8'
-        });
-
-        const options = {
-          headers,
-          params,
-          responseType: 'json' as const,
-          observe: 'body' as const
-        };
-
-        return this.http.get<ApiResponse<Member[]>>(this.apiUrl, options).pipe(
-          map(response => {
-            if (response.status === 'error') throw new Error(response.error?.message);
-            this.clubContext.setLastMemberRefresh(new Date());
-            return response.data || [];
-          }),
-          switchMap(members => from(MembersDB.setAll(members)).pipe(map(() => members))),
-          map(members => ({ members, isFresh: true })),
-          catchError(error => {
-            console.error('Error fetching members:', error);
-            throw error;
-          })
+    return from(this.googleSheetService.RefreshMembersData()).pipe(
+      switchMap(members => {
+        // Store in local DB and update last refresh time
+        this.clubContext.setLastMemberRefresh(new Date());
+        return from(MembersDB.setAll(members)).pipe(
+          map(() => ({ members, isFresh: true }))
         );
-      })
-    );
-  }
-
-  searchMembers(searchTerm: string): Observable<Member[]> {
-    return from(this.authService.getAuthToken()).pipe(
-      switchMap(token => {
-        const params = new HttpParams()
-          .set('action', 'getMembers')
-          .set('payload', JSON.stringify({ filters: { searchTerm } }))
-          .set('authorization', token ? 'Bearer ' + token : '');
-
-        const headers = new HttpHeaders({
-          'Content-Type': 'text/plain;charset=utf-8'
-        });
-
-        const options = {
-          headers,
-          params,
-          responseType: 'json' as const,
-          observe: 'body' as const
-        };
-
-        return this.http.get<ApiResponse<Member[]>>(this.apiUrl, options).pipe(
-          map(response => {
-            if (response.status === 'error') throw new Error(response.error?.message);
-            return response.data || [];
-          }),
-          catchError(error => {
-            console.error('Error searching members:', error);
-            throw error;
-          })
-        );
+      }),
+      catchError(error => {
+        console.error('Error fetching members from Google Sheets:', error);
+        throw error;
       })
     );
   }

@@ -36,6 +36,7 @@ function recordExpense(expenseData) {
   if (!expenseData["date"]) expenseData["date"] = new Date();
   var expenseRow = Object.assign({}, expenseData);
   delete expenseRow.context;
+  delete expenseRow.id;
   var newExpense = Expenses.create(expenseRow);
   if (newExpense === false) {
     throw new Error("Validation failed: Invalid expense data.");

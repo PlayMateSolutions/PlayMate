@@ -55,7 +55,6 @@ import { RelativeTimePipe } from './relative-time.pipe';
 import { Router } from '@angular/router';
 import { formatDateHuman } from '../../shared/utils/date-utils';
 
-
 @Component({
   selector: 'app-members',
   templateUrl: './members.page.html',
@@ -86,7 +85,9 @@ import { formatDateHuman } from '../../shared/utils/date-utils';
     IonMenuButton,
     RelativeTimePipe
   ],
-  providers: [MemberService]
+  providers: [
+    MemberService
+  ]
 })
 export class MembersPage implements OnInit {
   members: Member[] = [];
@@ -152,7 +153,7 @@ export class MembersPage implements OnInit {
     });
   }
 
-  refreshMembers() {
+  async refreshMembers() {
     this.loading = true;
     this.error = null;
     this.memberService.refreshMembers().subscribe({
@@ -225,8 +226,8 @@ export class MembersPage implements OnInit {
           compareB = new Date(b.expiryDate).getTime();
           break;
         case 'createdDate':
-          compareA = new Date(a.id).getTime();
-          compareB = new Date(b.id).getTime();
+          compareA = new Number(a.id);
+          compareB = new Number(b.id);
           break;
         default:
           compareA = `${a.firstName} ${a.lastName}`.toLowerCase();

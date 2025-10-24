@@ -1,4 +1,10 @@
-import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  CUSTOM_ELEMENTS_SCHEMA,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
 import {
   ToastController,
   IonHeader,
@@ -29,7 +35,11 @@ import { AuthService } from '../../core/services/auth.service';
 import { PlayMateDB } from '../../core/services/playmate-db';
 import { ApiService } from '../../core/services/api.service';
 import { addIcons } from 'ionicons';
-import { saveOutline } from 'ionicons/icons';
+import { saveOutline, logoGoogle, createOutline } from 'ionicons/icons';
+import '@googleworkspace/drive-picker-element';
+import { environment } from 'src/environments/environment';
+import { Spreadsheet } from 'src/app/shared/interfaces/spreadsheet.interface';
+import { GymMateGoogleSheetService } from '../members/services/google-sheet.service';
 
 @Component({
   selector: 'app-settings',
@@ -52,7 +62,6 @@ import { saveOutline } from 'ionicons/icons';
     IonItemDivider,
     IonItem,
     IonLabel,
-    IonInput,
     IonNote,
     IonToggle,
     IonSelect,
@@ -62,6 +71,7 @@ import { saveOutline } from 'ionicons/icons';
 })
 export class SettingsPage implements OnInit {
   sportsClubId: string = '';
+  selectedSpreadsheet: Spreadsheet | null = null;
   hasChanges: boolean = false;
   loading: boolean = false; // Indicates API call loading state
   darkMode: boolean = false;
@@ -70,12 +80,21 @@ export class SettingsPage implements OnInit {
   userName: string = '';
   userPicture: string = '';
 
+  public pickerVisible = false;
+
+  public clientId = environment.googleSignInClientId;
+  public appId = environment.googleProjectNumber;
+  public oauthToken = 'test';
+
+  @ViewChild('drivePickerElement') drivePickerElement!: ElementRef<any>;
+
   constructor(
     private clubContext: ClubContextService,
     private toastCtrl: ToastController,
     private router: Router,
     private authService: AuthService,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private googleSheetService: GymMateGoogleSheetService
   ) {
     // Get the stored theme preference or system preference
     this.darkMode = document.body.classList.contains('dark-theme');
@@ -87,10 +106,39 @@ export class SettingsPage implements OnInit {
     // Load Sports Club ID
     const storedClubId = this.clubContext.getSportsClubId();
     this.sportsClubId = storedClubId || '';
+    this.selectedSpreadsheet = this.clubContext.getSpreadSheet();
 
     // Load user info
     this.loadUserInfo();
-    addIcons({ saveOutline });
+    addIcons({ saveOutline, logoGoogle, createOutline });
+  }
+
+  async ngAfterViewInit() {
+    var session = await this.authService.getSession();
+    this.oauthToken = session?.accessToken || '';
+
+    const currentSheet = this.clubContext.getSpreadSheet();
+    if (currentSheet) {
+      this.pickerVisible = false;
+      console.log('Current Spreadsheet:', currentSheet);
+      return;
+    }
+
+    // const pickerEl = document.querySelector<any>("drive-picker");
+    // if (pickerEl) {
+    //   pickerEl.visible = true;
+    //   console.log('Drive Picker initialized:', pickerEl);
+
+    //   pickerEl.addEventListener("picker:picked", (event: any) => {
+    //     console.log("Document picked:", event);
+    //     const selectedDoc = event.detail.docs[0];
+    //     this.clubContext.setSpreadSheet(selectedDoc)
+    //   });
+
+    //   pickerEl.addEventListener("picker:canceled", (event: any) => {
+    //     console.log("Picker cancelled:", event);
+    //   });
+    // }
   }
 
   loadUserInfo() {
@@ -107,10 +155,18 @@ export class SettingsPage implements OnInit {
     this.hasChanges = true;
   }
 
+  async clearDatabase() {
+    await PlayMateDB.deleteDatabase().catch((err) => {
+      console.error('Error deleting PlayMateDB during settings save:', err);
+    });
+  }
+
   async saveSettings() {
     this.loading = true;
     const trimmedClubId = this.sportsClubId.trim();
     const currentClubId = this.clubContext.getSportsClubId() || '';
+    this.clubContext.setSpreadSheet(this.selectedSpreadsheet);
+
     if (trimmedClubId) {
       // Only validate with server if club ID has changed
       if (trimmedClubId !== currentClubId) {
@@ -126,6 +182,8 @@ export class SettingsPage implements OnInit {
             response.data.active
           ) {
             this.clubContext.setSportsClubId(trimmedClubId);
+            await this.clearDatabase();
+            
             const toast = await this.toastCtrl.create({
               message: 'Settings saved successfully!',
               duration: 1500,
@@ -216,5 +274,44 @@ export class SettingsPage implements OnInit {
       });
       await toast.present();
     }
+  }
+
+  openPicker() {
+    if (this.drivePickerElement && this.drivePickerElement.nativeElement) {
+      this.drivePickerElement.nativeElement.visible = true;
+    } else {
+      console.error('Drive Picker element not found');
+    }
+  }
+
+  toSpreadsheet(raw: any): Spreadsheet {
+    return {
+      description: raw.description ?? '',
+      driveSuccess: raw.driveSuccess ?? true,
+      embedUrl: raw.embedUrl ?? '',
+      iconUrl: raw.iconUrl ?? '',
+      id: raw.id ?? '',
+      isShared: raw.isShared ?? false,
+      lastEditedUtc: raw.lastEditedUtc ?? 0,
+      mimeType: raw.mimeType ?? '',
+      name: raw.name ?? '',
+      serviceId: raw.serviceId ?? '',
+      sizeBytes: raw.sizeBytes ?? 0,
+      type: raw.type ?? '',
+      url: raw.url ?? '',
+    };
+  }
+
+  onDrivePicked(event: any) {
+    const selectedDoc = event.detail.docs[0];
+    this.selectedSpreadsheet = this.toSpreadsheet(selectedDoc);
+    this.hasChanges = true;
+
+    this.googleSheetService.FetchClubSettings(this.selectedSpreadsheet.id).then((clubsettings) => {
+      console.log('Club settings fetched from selected spreadsheet:', clubsettings);
+      this.sportsClubId = clubsettings.clubId || '';
+    }).catch((err : any) => {
+      console.error('Error fetching club settings from spreadsheet:', err);
+    });
   }
 }

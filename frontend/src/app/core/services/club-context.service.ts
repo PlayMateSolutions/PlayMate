@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
+import { Spreadsheet } from 'src/app/shared/interfaces/spreadsheet.interface';
 
 @Injectable({ providedIn: 'root' })
 export class ClubContextService {
+  
   private sportsClubId: string | null = null;
   private readonly STORAGE_KEY = 'sportsClubId';
   private readonly MEMBER_REFRESH_KEY = 'lastMemberRefresh';
@@ -25,6 +27,19 @@ export class ClubContextService {
 
   getSportsClubId(): string | null {
     return this.sportsClubId;
+  }
+
+  setSpreadSheet(selectedDoc: Spreadsheet | null) {
+    if (!selectedDoc) {
+      localStorage.removeItem('selectedSpreadsheet');
+      return;
+    }
+    localStorage.setItem('selectedSpreadsheet', JSON.stringify(selectedDoc));
+  }
+
+  getSpreadSheet(): Spreadsheet | null {
+    const stored = localStorage.getItem('selectedSpreadsheet');
+    return stored ? JSON.parse(stored) : null;
   }
 
   clear() {

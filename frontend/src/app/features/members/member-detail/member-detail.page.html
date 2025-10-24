@@ -40,7 +40,6 @@
   </ion-segment>
 
   <div *ngIf="selectedTab === 'attendance'">
-    <h3 style="margin-bottom: 0.5rem;">Attendance</h3>
     <app-calendar-grid 
       [events]="attendanceDates"
       [paymentEvents]="paymentDates">
@@ -48,7 +47,6 @@
   </div>
 
   <div *ngIf="selectedTab === 'payments'">
-    <h3 style="margin-bottom: 0.5rem;">Payments</h3>
     <ion-list *ngIf="payments.length > 0">
       <ion-item *ngFor="let payment of payments">
         <ion-label>
