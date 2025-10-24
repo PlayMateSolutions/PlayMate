@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { IonButton, IonInput, IonItem, IonLabel, IonDatetime, IonTextarea, IonPopover, IonList, IonContent, IonButtons, IonHeader, IonToolbar, IonTitle, IonSpinner, ModalController } from '@ionic/angular/standalone';
 import { Expense } from './expense.interface';
 import { ExpenseService } from './expense.service';
+import { AuthService } from 'src/app/core/services/auth.service';
 
 @Component({
   selector: 'app-expense-modal',
@@ -14,7 +15,6 @@ import { ExpenseService } from './expense.service';
   providers: [ExpenseService]
 })
 export class ExpenseModalComponent {
-  @Input() currentUser: string = '';
   expense: Partial<Expense> = {
     date: new Date().toISOString(),
     paymentType: 'Cash',
@@ -22,9 +22,14 @@ export class ExpenseModalComponent {
   };
   saving = false;
   errorMsg = '';
+  currentUser = 'Unknown';
 
-  constructor(private modalCtrl: ModalController, private expenseService: ExpenseService) {
-    console.log('ExpenseModalComponent initialized with currentUser:', this.currentUser);
+  constructor(private modalCtrl: ModalController, private expenseService: ExpenseService, private authService: AuthService) {
+    this.authService.userSession$.subscribe(session => {
+      if (session) {
+        this.currentUser = session.name;
+      }
+    });
   }
 
   dismiss() {

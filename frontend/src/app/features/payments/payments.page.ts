@@ -287,15 +287,8 @@ export class PaymentsPage implements OnInit {
 
   async openExpenseModal() {
     console.log('Opening expense modal...');
-    let userName = 'Unknown';
-    // const session = await this.authService.userSession$.toPromise();
-    // if (session && session.name) userName = session.name;
-    console.log('Current user for expense modal:', userName);
     const modal = await this.modalController.create({
       component: ExpenseModalComponent,
-      componentProps: {
-        currentUser: userName
-      },
       showBackdrop: true,
       backdropDismiss: false,
       cssClass: 'expense-modal',
@@ -303,7 +296,6 @@ export class PaymentsPage implements OnInit {
     });
     modal.onWillDismiss().then(async (result) => {
       if (result.data && result.data.expense) {
-        await this.expenseService.addExpense(result.data.expense);
         this.expenseService.loadData();
         const toast = await this.toastController.create({
           message: 'Expense logged successfully',
