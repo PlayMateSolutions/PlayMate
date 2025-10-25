@@ -27,6 +27,7 @@ import { PaymentService } from './services/payment.service';
 import { TranslateService } from '@ngx-translate/core';
 import { ClubContextService } from '../../core/services/club-context.service';
 import { formatDateHuman } from '../../shared/utils/date-utils';
+import { AuthService } from 'src/app/core/services/auth.service';
 
 @Component({
   selector: 'app-record-payment',
@@ -66,7 +67,8 @@ export class RecordPaymentComponent {
     periodStart: new Date().toISOString(),
     periodEnd: '',
     status: 'Paid' as const,
-    notes: 'Monthly Fees'
+    notes: 'Monthly Fees',
+    recordedBy: 'Unknown'
   };
 
   constructor(
@@ -74,7 +76,8 @@ export class RecordPaymentComponent {
     private paymentService: PaymentService,
     private loadingCtrl: LoadingController,
     private translateService: TranslateService,
-    private clubContext: ClubContextService
+    private clubContext: ClubContextService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
@@ -88,6 +91,12 @@ export class RecordPaymentComponent {
     const endDate = new Date(startDate);
     endDate.setMonth(endDate.getMonth() + 1);
     this.payment.periodEnd = endDate.toISOString();
+
+    this.authService.userSession$.subscribe(session => {
+      if (session) {
+        this.payment.recordedBy = session.name || 'Unknown';
+      }
+    });
   }
 
   isValid(): boolean {

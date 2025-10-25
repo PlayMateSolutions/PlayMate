@@ -27,7 +27,7 @@ export class ExpenseModalComponent {
   constructor(private modalCtrl: ModalController, private expenseService: ExpenseService, private authService: AuthService) {
     this.authService.userSession$.subscribe(session => {
       if (session) {
-        this.currentUser = session.name;
+        this.currentUser = session.name || 'Unknown';;
       }
     });
   }
