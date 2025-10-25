@@ -10,24 +10,47 @@
 <ion-content *ngIf="member">
   <ion-card class="member-detail-card" [ngClass]="member.status ? member.status.toLowerCase() : ''">
     <ion-card-content class="card-content">
-      <div class="member-info-row" style="display: flex; align-items: center;">
-        <div class="member-avatar" 
-             [style.background]="getAvatarColor(member.firstName ? member.firstName.charAt(0) : '?')" 
-             style="width:48px; height:48px; border-radius:50%; color:#fff; display:flex; align-items:center; justify-content:center; font-size:1.5em; font-weight:bold; margin-right:16px;">
-          {{ member.firstName ? member.firstName.charAt(0).toUpperCase() : '?' }}
-        </div>
-        <div class="member-info" style="flex:1;">
-          <div class="member-name">
-            <strong>{{ member.firstName }} {{ member.lastName }}</strong>
-            <small class="member-id">ID: {{ member.id }}</small>
-          </div>
-          <div>Phone: {{ member.phone || 'N/A' }}</div>
-          <div>Status: {{ member.status || 'N/A' }}</div>
-          <div>Joined: {{ member.joinDate ? (member.joinDate | date:'mediumDate') : 'N/A' }}</div>
-          <div>Expiry: {{ member.expiryDate ? (member.expiryDate | date:'mediumDate') : 'N/A' }}</div>
-        </div>
+  <div class="member-info-row" style="display: flex; align-items: center; justify-content: space-between;">
+    <div style="display: flex; align-items: center; flex: 1;">
+      <div
+        class="member-avatar"
+        [style.background]="getAvatarColor(member.firstName ? member.firstName.charAt(0) : '?')"
+        style="width:48px; height:48px; border-radius:50%; color:#fff; display:flex; align-items:center; justify-content:center; font-size:1.5em; font-weight:bold; margin-right:16px;">
+        {{ member.firstName ? member.firstName.charAt(0).toUpperCase() : '?' }}
       </div>
-    </ion-card-content>
+
+      <div class="member-info" style="flex:1;">
+        <div class="member-name">
+          <strong>{{ member.firstName }} {{ member.lastName }}</strong>
+          <small class="member-id" style="margin-left: 8px;">ID: {{ member.id }}</small>
+        </div>
+        <div>Phone: {{ member.phone || 'N/A' }}</div>
+        <div>Status: {{ member.status || 'N/A' }}</div>
+        <div>Joined: {{ member.joinDate ? (member.joinDate | date:'mediumDate') : 'N/A' }}</div>
+        <div>Expiry: {{ member.expiryDate ? (member.expiryDate | date:'mediumDate') : 'N/A' }}</div>
+      </div>
+    </div>
+
+    <div class="member-actions" style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+      <ion-button
+        fill="clear"
+        color="success"
+        class="action-button whatsapp-btn"
+        (click)="openWhatsApp(member.phone)">
+        <ion-icon name="logo-whatsapp"></ion-icon>
+      </ion-button>
+
+      <ion-button
+        fill="clear"
+        [style.color]="'#0A84FF'"
+        class="action-button call-btn"
+        (click)="callMember(member.phone)">
+        <ion-icon name="call-outline"></ion-icon>
+      </ion-button>
+    </div>
+  </div>
+</ion-card-content>
+
   </ion-card>
 
   <ion-segment value="attendance" (ionChange)="onTabChange($event)" style="margin: 1.5rem 0 1rem 0;">

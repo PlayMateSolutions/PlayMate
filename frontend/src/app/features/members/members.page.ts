@@ -54,6 +54,7 @@ import { ClubContextService } from '../../core/services/club-context.service';
 import { RelativeTimePipe } from './relative-time.pipe';
 import { Router } from '@angular/router';
 import { formatDateHuman } from '../../shared/utils/date-utils';
+import { normalizePhoneNumber } from 'src/app/shared/utils/phone-utils';
 
 @Component({
   selector: 'app-members',
@@ -389,20 +390,9 @@ export class MembersPage implements OnInit {
     }
     
     // Format the phone number (remove spaces, dashes, etc.)
-    let phoneNumber = member.phone.toString().replace(/\s+/g, '').replace(/-/g, '');
-    
-    // If the phone number doesn't start with '+', add the country code
-    // Assuming India (+91) as default country code
-    if (!phoneNumber.startsWith('+')) {
-      // Remove leading zeros if any
-      phoneNumber = phoneNumber.replace(/^0+/, '');
-      
-      // If the number doesn't have country code, add it
-      if (!phoneNumber.startsWith('91')) {
-        phoneNumber = '91' + phoneNumber;
-      }
-    }
-      // Create message based on membership status using translations
+    let phoneNumber = normalizePhoneNumber(member.phone.toString());
+
+    // Create message based on membership status using translations
     const membershipStatus = this.getMembershipStatus(member.expiryDate);
     const params = {
       name: `${member.firstName} ${member.lastName}`,

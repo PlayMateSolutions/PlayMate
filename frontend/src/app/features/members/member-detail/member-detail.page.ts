@@ -1,15 +1,17 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonCard, IonCardContent, IonSegment, IonSegmentButton, IonLabel, IonList, IonItem, IonNote } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonButtons, IonButton, IonBackButton, IonTitle, IonContent, IonCard, IonCardContent, IonSegment, IonSegmentButton, IonLabel, IonList, IonItem, IonNote, IonIcon } from '@ionic/angular/standalone';
 import { MemberService } from '../services/member.service';
 import { Member } from '../../../shared/interfaces/member.interface';
 import { CalendarGridComponent } from '../../../shared/components/calendar-grid.component';
 import { AttendanceService } from '../../attendance/services/attendance.service';
-import { Attendance } from '../../../shared/interfaces/attendance.interface';
 import { PaymentService } from '../../payments/payment.service';
 import { Payment } from '../../payments/payment.interface';
 import { Subscription } from 'rxjs';
+import { normalizePhoneNumber } from 'src/app/shared/utils/phone-utils';
+import { callOutline, logoWhatsapp } from 'ionicons/icons';
+import { addIcons } from 'ionicons';
 
 @Component({
   selector: 'app-member-detail',
@@ -20,6 +22,8 @@ import { Subscription } from 'rxjs';
     IonHeader,
     IonToolbar,
     IonButtons,
+    IonButton,
+    IonIcon,
     IonBackButton,
     IonTitle,
     IonContent,
@@ -49,7 +53,9 @@ export class MemberDetailPage implements OnInit, OnDestroy {
     private memberService: MemberService,
     private attendanceService: AttendanceService,
     private paymentService: PaymentService
-  ) {}
+  ) {
+    addIcons({ callOutline, logoWhatsapp });
+  }
 
   ngOnInit() {
     const memberId = this.route.snapshot.paramMap.get('id');
@@ -87,5 +93,19 @@ export class MemberDetailPage implements OnInit, OnDestroy {
     const saturation = 50; // percent
     const lightness = 60; // percent
     return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+  }
+
+  openWhatsApp(phone: string | null) {
+    if (phone) {
+      const url = `https://wa.me/${normalizePhoneNumber(phone)}`;
+      window.open(url, '_blank');
+    }
+  }
+
+  callMember(phone: string | null) {
+    if (phone) {
+      const url = `tel:${normalizePhoneNumber(phone)}`;
+      window.open(url, '_blank');
+    }
   }
 }
