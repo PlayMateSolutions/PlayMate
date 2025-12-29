@@ -1,0 +1,1 @@
+function n(t){if(!t)return"N/A";try{return(typeof t=="string"?new Date(t):t).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}catch{return typeof t=="string"?t:t.toString()}}export{n as a};
