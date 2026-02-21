@@ -1,0 +1,1 @@
+import{B as o}from"./chunk-PIZEJFMR.js";import{a as e}from"./chunk-T47TWMLD.js";var c=e("Browser",{web:()=>import("./chunk-G55KX47X.js").then(t=>new t.BrowserWeb)});var m=(()=>{let r=class r{constructor(){this.refreshAll=null}};r.\u0275fac=function(n){return new(n||r)},r.\u0275prov=o({token:r,factory:r.\u0275fac,providedIn:"root"});let t=r;return t})();export{c as a,m as b};
