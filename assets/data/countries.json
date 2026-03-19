@@ -5,7 +5,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "USD",
-	"name_plural": "US dollars"
+	"name_plural": "US dollars",
+	"phoneCode": "+1"
 }, {
 	"symbol": "CA$",
 	"name": "Canadian Dollar",
@@ -13,7 +14,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "CAD",
-	"name_plural": "Canadian dollars"
+	"name_plural": "Canadian dollars",
+	"phoneCode": "+1"
 }, {
 	"symbol": "€",
 	"name": "Euro",
@@ -21,7 +23,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "EUR",
-	"name_plural": "euros"
+	"name_plural": "euros",
+	"phoneCode": "+49"
 }, {
 	"symbol": "AED",
 	"name": "United Arab Emirates Dirham",
@@ -29,7 +32,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "AED",
-	"name_plural": "UAE dirhams"
+	"name_plural": "UAE dirhams",
+	"phoneCode": "+971"
 }, {
 	"symbol": "Af",
 	"name": "Afghan Afghani",
@@ -37,7 +41,8 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "AFN",
-	"name_plural": "Afghan Afghanis"
+	"name_plural": "Afghan Afghanis",
+	"phoneCode": "+93"
 }, {
 	"symbol": "ALL",
 	"name": "Albanian Lek",
@@ -45,7 +50,8 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "ALL",
-	"name_plural": "Albanian lekë"
+	"name_plural": "Albanian lekë",
+	"phoneCode": "+355"
 }, {
 	"symbol": "AMD",
 	"name": "Armenian Dram",
@@ -53,7 +59,8 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "AMD",
-	"name_plural": "Armenian drams"
+	"name_plural": "Armenian drams",
+	"phoneCode": "+374"
 }, {
 	"symbol": "AR$",
 	"name": "Argentine Peso",
@@ -61,7 +68,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "ARS",
-	"name_plural": "Argentine pesos"
+	"name_plural": "Argentine pesos",
+	"phoneCode": "+54"
 }, {
 	"symbol": "AU$",
 	"name": "Australian Dollar",
@@ -69,7 +77,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "AUD",
-	"name_plural": "Australian dollars"
+	"name_plural": "Australian dollars",
+	"phoneCode": "+61"
 }, {
 	"symbol": "man.",
 	"name": "Azerbaijani Manat",
@@ -77,7 +86,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "AZN",
-	"name_plural": "Azerbaijani manats"
+	"name_plural": "Azerbaijani manats",
+	"phoneCode": "+994"
 }, {
 	"symbol": "KM",
 	"name": "Bosnia-Herzegovina Convertible Mark",
@@ -85,7 +95,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "BAM",
-	"name_plural": "Bosnia-Herzegovina convertible marks"
+	"name_plural": "Bosnia-Herzegovina convertible marks",
+	"phoneCode": "+387"
 }, {
 	"symbol": "Tk",
 	"name": "Bangladeshi Taka",
@@ -93,7 +104,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "BDT",
-	"name_plural": "Bangladeshi takas"
+	"name_plural": "Bangladeshi takas",
+	"phoneCode": "+880"
 }, {
 	"symbol": "BGN",
 	"name": "Bulgarian Lev",
@@ -101,7 +113,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "BGN",
-	"name_plural": "Bulgarian leva"
+	"name_plural": "Bulgarian leva",
+	"phoneCode": "+359"
 }, {
 	"symbol": "BD",
 	"name": "Bahraini Dinar",
@@ -109,7 +122,8 @@
 	"decimal_digits": 3,
 	"rounding": 0,
 	"code": "BHD",
-	"name_plural": "Bahraini dinars"
+	"name_plural": "Bahraini dinars",
+	"phoneCode": "+973"
 }, {
 	"symbol": "FBu",
 	"name": "Burundian Franc",
@@ -117,7 +131,8 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "BIF",
-	"name_plural": "Burundian francs"
+	"name_plural": "Burundian francs",
+	"phoneCode": "+257"
 }, {
 	"symbol": "BN$",
 	"name": "Brunei Dollar",
@@ -125,7 +140,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "BND",
-	"name_plural": "Brunei dollars"
+	"name_plural": "Brunei dollars",
+	"phoneCode": "+673"
 }, {
 	"symbol": "Bs",
 	"name": "Bolivian Boliviano",
@@ -133,7 +149,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "BOB",
-	"name_plural": "Bolivian bolivianos"
+	"name_plural": "Bolivian bolivianos",
+	"phoneCode": "+591"
 }, {
 	"symbol": "R$",
 	"name": "Brazilian Real",
@@ -141,7 +158,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "BRL",
-	"name_plural": "Brazilian reals"
+	"name_plural": "Brazilian reals",
+	"phoneCode": "+55"
 }, {
 	"symbol": "BWP",
 	"name": "Botswanan Pula",
@@ -149,7 +167,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "BWP",
-	"name_plural": "Botswanan pulas"
+	"name_plural": "Botswanan pulas",
+	"phoneCode": "+267"
 }, {
 	"symbol": "BYR",
 	"name": "Belarusian Ruble",
@@ -157,7 +176,8 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "BYR",
-	"name_plural": "Belarusian rubles"
+	"name_plural": "Belarusian rubles",
+	"phoneCode": "+375"
 }, {
 	"symbol": "BZ$",
 	"name": "Belize Dollar",
@@ -165,7 +185,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "BZD",
-	"name_plural": "Belize dollars"
+	"name_plural": "Belize dollars",
+	"phoneCode": "+501"
 }, {
 	"symbol": "CDF",
 	"name": "Congolese Franc",
@@ -173,7 +194,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "CDF",
-	"name_plural": "Congolese francs"
+	"name_plural": "Congolese francs",
+	"phoneCode": "+243"
 }, {
 	"symbol": "CHF",
 	"name": "Swiss Franc",
@@ -181,7 +203,8 @@
 	"decimal_digits": 2,
 	"rounding": 0.05,
 	"code": "CHF",
-	"name_plural": "Swiss francs"
+	"name_plural": "Swiss francs",
+	"phoneCode": "+41"
 }, {
 	"symbol": "CL$",
 	"name": "Chilean Peso",
@@ -189,7 +212,8 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "CLP",
-	"name_plural": "Chilean pesos"
+	"name_plural": "Chilean pesos",
+	"phoneCode": "+56"
 }, {
 	"symbol": "CN¥",
 	"name": "Chinese Yuan",
@@ -197,7 +221,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "CNY",
-	"name_plural": "Chinese yuan"
+	"name_plural": "Chinese yuan",
+	"phoneCode": "+86"
 }, {
 	"symbol": "CO$",
 	"name": "Colombian Peso",
@@ -205,7 +230,8 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "COP",
-	"name_plural": "Colombian pesos"
+	"name_plural": "Colombian pesos",
+	"phoneCode": "+57"
 }, {
 	"symbol": "₡",
 	"name": "Costa Rican Colón",
@@ -213,7 +239,8 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "CRC",
-	"name_plural": "Costa Rican colóns"
+	"name_plural": "Costa Rican colóns",
+	"phoneCode": "+506"
 }, {
 	"symbol": "CV$",
 	"name": "Cape Verdean Escudo",
@@ -221,7 +248,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "CVE",
-	"name_plural": "Cape Verdean escudos"
+	"name_plural": "Cape Verdean escudos",
+	"phoneCode": "+238"
 }, {
 	"symbol": "Kč",
 	"name": "Czech Republic Koruna",
@@ -229,7 +257,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "CZK",
-	"name_plural": "Czech Republic korunas"
+	"name_plural": "Czech Republic korunas",
+	"phoneCode": "+420"
 }, {
 	"symbol": "Fdj",
 	"name": "Djiboutian Franc",
@@ -237,7 +266,8 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "DJF",
-	"name_plural": "Djiboutian francs"
+	"name_plural": "Djiboutian francs",
+	"phoneCode": "+253"
 }, {
 	"symbol": "Dkr",
 	"name": "Danish Krone",
@@ -245,7 +275,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "DKK",
-	"name_plural": "Danish kroner"
+	"name_plural": "Danish kroner",
+	"phoneCode": "+45"
 }, {
 	"symbol": "RD$",
 	"name": "Dominican Peso",
@@ -253,7 +284,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "DOP",
-	"name_plural": "Dominican pesos"
+	"name_plural": "Dominican pesos",
+	"phoneCode": "+1"
 }, {
 	"symbol": "DA",
 	"name": "Algerian Dinar",
@@ -261,7 +293,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "DZD",
-	"name_plural": "Algerian dinars"
+	"name_plural": "Algerian dinars",
+	"phoneCode": "+213"
 }, {
 	"symbol": "Ekr",
 	"name": "Estonian Kroon",
@@ -269,7 +302,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "EEK",
-	"name_plural": "Estonian kroons"
+	"name_plural": "Estonian kroons",
+	"phoneCode": "+372"
 }, {
 	"symbol": "EGP",
 	"name": "Egyptian Pound",
@@ -277,7 +311,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "EGP",
-	"name_plural": "Egyptian pounds"
+	"name_plural": "Egyptian pounds",
+	"phoneCode": "+20"
 }, {
 	"symbol": "Nfk",
 	"name": "Eritrean Nakfa",
@@ -285,7 +320,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "ERN",
-	"name_plural": "Eritrean nakfas"
+	"name_plural": "Eritrean nakfas",
+	"phoneCode": "+291"
 }, {
 	"symbol": "Br",
 	"name": "Ethiopian Birr",
@@ -293,7 +329,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "ETB",
-	"name_plural": "Ethiopian birrs"
+	"name_plural": "Ethiopian birrs",
+	"phoneCode": "+251"
 }, {
 	"symbol": "£",
 	"name": "British Pound Sterling",
@@ -301,7 +338,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "GBP",
-	"name_plural": "British pounds sterling"
+	"name_plural": "British pounds sterling",
+	"phoneCode": "+44"
 }, {
 	"symbol": "GEL",
 	"name": "Georgian Lari",
@@ -309,7 +347,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "GEL",
-	"name_plural": "Georgian laris"
+	"name_plural": "Georgian laris",
+	"phoneCode": "+995"
 }, {
 	"symbol": "GH₵",
 	"name": "Ghanaian Cedi",
@@ -317,7 +356,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "GHS",
-	"name_plural": "Ghanaian cedis"
+	"name_plural": "Ghanaian cedis",
+	"phoneCode": "+233"
 }, {
 	"symbol": "FG",
 	"name": "Guinean Franc",
@@ -325,7 +365,8 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "GNF",
-	"name_plural": "Guinean francs"
+	"name_plural": "Guinean francs",
+	"phoneCode": "+224"
 }, {
 	"symbol": "GTQ",
 	"name": "Guatemalan Quetzal",
@@ -333,7 +374,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "GTQ",
-	"name_plural": "Guatemalan quetzals"
+	"name_plural": "Guatemalan quetzals",
+	"phoneCode": "+502"
 }, {
 	"symbol": "HK$",
 	"name": "Hong Kong Dollar",
@@ -341,7 +383,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "HKD",
-	"name_plural": "Hong Kong dollars"
+	"name_plural": "Hong Kong dollars",
+	"phoneCode": "+852"
 }, {
 	"symbol": "HNL",
 	"name": "Honduran Lempira",
@@ -349,7 +392,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "HNL",
-	"name_plural": "Honduran lempiras"
+	"name_plural": "Honduran lempiras",
+	"phoneCode": "+504"
 }, {
 	"symbol": "kn",
 	"name": "Croatian Kuna",
@@ -357,7 +401,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "HRK",
-	"name_plural": "Croatian kunas"
+	"name_plural": "Croatian kunas",
+	"phoneCode": "+385"
 }, {
 	"symbol": "Ft",
 	"name": "Hungarian Forint",
@@ -365,7 +410,8 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "HUF",
-	"name_plural": "Hungarian forints"
+	"name_plural": "Hungarian forints",
+	"phoneCode": "+36"
 }, {
 	"symbol": "Rp",
 	"name": "Indonesian Rupiah",
@@ -373,7 +419,8 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "IDR",
-	"name_plural": "Indonesian rupiahs"
+	"name_plural": "Indonesian rupiahs",
+	"phoneCode": "+62"
 }, {
 	"symbol": "₪",
 	"name": "Israeli New Sheqel",
@@ -381,7 +428,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "ILS",
-	"name_plural": "Israeli new sheqels"
+	"name_plural": "Israeli new sheqels",
+	"phoneCode": "+972"
 }, {
 	"symbol": "₹",
 	"name": "Indian Rupee",
@@ -389,7 +437,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "INR",
-	"name_plural": "Indian rupees"
+	"name_plural": "Indian rupees",
+	"phoneCode": "+91"
 }, {
 	"symbol": "IQD",
 	"name": "Iraqi Dinar",
@@ -397,7 +446,8 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "IQD",
-	"name_plural": "Iraqi dinars"
+	"name_plural": "Iraqi dinars",
+	"phoneCode": "+964"
 }, {
 	"symbol": "IRR",
 	"name": "Iranian Rial",
@@ -405,7 +455,8 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "IRR",
-	"name_plural": "Iranian rials"
+	"name_plural": "Iranian rials",
+	"phoneCode": "+98"
 }, {
 	"symbol": "Ikr",
 	"name": "Icelandic Króna",
@@ -413,7 +464,8 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "ISK",
-	"name_plural": "Icelandic krónur"
+	"name_plural": "Icelandic krónur",
+	"phoneCode": "+354"
 }, {
 	"symbol": "J$",
 	"name": "Jamaican Dollar",
@@ -421,7 +473,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "JMD",
-	"name_plural": "Jamaican dollars"
+	"name_plural": "Jamaican dollars",
+	"phoneCode": "+1"
 }, {
 	"symbol": "JD",
 	"name": "Jordanian Dinar",
@@ -429,7 +482,8 @@
 	"decimal_digits": 3,
 	"rounding": 0,
 	"code": "JOD",
-	"name_plural": "Jordanian dinars"
+	"name_plural": "Jordanian dinars",
+	"phoneCode": "+962"
 }, {
 	"symbol": "¥",
 	"name": "Japanese Yen",
@@ -437,7 +491,8 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "JPY",
-	"name_plural": "Japanese yen"
+	"name_plural": "Japanese yen",
+	"phoneCode": "+81"
 }, {
 	"symbol": "Ksh",
 	"name": "Kenyan Shilling",
@@ -445,7 +500,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "KES",
-	"name_plural": "Kenyan shillings"
+	"name_plural": "Kenyan shillings",
+	"phoneCode": "+254"
 }, {
 	"symbol": "KHR",
 	"name": "Cambodian Riel",
@@ -453,7 +509,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "KHR",
-	"name_plural": "Cambodian riels"
+	"name_plural": "Cambodian riels",
+	"phoneCode": "+855"
 }, {
 	"symbol": "CF",
 	"name": "Comorian Franc",
@@ -461,7 +518,8 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "KMF",
-	"name_plural": "Comorian francs"
+	"name_plural": "Comorian francs",
+	"phoneCode": "+269"
 }, {
 	"symbol": "₩",
 	"name": "South Korean Won",
@@ -469,7 +527,8 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "KRW",
-	"name_plural": "South Korean won"
+	"name_plural": "South Korean won",
+	"phoneCode": "+82"
 }, {
 	"symbol": "KD",
 	"name": "Kuwaiti Dinar",
@@ -477,7 +536,8 @@
 	"decimal_digits": 3,
 	"rounding": 0,
 	"code": "KWD",
-	"name_plural": "Kuwaiti dinars"
+	"name_plural": "Kuwaiti dinars",
+	"phoneCode": "+965"
 }, {
 	"symbol": "KZT",
 	"name": "Kazakhstani Tenge",
@@ -485,7 +545,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "KZT",
-	"name_plural": "Kazakhstani tenges"
+	"name_plural": "Kazakhstani tenges",
+	"phoneCode": "+7"
 }, {
 	"symbol": "LB£",
 	"name": "Lebanese Pound",
@@ -493,7 +554,8 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "LBP",
-	"name_plural": "Lebanese pounds"
+	"name_plural": "Lebanese pounds",
+	"phoneCode": "+961"
 }, {
 	"symbol": "SLRs",
 	"name": "Sri Lankan Rupee",
@@ -501,7 +563,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "LKR",
-	"name_plural": "Sri Lankan rupees"
+	"name_plural": "Sri Lankan rupees",
+	"phoneCode": "+94"
 }, {
 	"symbol": "Lt",
 	"name": "Lithuanian Litas",
@@ -509,7 +572,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "LTL",
-	"name_plural": "Lithuanian litai"
+	"name_plural": "Lithuanian litai",
+	"phoneCode": "+370"
 }, {
 	"symbol": "Ls",
 	"name": "Latvian Lats",
@@ -517,7 +581,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "LVL",
-	"name_plural": "Latvian lati"
+	"name_plural": "Latvian lati",
+	"phoneCode": "+371"
 }, {
 	"symbol": "LD",
 	"name": "Libyan Dinar",
@@ -525,7 +590,8 @@
 	"decimal_digits": 3,
 	"rounding": 0,
 	"code": "LYD",
-	"name_plural": "Libyan dinars"
+	"name_plural": "Libyan dinars",
+	"phoneCode": "+218"
 }, {
 	"symbol": "MAD",
 	"name": "Moroccan Dirham",
@@ -533,7 +599,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "MAD",
-	"name_plural": "Moroccan dirhams"
+	"name_plural": "Moroccan dirhams",
+	"phoneCode": "+212"
 }, {
 	"symbol": "MDL",
 	"name": "Moldovan Leu",
@@ -541,7 +608,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "MDL",
-	"name_plural": "Moldovan lei"
+	"name_plural": "Moldovan lei",
+	"phoneCode": "+373"
 }, {
 	"symbol": "MGA",
 	"name": "Malagasy Ariary",
@@ -549,7 +617,8 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "MGA",
-	"name_plural": "Malagasy Ariaries"
+	"name_plural": "Malagasy Ariaries",
+	"phoneCode": "+261"
 }, {
 	"symbol": "MKD",
 	"name": "Macedonian Denar",
@@ -557,7 +626,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "MKD",
-	"name_plural": "Macedonian denari"
+	"name_plural": "Macedonian denari",
+	"phoneCode": "+389"
 }, {
 	"symbol": "MMK",
 	"name": "Myanma Kyat",
@@ -565,7 +635,8 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "MMK",
-	"name_plural": "Myanma kyats"
+	"name_plural": "Myanma kyats",
+	"phoneCode": "+95"
 }, {
 	"symbol": "MOP$",
 	"name": "Macanese Pataca",
@@ -573,7 +644,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "MOP",
-	"name_plural": "Macanese patacas"
+	"name_plural": "Macanese patacas",
+	"phoneCode": "+853"
 }, {
 	"symbol": "MURs",
 	"name": "Mauritian Rupee",
@@ -581,7 +653,8 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "MUR",
-	"name_plural": "Mauritian rupees"
+	"name_plural": "Mauritian rupees",
+	"phoneCode": "+230"
 }, {
 	"symbol": "MX$",
 	"name": "Mexican Peso",
@@ -589,7 +662,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "MXN",
-	"name_plural": "Mexican pesos"
+	"name_plural": "Mexican pesos",
+	"phoneCode": "+52"
 }, {
 	"symbol": "RM",
 	"name": "Malaysian Ringgit",
@@ -597,7 +671,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "MYR",
-	"name_plural": "Malaysian ringgits"
+	"name_plural": "Malaysian ringgits",
+	"phoneCode": "+60"
 }, {
 	"symbol": "MTn",
 	"name": "Mozambican Metical",
@@ -605,7 +680,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "MZN",
-	"name_plural": "Mozambican meticals"
+	"name_plural": "Mozambican meticals",
+	"phoneCode": "+258"
 }, {
 	"symbol": "N$",
 	"name": "Namibian Dollar",
@@ -613,7 +689,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "NAD",
-	"name_plural": "Namibian dollars"
+	"name_plural": "Namibian dollars",
+	"phoneCode": "+264"
 }, {
 	"symbol": "₦",
 	"name": "Nigerian Naira",
@@ -621,7 +698,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "NGN",
-	"name_plural": "Nigerian nairas"
+	"name_plural": "Nigerian nairas",
+	"phoneCode": "+234"
 }, {
 	"symbol": "C$",
 	"name": "Nicaraguan Córdoba",
@@ -629,7 +707,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "NIO",
-	"name_plural": "Nicaraguan córdobas"
+	"name_plural": "Nicaraguan córdobas",
+	"phoneCode": "+505"
 }, {
 	"symbol": "Nkr",
 	"name": "Norwegian Krone",
@@ -637,7 +716,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "NOK",
-	"name_plural": "Norwegian kroner"
+	"name_plural": "Norwegian kroner",
+	"phoneCode": "+47"
 }, {
 	"symbol": "NPRs",
 	"name": "Nepalese Rupee",
@@ -645,7 +725,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "NPR",
-	"name_plural": "Nepalese rupees"
+	"name_plural": "Nepalese rupees",
+	"phoneCode": "+977"
 }, {
 	"symbol": "NZ$",
 	"name": "New Zealand Dollar",
@@ -653,7 +734,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "NZD",
-	"name_plural": "New Zealand dollars"
+	"name_plural": "New Zealand dollars",
+	"phoneCode": "+64"
 }, {
 	"symbol": "OMR",
 	"name": "Omani Rial",
@@ -661,7 +743,8 @@
 	"decimal_digits": 3,
 	"rounding": 0,
 	"code": "OMR",
-	"name_plural": "Omani rials"
+	"name_plural": "Omani rials",
+	"phoneCode": "+968"
 }, {
 	"symbol": "B/.",
 	"name": "Panamanian Balboa",
@@ -669,7 +752,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "PAB",
-	"name_plural": "Panamanian balboas"
+	"name_plural": "Panamanian balboas",
+	"phoneCode": "+507"
 }, {
 	"symbol": "S/.",
 	"name": "Peruvian Nuevo Sol",
@@ -677,7 +761,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "PEN",
-	"name_plural": "Peruvian nuevos soles"
+	"name_plural": "Peruvian nuevos soles",
+	"phoneCode": "+51"
 }, {
 	"symbol": "₱",
 	"name": "Philippine Peso",
@@ -685,7 +770,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "PHP",
-	"name_plural": "Philippine pesos"
+	"name_plural": "Philippine pesos",
+	"phoneCode": "+63"
 }, {
 	"symbol": "PKRs",
 	"name": "Pakistani Rupee",
@@ -693,7 +779,8 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "PKR",
-	"name_plural": "Pakistani rupees"
+	"name_plural": "Pakistani rupees",
+	"phoneCode": "+92"
 }, {
 	"symbol": "zł",
 	"name": "Polish Zloty",
@@ -701,7 +788,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "PLN",
-	"name_plural": "Polish zlotys"
+	"name_plural": "Polish zlotys",
+	"phoneCode": "+48"
 }, {
 	"symbol": "₲",
 	"name": "Paraguayan Guarani",
@@ -709,7 +797,8 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "PYG",
-	"name_plural": "Paraguayan guaranis"
+	"name_plural": "Paraguayan guaranis",
+	"phoneCode": "+595"
 }, {
 	"symbol": "QR",
 	"name": "Qatari Rial",
@@ -717,7 +806,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "QAR",
-	"name_plural": "Qatari rials"
+	"name_plural": "Qatari rials",
+	"phoneCode": "+974"
 }, {
 	"symbol": "RON",
 	"name": "Romanian Leu",
@@ -725,7 +815,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "RON",
-	"name_plural": "Romanian lei"
+	"name_plural": "Romanian lei",
+	"phoneCode": "+40"
 }, {
 	"symbol": "din.",
 	"name": "Serbian Dinar",
@@ -733,7 +824,8 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "RSD",
-	"name_plural": "Serbian dinars"
+	"name_plural": "Serbian dinars",
+	"phoneCode": "+381"
 }, {
 	"symbol": "RUB",
 	"name": "Russian Ruble",
@@ -741,7 +833,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "RUB",
-	"name_plural": "Russian rubles"
+	"name_plural": "Russian rubles",
+	"phoneCode": "+7"
 }, {
 	"symbol": "RWF",
 	"name": "Rwandan Franc",
@@ -749,7 +842,8 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "RWF",
-	"name_plural": "Rwandan francs"
+	"name_plural": "Rwandan francs",
+	"phoneCode": "+250"
 }, {
 	"symbol": "SR",
 	"name": "Saudi Riyal",
@@ -757,7 +851,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "SAR",
-	"name_plural": "Saudi riyals"
+	"name_plural": "Saudi riyals",
+	"phoneCode": "+966"
 }, {
 	"symbol": "SDG",
 	"name": "Sudanese Pound",
@@ -765,7 +860,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "SDG",
-	"name_plural": "Sudanese pounds"
+	"name_plural": "Sudanese pounds",
+	"phoneCode": "+249"
 }, {
 	"symbol": "Skr",
 	"name": "Swedish Krona",
@@ -773,7 +869,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "SEK",
-	"name_plural": "Swedish kronor"
+	"name_plural": "Swedish kronor",
+	"phoneCode": "+46"
 }, {
 	"symbol": "S$",
 	"name": "Singapore Dollar",
@@ -781,7 +878,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "SGD",
-	"name_plural": "Singapore dollars"
+	"name_plural": "Singapore dollars",
+	"phoneCode": "+65"
 }, {
 	"symbol": "Ssh",
 	"name": "Somali Shilling",
@@ -789,7 +887,8 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "SOS",
-	"name_plural": "Somali shillings"
+	"name_plural": "Somali shillings",
+	"phoneCode": "+252"
 }, {
 	"symbol": "SY£",
 	"name": "Syrian Pound",
@@ -797,7 +896,8 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "SYP",
-	"name_plural": "Syrian pounds"
+	"name_plural": "Syrian pounds",
+	"phoneCode": "+963"
 }, {
 	"symbol": "฿",
 	"name": "Thai Baht",
@@ -805,7 +905,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "THB",
-	"name_plural": "Thai baht"
+	"name_plural": "Thai baht",
+	"phoneCode": "+66"
 }, {
 	"symbol": "DT",
 	"name": "Tunisian Dinar",
@@ -813,7 +914,8 @@
 	"decimal_digits": 3,
 	"rounding": 0,
 	"code": "TND",
-	"name_plural": "Tunisian dinars"
+	"name_plural": "Tunisian dinars",
+	"phoneCode": "+216"
 }, {
 	"symbol": "T$",
 	"name": "Tongan Paʻanga",
@@ -821,7 +923,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "TOP",
-	"name_plural": "Tongan paʻanga"
+	"name_plural": "Tongan paʻanga",
+	"phoneCode": "+676"
 }, {
 	"symbol": "TL",
 	"name": "Turkish Lira",
@@ -829,7 +932,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "TRY",
-	"name_plural": "Turkish Lira"
+	"name_plural": "Turkish Lira",
+	"phoneCode": "+90"
 }, {
 	"symbol": "TT$",
 	"name": "Trinidad and Tobago Dollar",
@@ -837,7 +941,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "TTD",
-	"name_plural": "Trinidad and Tobago dollars"
+	"name_plural": "Trinidad and Tobago dollars",
+	"phoneCode": "+1"
 }, {
 	"symbol": "NT$",
 	"name": "New Taiwan Dollar",
@@ -845,7 +950,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "TWD",
-	"name_plural": "New Taiwan dollars"
+	"name_plural": "New Taiwan dollars",
+	"phoneCode": "+886"
 }, {
 	"symbol": "TSh",
 	"name": "Tanzanian Shilling",
@@ -853,7 +959,8 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "TZS",
-	"name_plural": "Tanzanian shillings"
+	"name_plural": "Tanzanian shillings",
+	"phoneCode": "+255"
 }, {
 	"symbol": "₴",
 	"name": "Ukrainian Hryvnia",
@@ -861,7 +968,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "UAH",
-	"name_plural": "Ukrainian hryvnias"
+	"name_plural": "Ukrainian hryvnias",
+	"phoneCode": "+380"
 }, {
 	"symbol": "USh",
 	"name": "Ugandan Shilling",
@@ -869,7 +977,8 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "UGX",
-	"name_plural": "Ugandan shillings"
+	"name_plural": "Ugandan shillings",
+	"phoneCode": "+256"
 }, {
 	"symbol": "$U",
 	"name": "Uruguayan Peso",
@@ -877,7 +986,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "UYU",
-	"name_plural": "Uruguayan pesos"
+	"name_plural": "Uruguayan pesos",
+	"phoneCode": "+598"
 }, {
 	"symbol": "UZS",
 	"name": "Uzbekistan Som",
@@ -885,7 +995,8 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "UZS",
-	"name_plural": "Uzbekistan som"
+	"name_plural": "Uzbekistan som",
+	"phoneCode": "+998"
 }, {
 	"symbol": "Bs.F.",
 	"name": "Venezuelan Bolívar",
@@ -893,7 +1004,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "VEF",
-	"name_plural": "Venezuelan bolívars"
+	"name_plural": "Venezuelan bolívars",
+	"phoneCode": "+58"
 }, {
 	"symbol": "₫",
 	"name": "Vietnamese Dong",
@@ -901,7 +1013,8 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "VND",
-	"name_plural": "Vietnamese dong"
+	"name_plural": "Vietnamese dong",
+	"phoneCode": "+84"
 }, {
 	"symbol": "FCFA",
 	"name": "CFA Franc BEAC",
@@ -909,7 +1022,8 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "XAF",
-	"name_plural": "CFA francs BEAC"
+	"name_plural": "CFA francs BEAC",
+	"phoneCode": "+237"
 }, {
 	"symbol": "CFA",
 	"name": "CFA Franc BCEAO",
@@ -917,7 +1031,8 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "XOF",
-	"name_plural": "CFA francs BCEAO"
+	"name_plural": "CFA francs BCEAO",
+	"phoneCode": "+225"
 }, {
 	"symbol": "YR",
 	"name": "Yemeni Rial",
@@ -925,7 +1040,8 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "YER",
-	"name_plural": "Yemeni rials"
+	"name_plural": "Yemeni rials",
+	"phoneCode": "+967"
 }, {
 	"symbol": "R",
 	"name": "South African Rand",
@@ -933,7 +1049,8 @@
 	"decimal_digits": 2,
 	"rounding": 0,
 	"code": "ZAR",
-	"name_plural": "South African rand"
+	"name_plural": "South African rand",
+	"phoneCode": "+27"
 }, {
 	"symbol": "ZK",
 	"name": "Zambian Kwacha",
@@ -941,5 +1058,6 @@
 	"decimal_digits": 0,
 	"rounding": 0,
 	"code": "ZMK",
-	"name_plural": "Zambian kwachas"
+	"name_plural": "Zambian kwachas",
+	"phoneCode": "+260"
 }]
