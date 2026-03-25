@@ -1,1 +1,0 @@
-var e={clubId:"",clubName:"",adminEmail:"",currency:"INR",currencySymbol:"\u20B9",phoneCode:"+91",monthlyFees:1e3,membershipBillingCycle:"monthly",latePaymentDays:5,apiToken:"",apiUrl:"",version:"1.0.0",lastUpdated:new Date().toISOString(),attendanceLastUpdated:"",membersLastUpdated:"",paymentsLastUpdated:"",expensesLastUpdated:""};export{e as a};
