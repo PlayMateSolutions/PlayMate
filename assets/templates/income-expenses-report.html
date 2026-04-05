@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20mm;
+            background: white;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .report-container {
+            width: 100%;
+            max-width: 170mm;
+            margin: 0 auto;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Page break rules for multi-page PDFs */
+        @page {
+            margin: 20mm;
+            size: A4;
+        }
+
+        .summary-section {
+            page-break-inside: avoid;
+        }
+
+        .breakdown-section {
+            page-break-before: auto;
+        }
+
+        .breakdown-table {
+            page-break-inside: auto;
+        }
+
+        .breakdown-table tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+        }
+
+        .breakdown-table thead {
+            display: table-header-group;
+        }
+
+        .footer {
+            page-break-inside: avoid;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #3880ff;
+            padding-bottom: 20px;
+        }
+
+        .club-name {
+            color: #3880ff;
+            margin: 0;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .report-title {
+            color: #666;
+            margin: 10px 0 0 0;
+            font-size: 20px;
+            font-weight: normal;
+        }
+
+        .date-range {
+            color: #888;
+            margin: 5px 0 0 0;
+            font-size: 14px;
+        }
+
+        /* Summary Cards */
+        .summary-section {
+            display: flex;
+            justify-content: space-between;
+            margin: 30px 0;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .summary-card {
+            flex: 1;
+            min-width: 150px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .summary-card.income {
+            border-left: 4px solid #2dd36f;
+        }
+
+        .summary-card.expenses {
+            border-left: 4px solid #eb445a;
+        }
+
+        .summary-card.net-profit {
+            border-left: 4px solid #2dd36f;
+        }
+
+        .summary-card.net-loss {
+            border-left: 4px solid #eb445a;
+        }
+
+        .summary-label {
+            margin: 0 0 8px 0;
+            font-size: 14px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .summary-label.income {
+            color: #2dd36f;
+        }
+
+        .summary-label.expenses {
+            color: #eb445a;
+        }
+
+        .summary-label.net-profit {
+            color: #2dd36f;
+        }
+
+        .summary-label.net-loss {
+            color: #eb445a;
+        }
+
+        .summary-value {
+            margin: 0;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .summary-value.income {
+            color: #2dd36f;
+        }
+
+        .summary-value.expenses {
+            color: #eb445a;
+        }
+
+        .summary-value.net-profit {
+            color: #2dd36f;
+        }
+
+        .summary-value.net-loss {
+            color: #eb445a;
+        }
+
+        /* Monthly Breakdown */
+        .breakdown-section {
+            margin-top: 40px;
+        }
+
+        .breakdown-title {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .breakdown-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            font-size: 12px;
+            table-layout: fixed;
+        }
+
+        .breakdown-table thead tr {
+            background: #f8f9fa;
+        }
+
+        .breakdown-table th {
+            padding: 10px 6px;
+            border-bottom: 2px solid #ddd;
+            color: #333;
+            font-weight: 600;
+            word-wrap: break-word;
+        }
+
+        .breakdown-table th.month {
+            text-align: left;
+            width: 35%;
+        }
+
+        .breakdown-table th.income {
+            text-align: right;
+            color: #2dd36f;
+            width: 22%;
+        }
+
+        .breakdown-table th.expenses {
+            text-align: right;
+            color: #eb445a;
+            width: 22%;
+        }
+
+        .breakdown-table th.net {
+            text-align: right;
+            width: 21%;
+        }
+
+        .breakdown-table td {
+            padding: 6px;
+            border-bottom: 1px solid #ddd;
+            font-size: 11px;
+            word-wrap: break-word;
+        }
+
+        .breakdown-table td.month {
+            text-align: left;
+        }
+
+        .breakdown-table td.income {
+            text-align: right;
+            color: #2dd36f;
+        }
+
+        .breakdown-table td.expenses {
+            text-align: right;
+            color: #eb445a;
+        }
+
+        .breakdown-table td.net {
+            text-align: right;
+            font-weight: bold;
+        }
+
+        .breakdown-table td.net.profit {
+            color: #2dd36f;
+        }
+
+        .breakdown-table td.net.loss {
+            color: #eb445a;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #888;
+            font-size: 12px;
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="report-container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="club-name">{{clubName}}</h1>
+            <h2 class="report-title">Income vs Expenses Report</h2>
+            <p class="date-range">{{dateRange}}</p>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-section">
+            <div class="summary-card income">
+                <h3 class="summary-label income">Total Income</h3>
+                <p class="summary-value income">{{currencySymbol}}{{totalIncome}}</p>
+            </div>
+            
+            <div class="summary-card expenses">
+                <h3 class="summary-label expenses">Total Expenses</h3>
+                <p class="summary-value expenses">{{currencySymbol}}{{totalExpenses}}</p>
+            </div>
+            
+            <div class="summary-card {{netClass}}">
+                <h3 class="summary-label {{netClass}}">Net {{netLabel}}</h3>
+                <p class="summary-value {{netClass}}">{{currencySymbol}}{{netAmount}}</p>
+            </div>
+        </div>
+
+        <!-- Monthly Breakdown Table -->
+        <div class="breakdown-section">
+            <h3 class="breakdown-title">Monthly Breakdown</h3>
+            <table class="breakdown-table">
+                <thead>
+                    <tr>
+                        <th class="month">Month</th>
+                        <th class="income">Income</th>
+                        <th class="expenses">Expenses</th>
+                        <th class="net">Net</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{monthlyRows}}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Generated on {{generatedDate}} by GymMate App</p>
+        </div>
+    </div>
+</body>
+
+</html>
