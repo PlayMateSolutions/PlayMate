@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        .leaderboard-container {
+            width: 450px;
+            height: 800px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+            color: white;
+        }
+
+        /* Background glow */
+        .leaderboard-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            z-index: 1;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .trophy-icon {
+            font-size: 32px;
+            margin-bottom: 5px;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 0 5px 0;
+        }
+
+        .club-name {
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0.9;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 4px 12px;
+            border-radius: 16px;
+            display: inline-block;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Members list */
+        .members-list {
+            height: 700px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Member card */
+        .member-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 10px 14px;
+            margin: 4px 0;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Top 3 highlight */
+        .member-card:nth-child(1) {
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .member-card:nth-child(2) {
+            box-shadow: 0 6px 20px rgba(192, 192, 192, 0.3);
+        }
+
+        .member-card:nth-child(3) {
+            box-shadow: 0 6px 20px rgba(205, 127, 50, 0.3);
+        }
+
+        /* Rank */
+        .rank-section {
+            margin-right: 12px;
+        }
+
+        .rank-badge {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+        }
+
+        .rank-badge.rank-1 {
+            background: linear-gradient(135deg, #ffd700, #ffed4a);
+        }
+
+        .rank-badge.rank-2 {
+            background: linear-gradient(135deg, #c0c0c0, #e5e5e5);
+        }
+
+        .rank-badge.rank-3 {
+            background: linear-gradient(135deg, #cd7f32, #daa520);
+        }
+
+        /* Member info */
+        .member-info {
+            flex: 1;
+        }
+
+        .member-name {
+            font-size: 15px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .member-id {
+            font-size: 11px;
+            opacity: 0.8;
+        }
+
+        /* Stats */
+        .stats-section {
+            text-align: center;
+            padding: 4px 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            min-width: 50px;
+        }
+
+        .attendance-count {
+            font-size: 16px;
+            font-weight: 800;
+            color: #00ff88;
+        }
+
+        .attendance-label {
+            font-size: 9px;
+            text-transform: uppercase;
+            opacity: 0.9;
+        }
+
+        /* Footer */
+        .footer {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 2;
+        }
+
+        .footer p {
+            font-size: 10px;
+            opacity: 0.7;
+        }
+
+        /* ------------------------------
+   AUTO SCALE BASED ON MEMBERS
+--------------------------------*/
+
+        /* 6–8 members → tighter layout */
+        .members-6 .member-card,
+        .members-7 .member-card,
+        .members-8 .member-card {
+            padding: 8px 12px;
+            margin: 3px 0;
+        }
+
+        .members-6 .member-name,
+        .members-7 .member-name,
+        .members-8 .member-name {
+            font-size: 14px;
+        }
+
+        .members-6 .rank-badge,
+        .members-7 .rank-badge,
+        .members-8 .rank-badge {
+            width: 32px;
+            height: 32px;
+            font-size: 13px;
+        }
+
+        .members-6 .attendance-count,
+        .members-7 .attendance-count,
+        .members-8 .attendance-count {
+            font-size: 15px;
+        }
+
+        /* 9–10 members → very tight layout */
+        .members-9 .member-card,
+        .members-10 .member-card {
+            padding: 6px 10px;
+            margin: 2px 0;
+        }
+
+        .members-9 .member-name,
+        .members-10 .member-name {
+            font-size: 12px;
+        }
+
+        .members-9 .rank-badge,
+        .members-10 .rank-badge {
+            width: 28px;
+            height: 28px;
+            font-size: 12px;
+        }
+
+        .members-9 .attendance-count,
+        .members-10 .attendance-count {
+            font-size: 14px;
+        }
+
+        .members-9 .stats-section,
+        .members-10 .stats-section {
+            min-width: 45px;
+            padding: 3px 6px;
+        }
+
+        .members-9 .attendance-label,
+        .members-10 .attendance-label {
+            font-size: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="leaderboard-container">
+        <div class="header">
+            <div class="trophy-icon">🏆</div>
+            <h1 class="title">{{title}}</h1>
+            <div class="club-name">{{clubName}}</div>
+        </div>
+
+        <div class="members-list" [ngClass]="'members-' + members.length">
+            <div class="member-card" *ngFor="let member of members; let i = index">
+                <div class="rank-section">
+                    <div class="rank-badge rank-{{member.rank}}">
+                        {{member.rank}}
+                    </div>
+                </div>
+                <div class="member-info">
+                    <h3 class="member-name">{{member.memberName}}</h3>
+                    <p class="member-id">#{{member.memberId}}</p>
+                </div>
+                <div class="stats-section">
+                    <div class="attendance-count">{{member.attendanceCount}}</div>
+                    <div class="attendance-label">visits</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Generated by GymMate App</p>
+        </div>
+    </div>
+</body>
+
+</html>
