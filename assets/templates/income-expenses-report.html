@@ -6,7 +6,7 @@
         body {
             font-family: 'Arial', sans-serif;
             margin: 0;
-            padding: 20mm;
+            padding: 0;
             background: white;
             color: #333;
             line-height: 1.4;
@@ -14,15 +14,15 @@
 
         .report-container {
             width: 100%;
-            max-width: 170mm;
-            margin: 0 auto;
-            padding: 0;
+            max-width: 100%;
+            margin: 0;
+            padding: 20px;
             box-sizing: border-box;
         }
 
         /* Page break rules for multi-page PDFs */
         @page {
-            margin: 20mm;
+            margin: 15mm;
             size: A4;
         }
 
@@ -55,6 +55,7 @@
         .header {
             text-align: center;
             margin-bottom: 30px;
+            padding-top: 20px;
             border-bottom: 2px solid #3880ff;
             padding-bottom: 20px;
         }
@@ -89,8 +90,9 @@
         }
 
         .summary-card {
-            flex: 1;
-            min-width: 150px;
+            flex: 1 1 180px;  /* Allow cards to grow/shrink with min basis of 180px */
+            max-width: 220px;  /* Prevent cards from getting too wide */
+            min-width: 160px;  /* Ensure minimum readable width */
             background: #f8f9fa;
             padding: 15px;
             border-radius: 8px;
@@ -157,6 +159,70 @@
 
         .summary-value.net-loss {
             color: #eb445a;
+        }
+
+        .summary-average {
+            margin: 8px 0 0 0;
+            font-size: 11px;
+            color: #666;
+            font-weight: 400;
+        }
+
+        /* Chart Section */
+        .chart-section {
+            margin: 40px 0;
+            page-break-inside: avoid;
+        }
+
+        .chart-title {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .chart-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .chart-svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .chart-legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+            font-size: 12px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        .legend-income {
+            background: #2dd36f;
+        }
+
+        .legend-expenses {
+            background: #eb445a;
         }
 
         /* Monthly Breakdown */
@@ -273,16 +339,37 @@
             <div class="summary-card income">
                 <h3 class="summary-label income">Total Income</h3>
                 <p class="summary-value income">{{currencySymbol}}{{totalIncome}}</p>
+                <p class="summary-average">Monthly Avg: {{currencySymbol}}{{avgIncome}}</p>
             </div>
             
             <div class="summary-card expenses">
                 <h3 class="summary-label expenses">Total Expenses</h3>
                 <p class="summary-value expenses">{{currencySymbol}}{{totalExpenses}}</p>
+                <p class="summary-average">Monthly Avg: {{currencySymbol}}{{avgExpenses}}</p>
             </div>
             
             <div class="summary-card {{netClass}}">
                 <h3 class="summary-label {{netClass}}">Net {{netLabel}}</h3>
                 <p class="summary-value {{netClass}}">{{currencySymbol}}{{netAmount}}</p>
+                <p class="summary-average">Monthly Avg: {{currencySymbol}}{{avgNetIncome}}</p>
+            </div>
+        </div>
+
+        <!-- Chart Section -->
+        <div class="chart-section">
+            <h3 class="chart-title">Income vs Expenses Trend</h3>
+            <div class="chart-container">
+                {{chartSvg}}
+            </div>
+            <div class="chart-legend">
+                <div class="legend-item">
+                    <div class="legend-color legend-income"></div>
+                    <span>Income</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color legend-expenses"></div>
+                    <span>Expenses</span>
+                </div>
             </div>
         </div>
 
