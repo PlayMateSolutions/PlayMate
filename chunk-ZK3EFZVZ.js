@@ -1,0 +1,1 @@
+import{a as i}from"./chunk-B4WYLIK2.js";function e(t,r){if(!t)return"";let n=new URLSearchParams({sheetId:t}),o=r==null?void 0:r.trim();return o&&n.set("club",o),`${i.customerPortalUrl}?${n.toString()}`}export{e as a};
